@@ -1,5 +1,5 @@
 // RTMLObservation.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLObservation.java,v 1.3 2005-01-19 11:53:28 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLObservation.java,v 1.4 2005-01-19 12:05:29 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -8,14 +8,14 @@ import java.net.*;
 /**
  * This class is a data container for information contained in the observation nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RTMLObservation implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLObservation.java,v 1.3 2005-01-19 11:53:28 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLObservation.java,v 1.4 2005-01-19 12:05:29 cjm Exp $";
 	/**
 	 * The device (instrument) of this observation.
 	 * This can be null, in which case pick up the generic document device information.
@@ -221,10 +221,10 @@ public class RTMLObservation implements Serializable, RTMLDeviceHolder
 		
 		sb = new StringBuffer();
 		sb.append(prefix+"Observation\n");
-		if(device != null)
-			sb.append(prefix+device.toString("\t")+"\n");
 		if(target != null)
 			sb.append(prefix+target.toString("\t")+"\n");
+		if(device != null)
+			sb.append(prefix+device.toString("\t")+"\n");
 		if(schedule != null)
 			sb.append(prefix+schedule.toString("\t")+"\n");
 		if(isObjectListTypeCluster()&&(objectListClusterString != null))
@@ -243,6 +243,9 @@ public class RTMLObservation implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2005/01/19 11:53:28  cjm
+** Added capability of having per-observation devices (instrument configs).
+**
 ** Revision 1.2  2004/03/18 17:32:34  cjm
 ** Added imageDataType.
 **
