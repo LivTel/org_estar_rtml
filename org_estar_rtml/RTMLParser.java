@@ -1,9 +1,12 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.4 2004-03-12 10:36:35 je Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.5 2004-03-12 17:28:35 je Exp $
 package org.estar.rtml;
 
 import java.io.*;
 import java.util.*;
+
+import java.net.URL;
+import java.net.MalformedURLException;
 
 import javax.xml.parsers.DocumentBuilder; 
 import javax.xml.parsers.DocumentBuilderFactory;  
@@ -27,14 +30,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class RTMLParser
 {
   /**
    * Revision control system version id.
    */
-  public final static String RCSID = "$Id: RTMLParser.java,v 1.4 2004-03-12 10:36:35 je Exp $";
+  public final static String RCSID = "$Id: RTMLParser.java,v 1.5 2004-03-12 17:28:35 je Exp $";
   /**
    * Private reference to org.w3c.dom.Document, the head of the DOM tree.
    */
@@ -1484,6 +1487,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2004/03/12 10:36:35  je
+** *** empty log message ***
+**
 ** Revision 1.3  2004/03/11 13:28:18  cjm
 ** Added parsing of device node.
 **
