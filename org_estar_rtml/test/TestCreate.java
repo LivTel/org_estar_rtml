@@ -1,8 +1,9 @@
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.2 2004-03-11 13:01:14 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.3 2004-03-12 18:30:01 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 
 import org.estar.astrometry.*;
@@ -11,14 +12,14 @@ import org.estar.rtml.*;
 /**
  * This class tests RTMLCreate.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.2 2004-03-11 13:01:14 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.3 2004-03-12 18:30:01 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
@@ -27,6 +28,10 @@ public class TestCreate
 	 * The document structure used by the create.
 	 */
 	RTMLDocument document = null;
+	/**
+	 * RTML contact data.
+	 */
+	RTMLContact contact = null;
 	/**
 	 * RTML intelligent agent data.
 	 */
@@ -71,7 +76,196 @@ public class TestCreate
 		}
 		for(int i = 0; i < args.length; i++)
 		{
-			if(args[i].equals("-dec"))
+			if(args[i].equals("-contact"))
+			{
+				contact = new RTMLContact();
+				document.setContact(contact);
+			}
+			else if(args[i].equals("-contact_address"))
+			{
+				if((i+1) < args.length)
+				{
+					if(contact != null)
+					{
+						contact.setAddress(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+	       						   ":parseArguments:Contact Address:Contact was null.");
+						System.exit(4);
+					}
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Contact Address needs a value.");
+					System.exit(3);
+				}
+			}
+			else if(args[i].equals("-contact_email"))
+			{
+				if((i+1) < args.length)
+				{
+					if(contact != null)
+					{
+						contact.setEmail(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+	       						   ":parseArguments:Contact Email:Contact was null.");
+						System.exit(4);
+					}
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Contact Email needs a value.");
+					System.exit(3);
+				}
+			}
+			else if(args[i].equals("-contact_fax"))
+			{
+				if((i+1) < args.length)
+				{
+					if(contact != null)
+					{
+						contact.setFax(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+	       						   ":parseArguments:Contact Fax:Contact was null.");
+						System.exit(4);
+					}
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Contact Fax needs a value.");
+					System.exit(3);
+				}
+			}
+			else if(args[i].equals("-contact_institution"))
+			{
+				if((i+1) < args.length)
+				{
+					if(contact != null)
+					{
+						contact.setInstitution(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+	       						   ":parseArguments:Contact Institution:Contact was null.");
+						System.exit(4);
+					}
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Contact Institution needs a value.");
+					System.exit(3);
+				}
+			}
+			else if(args[i].equals("-contact_name"))
+			{
+				if((i+1) < args.length)
+				{
+					if(contact != null)
+					{
+						contact.setName(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+	       						   ":parseArguments:Contact Name:Contact was null.");
+						System.exit(4);
+					}
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Contact Name needs a value.");
+					System.exit(3);
+				}
+			}
+			else if(args[i].equals("-contact_telephone"))
+			{
+				if((i+1) < args.length)
+				{
+					if(contact != null)
+					{
+						contact.setTelephone(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+	       						   ":parseArguments:Contact Telephone:Contact was null.");
+						System.exit(4);
+					}
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Contact Telephone needs a value.");
+					System.exit(3);
+				}
+			}
+			else if(args[i].equals("-contact_url"))
+			{
+				if((i+1) < args.length)
+				{
+					if(contact != null)
+					{
+						contact.setUrl(new URL(args[i+1]));
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+	       						   ":parseArguments:Contact Url:Contact was null.");
+						System.exit(4);
+					}
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Contact Url needs a value.");
+					System.exit(3);
+				}
+			}
+			else if(args[i].equals("-contact_user"))
+			{
+				if((i+1) < args.length)
+				{
+					if(contact != null)
+					{
+						contact.setUser(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+	       						   ":parseArguments:Contact User:Contact was null.");
+						System.exit(4);
+					}
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Contact User needs a value.");
+					System.exit(3);
+				}
+			}
+			else if(args[i].equals("-dec"))
 			{
 				if((i+1) < args.length)
 				{
@@ -302,8 +496,11 @@ public class TestCreate
 	{
 		System.err.println("java -Dhttp.proxyHost=wwwcache.livjm.ac.uk -Dhttp.proxyPort=8080 org.estar.rtml.test.TestCreate");
 		System.err.println("\t<-request|-score><-iahost <hostname><-iaid <id>><-iaport <number>>[-help]");
+		System.err.println("\t[-contact [-contact_address <address>][-contact_email <email>]");
+		System.err.println("\t\t[-contact_fax <fax>][-contact_institution <institute>][-contact_name <name>]");
+		System.err.println("\t\t[-contact_telephone <telno>][-contact_url <URL>][-contact_user <user>]]");
 		System.err.println("\t[-device <name> <device type> <spectral region> <filter type>]");
-		System.err.println("\t<-observation <-name <string>> <-ra <HH:MM:SS>> <-dec <DD:MM:SS>> [-toop]");
+		System.err.println("\t<-observation <-name <string>> <-ra <HH:MM:SS>> <-dec <[+|-]DD:MM:SS>> [-toop]");
 		System.err.println("\t\t<-exposure <length> <units>>>");
 	}
 
@@ -331,6 +528,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2004/03/11 13:01:14  cjm
+** Added device node creation.
+**
 ** Revision 1.1  2003/02/24 13:23:25  cjm
 ** Initial revision
 **
