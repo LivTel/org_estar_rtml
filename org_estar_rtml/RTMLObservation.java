@@ -1,20 +1,26 @@
 // RTMLObservation.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLObservation.java,v 1.2 2004-03-18 17:32:34 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLObservation.java,v 1.3 2005-01-19 11:53:28 cjm Exp $
 package org.estar.rtml;
 
+import java.io.*;
 import java.net.*;
 
 /**
  * This class is a data container for information contained in the observation nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class RTMLObservation
+public class RTMLObservation implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLObservation.java,v 1.2 2004-03-18 17:32:34 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLObservation.java,v 1.3 2005-01-19 11:53:28 cjm Exp $";
+	/**
+	 * The device (instrument) of this observation.
+	 * This can be null, in which case pick up the generic document device information.
+	 */
+	private RTMLDevice device = null;
 	/**
 	 * The target of this observation.
 	 */
@@ -51,6 +57,24 @@ public class RTMLObservation
 	public RTMLObservation()
 	{
 		super();
+	}
+
+	/**
+	 * Set the device.
+	 * @param device The device to set.
+	 */
+	public void setDevice(RTMLDevice d)
+	{
+		device = d;
+	}
+
+	/**
+	 * Get the device.
+	 * @return The device.
+	 */
+	public RTMLDevice getDevice()
+	{
+		return device;
 	}
 
 	public void setTarget(RTMLTarget t)
@@ -182,6 +206,7 @@ public class RTMLObservation
 	/**
 	 * Method to print out a string representation of this node, with a prefix.
 	 * @param prefix A string to prefix to each line of data we print out.
+	 * @see #device
 	 * @see #target
 	 * @see #schedule
 	 * @see #objectListClusterString
@@ -196,6 +221,8 @@ public class RTMLObservation
 		
 		sb = new StringBuffer();
 		sb.append(prefix+"Observation\n");
+		if(device != null)
+			sb.append(prefix+device.toString("\t")+"\n");
 		if(target != null)
 			sb.append(prefix+target.toString("\t")+"\n");
 		if(schedule != null)
@@ -216,6 +243,9 @@ public class RTMLObservation
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2004/03/18 17:32:34  cjm
+** Added imageDataType.
+**
 ** Revision 1.1  2003/02/24 13:19:56  cjm
 ** Initial revision
 **
