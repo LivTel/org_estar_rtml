@@ -1,19 +1,20 @@
 // RTMLProject.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLProject.java,v 1.1 2005-01-18 15:08:28 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLProject.java,v 1.2 2005-01-19 15:30:38 cjm Exp $
 package org.estar.rtml;
 
+import java.io.*;
 
 /**
  * This class is a data container for information contained in the Project nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-public class RTMLProject
+public class RTMLProject implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLProject.java,v 1.1 2005-01-18 15:08:28 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLProject.java,v 1.2 2005-01-19 15:30:38 cjm Exp $";
 	/**
 	 * The project text node, currently used to store the proposal ID for LT/FTN/FTS.
 	 * In RTML3.0, this will change to ProjectID.
@@ -72,4 +73,7 @@ public class RTMLProject
 }
 //
 // $Log: not supported by cvs2svn $
+// Revision 1.1  2005/01/18 15:08:28  cjm
+// Initial revision
+//
 //

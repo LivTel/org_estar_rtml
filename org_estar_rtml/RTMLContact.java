@@ -1,19 +1,20 @@
 package org.estar.rtml;
 
+import java.io.*;
 import java.net.URL;
 
 /**
  * This class is a data container for information contained in the Contact
  * nodes/tags of an RTML document.
  * @author Jason Etherton
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class RTMLContact
+public class RTMLContact implements Serializable
 {
   /**
    * Revision control system version id.
    */
-  public final static String RCSID = "$Id: RTMLContact.java,v 1.2 2005-01-18 15:18:19 cjm Exp $";
+  public final static String RCSID = "$Id: RTMLContact.java,v 1.3 2005-01-19 15:30:38 cjm Exp $";
 
   /**
    * The User element for this Contact.
@@ -272,11 +273,14 @@ public class RTMLContact
   }
 }
 /*
- *    $Date: 2005-01-18 15:18:19 $
+ *    $Date: 2005-01-19 15:30:38 $
  * $RCSfile: RTMLContact.java,v $
  *  $Source: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLContact.java,v $
- *      $Id: RTMLContact.java,v 1.2 2005-01-18 15:18:19 cjm Exp $
+ *      $Id: RTMLContact.java,v 1.3 2005-01-19 15:30:38 cjm Exp $
  *     $Log: not supported by cvs2svn $
+ *     Revision 1.2  2005/01/18 15:18:19  cjm
+ *     Added ID.
+ *
  *     Revision 1.1  2004/03/12 10:55:18  je
  *     Initial revision
  *

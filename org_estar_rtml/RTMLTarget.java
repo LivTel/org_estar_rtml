@@ -1,20 +1,21 @@
 // RTMLTarget.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLTarget.java,v 1.1 2003-02-24 13:19:56 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLTarget.java,v 1.2 2005-01-19 15:30:38 cjm Exp $
 package org.estar.rtml;
 
+import java.io.*;
 import org.estar.astrometry.*;
 
 /**
  * This class is a data container for information contained in the target nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-public class RTMLTarget
+public class RTMLTarget implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLTarget.java,v 1.1 2003-02-24 13:19:56 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLTarget.java,v 1.2 2005-01-19 15:30:38 cjm Exp $";
 	/**
 	 * The type of the Target, the type attribute in the Target tag. Should be either "normal" or
 	 * "toop".
@@ -236,4 +237,7 @@ public class RTMLTarget
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2003/02/24 13:19:56  cjm
+** Initial revision
+**
 */

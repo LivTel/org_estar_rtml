@@ -1,20 +1,21 @@
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.1 2003-02-24 13:19:56 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.2 2005-01-19 15:30:38 cjm Exp $
 package org.estar.rtml;
 
+import java.io.*;
 import org.estar.astrometry.*;
 
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-public class RTMLSchedule
+public class RTMLSchedule implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.1 2003-02-24 13:19:56 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.2 2005-01-19 15:30:38 cjm Exp $";
 	/**
 	 * The type of the Exposure, the "type" attribute in the Exposure tag. Should be either "time" or
 	 * "snr".
@@ -165,4 +166,7 @@ public class RTMLSchedule
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2003/02/24 13:19:56  cjm
+** Initial revision
+**
 */

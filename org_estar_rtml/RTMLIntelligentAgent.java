@@ -1,18 +1,20 @@
 // RTMLIntelligentAgent.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLIntelligentAgent.java,v 1.1 2003-02-24 13:19:56 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLIntelligentAgent.java,v 1.2 2005-01-19 15:30:38 cjm Exp $
 package org.estar.rtml;
+
+import java.io.*;
 
 /**
  * This class is a data container for information contained in the intelligent agent nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-public class RTMLIntelligentAgent
+public class RTMLIntelligentAgent implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLIntelligentAgent.java,v 1.1 2003-02-24 13:19:56 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLIntelligentAgent.java,v 1.2 2005-01-19 15:30:38 cjm Exp $";
 	/**
 	 * The unique identifier for the RTML request, the #PCDATA in the IntelligentAgent tag.
 	 */
@@ -109,4 +111,7 @@ public class RTMLIntelligentAgent
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2003/02/24 13:19:56  cjm
+** Initial revision
+**
 */
