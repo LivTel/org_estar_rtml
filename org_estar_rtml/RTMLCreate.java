@@ -1,8 +1,9 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.1 2003-02-24 13:19:56 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.2 2004-03-10 11:43:44 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
+import java.net.*;
 import java.text.*;
 import java.util.*;
 
@@ -39,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.1 2003-02-24 13:19:56 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.2 2004-03-10 11:43:44 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.1) for eSTAR documents.
 	 */
@@ -271,6 +272,15 @@ public class RTMLCreate
 		rtmlElement.appendChild(iaElement);
 	}
 
+	/**
+	 * Method to create XML in the Observation tag.
+	 * @param rtmlElement The RTML element to add the Observation tag to.
+	 * @param observation The Java object containing the observation data to add.
+	 * @see #document
+	 * @see #createTarget
+	 * @see #createSchedule
+	 * @see #createImageData
+	 */
 	private void createObservation(Element rtmlElement,RTMLObservation observation)
 	{
 		Element observationElement = null;
@@ -280,6 +290,8 @@ public class RTMLCreate
 			createTarget(observationElement,observation.getTarget());
 		if(observation.getSchedule() != null)
 			createSchedule(observationElement,observation.getSchedule());
+		if(observation.getImageDataURL() != null)
+			createImageData(observationElement,observation.getImageDataURL());
 		rtmlElement.appendChild(observationElement);
 	}
 
@@ -359,6 +371,23 @@ public class RTMLCreate
 		observationElement.appendChild(scheduleElement);		
 	}
 
+	private void createImageData(Element rtmlElement,URL imageDataURL)
+	{
+		Element imageDataElement = null;
+		String s = null;
+
+		imageDataElement = (Element)document.createElement("ImageData");
+		s = imageDataURL.toString();
+		imageDataElement.appendChild(document.createTextNode(s));
+		if(s.endsWith(".fits"))
+			imageDataElement.setAttribute("type","FITS16");
+		else if(s.endsWith(".jpg"))
+			imageDataElement.setAttribute("type","jpg");
+		imageDataElement.setAttribute("delivery","url");
+		imageDataElement.setAttribute("reduced","true");
+		rtmlElement.appendChild(imageDataElement);
+	}
+
 	private void createScore(Element rtmlElement,double score)
 	{
 		Element e = null;
@@ -384,4 +413,7 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2003/02/24 13:19:56  cjm
+** Initial revision
+**
 */
