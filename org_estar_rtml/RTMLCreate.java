@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.9 2004-03-12 10:56:04 je Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.10 2004-03-12 11:01:28 je Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class RTMLCreate
 {
   /**
    * Revision control system version id.
    */
-  public final static String RCSID = "$Id: RTMLCreate.java,v 1.9 2004-03-12 10:56:04 je Exp $";
+  public final static String RCSID = "$Id: RTMLCreate.java,v 1.10 2004-03-12 11:01:28 je Exp $";
   /**
    * RTML version attribute constant string (2.1) for eSTAR documents.
    */
@@ -224,7 +224,8 @@ public class RTMLCreate
     document.appendChild(rtmlElement);
     rtmlElement.setAttribute("version",RTML_VERSION_STRING);
     rtmlElement.setAttribute("type",d.getType());
-    createContact(rtmlElement);
+    if(d.getContact() != null)
+      createContact(rtmlElement,d.getContact());
     createProject(rtmlElement);
     createTelescope(rtmlElement);
     if(d.getIntelligentAgent() != null)
@@ -253,7 +254,7 @@ public class RTMLCreate
 
     if(contact.getName() != null)
       rtmlElement.appendChild(document.createTextNode
-			      (contact.getname()));
+			      (contact.getName()));
     if(contact.getUser() != null)
       rtmlElement.appendChild(document.createTextNode
 			      (contact.getUser()));
@@ -475,6 +476,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.9  2004/03/12 10:56:04  je
+** Added RTMLContact node creation
+**
 ** Revision 1.8  2004/03/11 15:54:19  cjm
 ** Tried to format output RTML.
 **
