@@ -1,5 +1,5 @@
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.4 2004-03-12 17:15:52 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.5 2005-01-18 15:08:21 cjm Exp $
 package org.estar.rtml;
 
 import java.text.*;
@@ -8,14 +8,14 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class RTMLDocument
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.4 2004-03-12 17:15:52 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.5 2005-01-18 15:08:21 cjm Exp $";
 	/**
 	 * The type of the document, as specified in the RTML node's "type" attribute.
 	 */
@@ -24,6 +24,14 @@ public class RTMLDocument
 	 * The details contained in the IntelligentAgent tag/node.
 	 */
 	public RTMLIntelligentAgent intelligentAgent = null;
+	/**
+	 * Contact info for this document.
+	 */
+	protected RTMLContact contact = null;
+	/**
+	 * Project info for this document.
+	 */
+	protected RTMLProject project = null;
 	/**
 	 * The instrument device this document wants to use.
 	 */
@@ -46,11 +54,6 @@ public class RTMLDocument
 	public String errorString = null;
 
 	/**
-	 * Contact info for this document.
-	 */
-	protected RTMLContact contact = null;
-
-	/**
 	 * Default constructor.
 	 * @see #observationList
 	 */
@@ -70,14 +73,24 @@ public class RTMLDocument
 		return type;
 	}
 
-	public void setContact( RTMLContact newContact )
+	public void setContact(RTMLContact newContact)
 	{
 		contact = newContact;
 	}
 
 	public RTMLContact getContact()
 	{
-		return( contact );
+		return(contact);
+	}
+
+	public void setProject(RTMLProject p)
+	{
+		project = p;
+	}
+
+	public RTMLProject getProject()
+	{
+		return(project);
 	}
 
 	public void setIntelligentAgent(RTMLIntelligentAgent ia)
@@ -265,8 +278,10 @@ public class RTMLDocument
 		
 		sb = new StringBuffer();
 		sb.append(prefix+"RTML : type = "+getType()+"\n");
-		if( getContact() != null )
-			sb.append( prefix+getContact().toString( "\t" )+"\n" );
+		if(getContact() != null)
+			sb.append( prefix+getContact().toString("\t")+"\n");
+		if(getProject() != null)
+			sb.append( prefix+getProject().toString("\t")+"\n");
 		if(getIntelligentAgent() != null)
 			sb.append(prefix+getIntelligentAgent().toString("\t")+"\n");
 		if(getDevice() != null)
@@ -287,6 +302,9 @@ public class RTMLDocument
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2004/03/12 17:15:52  cjm
+** reformatted.
+**
 ** Revision 1.3  2004/03/12 10:24:54  je
 ** Added Contact field, accessor, mutator and included in toString
 **
