@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.1 2003-02-24 13:19:56 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.2 2003-05-19 15:31:53 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -27,14 +27,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.1 2003-02-24 13:19:56 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.2 2003-05-19 15:31:53 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -951,6 +951,7 @@ public class RTMLParser
 	{
 		Node childNode;
 		NodeList childList;
+		String s;
 
 		// check current XML node is correct
 		if(completionTimeNode.getNodeType() != Node.ELEMENT_NODE)
@@ -972,7 +973,11 @@ public class RTMLParser
 			
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
-				rtmlDocument.setCompletionTime(childNode.getNodeValue());
+				s = childNode.getNodeValue();
+				if(s.equals("never"))
+					rtmlDocument.setCompletionTime((Date)null);
+				else
+					rtmlDocument.setCompletionTime(s);
 			}
 			else
 				System.err.println("parseCompletionTimeNode:"+childNode);
@@ -981,4 +986,7 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2003/02/24 13:19:56  cjm
+** Initial revision
+**
 */
