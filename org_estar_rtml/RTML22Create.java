@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.13 2004-03-12 19:55:42 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.14 2004-03-15 12:24:08 je Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.13 2004-03-12 19:55:42 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.14 2004-03-15 12:24:08 je Exp $";
 	/**
 	 * RTML version attribute constant string (2.1) for eSTAR documents.
 	 */
@@ -55,7 +55,8 @@ public class RTMLCreate
 	/**
 	 * System ID put into DOCTYPE statement. This is the URL of the RTML DTD.
 	 */
-	public final static String DOCTYPE_SYSTEM_ID = "http://150.204.240.111/~dev/robonet/rtml2.1.dtd";
+        //public final static String DOCTYPE_SYSTEM_ID = "http://150.204.240.111/~dev/robonet/rtml2.1.dtd";
+        public final static String DOCTYPE_SYSTEM_ID = "http://www.astro.livjm.ac.uk/~je/rtml2.1.dtd";
 	/**
 	 * The instance of DocumentBuilder, used to build the document tree.
 	 */
@@ -513,6 +514,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.13  2004/03/12 19:55:42  cjm
+** Fixed Device tag. Can have a Device tag with no (null) name.
+**
 ** Revision 1.12  2004/03/12 18:29:48  cjm
 ** Made createContact create sub-elemetn tags correctly.
 **
