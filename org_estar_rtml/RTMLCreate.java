@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.14 2004-03-15 12:24:08 je Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.15 2004-03-18 17:33:53 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.14 2004-03-15 12:24:08 je Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.15 2004-03-18 17:33:53 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.1) for eSTAR documents.
 	 */
@@ -391,8 +391,11 @@ public class RTMLCreate
 			createTarget(observationElement,observation.getTarget());
 		if(observation.getSchedule() != null)
 			createSchedule(observationElement,observation.getSchedule());
-		if(observation.getImageDataURL() != null)
-			createImageData(observationElement,observation.getImageDataURL());
+		if((observation.getImageDataURL() != null)||(observation.getImageDataType() != null))
+		{
+			createImageData(observationElement,observation.getImageDataType(),
+					observation.getImageDataURL());
+		}
 		rtmlElement.appendChild(observationElement);
 	}
 
@@ -472,18 +475,34 @@ public class RTMLCreate
 		observationElement.appendChild(scheduleElement);		
 	}
 
-	private void createImageData(Element rtmlElement,URL imageDataURL)
+	/**
+	 * Mehtod to create image data sub-node.
+	 * @param rtmlElement The Element to add the <ImageData> node to.
+	 * @param imageDataType The type of the image data, can be null.
+	 * @param imageDataURL The URL of the image data, can be null.
+	 */
+	private void createImageData(Element rtmlElement,String imageDataType,URL imageDataURL)
 	{
 		Element imageDataElement = null;
 		String s = null;
 
 		imageDataElement = (Element)document.createElement("ImageData");
-		s = imageDataURL.toString();
-		imageDataElement.appendChild(document.createTextNode(s));
-		if(s.endsWith(".fits"))
-			imageDataElement.setAttribute("type","FITS16");
-		else if(s.endsWith(".jpg"))
-			imageDataElement.setAttribute("type","jpg");
+		// if URL is present, add as text node
+		if(imageDataURL != null)
+		{
+			s = imageDataURL.toString();
+			imageDataElement.appendChild(document.createTextNode(s));
+			// if no imageDataType has been set, we can deduce this from the end of the URL
+			if(imageDataType == null)
+			{
+				if(s.endsWith(".fits"))
+					imageDataType = new String("FITS16");
+				else if(s.endsWith(".jpg"))
+					imageDataType = new String("jpg");
+			}
+		}
+		if(imageDataType != null)
+			imageDataElement.setAttribute("type",imageDataType);
 		imageDataElement.setAttribute("delivery","url");
 		imageDataElement.setAttribute("reduced","true");
 		rtmlElement.appendChild(imageDataElement);
@@ -514,6 +533,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.14  2004/03/15 12:24:08  je
+** Changed http://www.estar.org.uk/estar/documents/rtml2.1.dtd for http://www.astro.livjm.ac.uk/~je/rtml2.1.dtd
+**
 ** Revision 1.13  2004/03/12 19:55:42  cjm
 ** Fixed Device tag. Can have a Device tag with no (null) name.
 **
