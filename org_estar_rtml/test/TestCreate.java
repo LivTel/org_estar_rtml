@@ -1,5 +1,5 @@
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.1 2003-02-24 13:23:25 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.2 2004-03-11 13:01:14 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -11,14 +11,14 @@ import org.estar.rtml.*;
 /**
  * This class tests RTMLCreate.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.1 2003-02-24 13:23:25 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.2 2004-03-11 13:01:14 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
@@ -31,6 +31,10 @@ public class TestCreate
 	 * RTML intelligent agent data.
 	 */
 	RTMLIntelligentAgent ia = null;
+	/**
+	 * RTML device data.
+	 */
+	RTMLDevice device = null;
 	/**
 	 * RTML observation data.
 	 */
@@ -88,6 +92,25 @@ public class TestCreate
 					System.err.println(this.getClass().getName()+
 							   ":parseArguments:Dec needs value.");
 					System.exit(3);
+				}
+			}
+			else if(args[i].equals("-device"))
+			{
+				if((i+4) < args.length)
+				{
+					device = new RTMLDevice();
+					device.setName(args[i+1]);
+					device.setType(args[i+2]);
+					device.setSpectralRegion(args[i+3]);
+					device.setFilterType(args[i+4]);
+					document.setDevice(device);
+					i+= 4;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+					":parseArguments:device needs name,type,spectral region and filter type.");
+					System.exit(5);
 				}
 			}
 			else if(args[i].equals("-exposure"))
@@ -278,7 +301,8 @@ public class TestCreate
 	public void help()
 	{
 		System.err.println("java -Dhttp.proxyHost=wwwcache.livjm.ac.uk -Dhttp.proxyPort=8080 org.estar.rtml.test.TestCreate");
-		System.err.println("\t<-request|-score><-iahost <hostname>><-iaid <id>><-iaport <number>>[-help]");
+		System.err.println("\t<-request|-score><-iahost <hostname><-iaid <id>><-iaport <number>>[-help]");
+		System.err.println("\t[-device <name> <device type> <spectral region> <filter type>]");
 		System.err.println("\t<-observation <-name <string>> <-ra <HH:MM:SS>> <-dec <DD:MM:SS>> [-toop]");
 		System.err.println("\t\t<-exposure <length> <units>>>");
 	}
@@ -307,4 +331,7 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2003/02/24 13:23:25  cjm
+** Initial revision
+**
 */
