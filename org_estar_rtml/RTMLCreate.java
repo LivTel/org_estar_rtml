@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.6 2004-03-11 13:25:21 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.7 2004-03-11 13:52:17 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.6 2004-03-11 13:25:21 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.7 2004-03-11 13:52:17 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.1) for eSTAR documents.
 	 */
@@ -230,10 +230,7 @@ public class RTMLCreate
 			obs = d.getObservation(i);
 			createObservation(rtmlElement,obs);
 		}
-		if(d.getType() != "score")
-		{
-			createScore(rtmlElement,d.getScore());
-		}
+		createScore(rtmlElement,d.getScore());
 		if(d.getCompletionTime() != null)
 		{
 			createCompletionTime(rtmlElement,d.getCompletionTime());
@@ -446,6 +443,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.6  2004/03/11 13:25:21  cjm
+** Fixed = bug.
+**
 ** Revision 1.5  2004/03/11 13:10:31  cjm
 ** Protected IntelligentAgent alements against null.
 **
