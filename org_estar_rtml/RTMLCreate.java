@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.7 2004-03-11 13:52:17 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.8 2004-03-11 15:54:19 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.7 2004-03-11 13:52:17 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.8 2004-03-11 15:54:19 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.1) for eSTAR documents.
 	 */
@@ -113,6 +113,9 @@ public class RTMLCreate
 			
 			// setup DOCTYPE
 			transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,DOCTYPE_SYSTEM_ID);
+			transformer.setOutputProperty(OutputKeys.ENCODING,"ISO-8859-1");
+			transformer.setOutputProperty(OutputKeys.INDENT,"yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 			DOMSource source = new DOMSource(document);
 			StreamResult result = new StreamResult(os);
 			transformer.transform(source, result);
@@ -140,6 +143,9 @@ public class RTMLCreate
 			
 			// setup DOCTYPE
 			transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,DOCTYPE_SYSTEM_ID);
+			transformer.setOutputProperty(OutputKeys.ENCODING,"ISO-8859-1");
+			transformer.setOutputProperty(OutputKeys.INDENT,"yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 			DOMSource source = new DOMSource(document);
 
 			stringWriter = new StringWriter();
@@ -443,6 +449,17 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.7  2004/03/11 13:52:17  cjm
+** Removed test:
+** if(g.getType != "score")
+**
+** around "createScore" call.
+**
+** This made sense when RTMLCreate was only used to create IA documents (i.e. IA should not create
+** <Score> tag for "score" requests). However, now RTMLCreate is used by LT/FT IA, we need a "score"
+** document to contain a <Score> tag for "score" replies. Will this break "score" request documents
+** from the MPIA IA to Meade ers DNs?
+**
 ** Revision 1.6  2004/03/11 13:25:21  cjm
 ** Fixed = bug.
 **
