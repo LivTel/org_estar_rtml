@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.17 2005-01-18 15:31:23 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.18 2005-01-18 19:37:58 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.17 2005-01-18 15:31:23 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.18 2005-01-18 19:37:58 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.1) for eSTAR documents.
 	 */
@@ -56,7 +56,8 @@ public class RTMLCreate
 	 * System ID put into DOCTYPE statement. This is the URL of the RTML DTD.
 	 */
         //public final static String DOCTYPE_SYSTEM_ID = "http://150.204.240.111/~dev/robonet/rtml2.1.dtd";
-        public final static String DOCTYPE_SYSTEM_ID = "http://www.astro.livjm.ac.uk/~je/rtml2.1.dtd";
+        //public final static String DOCTYPE_SYSTEM_ID = "http://www.astro.livjm.ac.uk/~je/rtml2.1.dtd";
+        public final static String DOCTYPE_SYSTEM_ID = "http://www.estar.org.uk/documents/rtml2.1.dtd";
 	/**
 	 * The instance of DocumentBuilder, used to build the document tree.
 	 */
@@ -366,8 +367,6 @@ public class RTMLCreate
 			deviceElement.setAttribute("type",device.getType());
 		if(device.getSpectralRegion() != null)
 			deviceElement.setAttribute("region",""+device.getSpectralRegion());
-		if(device.getName() != null)
-			deviceElement.appendChild(document.createTextNode(device.getName()));
 		// filter type sub-element(s)
 		if(device.getFilterType() != null)
 		{
@@ -376,9 +375,13 @@ public class RTMLCreate
 			deviceElement.appendChild(filterElement);
 			// filter type node/tag
 			filterTypeElement = (Element)document.createElement("FilterType");
-			filterTypeElement.setAttribute("type",device.getFilterType());
 			filterElement.appendChild(filterTypeElement);
+			// filter type node/tag
+			if(device.getFilterType() != null)
+				filterTypeElement.appendChild(document.createTextNode(device.getFilterType()));
 		}
+		if(device.getName() != null)
+			deviceElement.appendChild(document.createTextNode(device.getName()));
 		rtmlElement.appendChild(deviceElement);
 	}
 
@@ -542,6 +545,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.17  2005/01/18 15:31:23  cjm
+** Added null protection for project.
+**
 ** Revision 1.16  2005/01/18 15:24:54  cjm
 ** Added project element details.
 **

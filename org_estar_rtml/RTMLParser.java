@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.8 2005-01-18 15:17:54 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.9 2005-01-18 19:37:56 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -30,14 +30,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLParser.java,v 1.8 2005-01-18 15:17:54 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLParser.java,v 1.9 2005-01-18 19:37:56 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -829,7 +829,7 @@ public class RTMLParser
 	}
 
 	/**
-	 * Internal method to parse a Filter node. Also parses the FilterType node internally.
+	 * Internal method to parse a Filter node.
 	 * @param device The device to add the filter to.
 	 * @param filterNode The XML DOM node for the Filter tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node.
@@ -862,15 +862,44 @@ public class RTMLParser
 			if(childNode.getNodeType() == Node.ELEMENT_NODE)
 			{
 				if(childNode.getNodeName() == "FilterType")
-				{
-					filterTypeNode = childNode;
-					// go through attribute list
-					attributeList = filterTypeNode.getAttributes();
-					// type
-					attributeNode = attributeList.getNamedItem("type");
-					if(attributeNode != null)
-						device.setFilterType(attributeNode.getNodeValue());
-				}
+					parseFilterTypeNode(device,childNode);
+			}
+		}
+	}
+
+	/**
+	 * Internal method to parse a FilterType node.
+	 * @param device The device to add the filter type to.
+	 * @param filterTypeNode The XML DOM node for the FilterType tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node.
+	 */
+	private void parseFilterTypeNode(RTMLDevice device,Node filterTypeNode) 
+		throws RTMLException
+	{
+		Node childNode,attributeNode;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(filterTypeNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseFilterTypeNode:Illegal Node:"+
+						filterTypeNode);
+		}
+		if(filterTypeNode.getNodeName() != "FilterType")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseFilterTypeNode:Illegal Node Name:"+
+						filterTypeNode.getNodeName());
+		}
+		// go through child nodes
+		childList = filterTypeNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+
+			if(childNode.getNodeType() == Node.TEXT_NODE)
+			{
+				device.setFilterType(childNode.getNodeValue());
 			}
 		}
 	}
@@ -1534,6 +1563,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.8  2005/01/18 15:17:54  cjm
+** Added project node parsing.
+**
 ** Revision 1.7  2004/03/19 16:59:40  cjm
 ** Fixed bug in device and contact nodes, if attributes do not exist.
 ** Test attribute is non-null.
