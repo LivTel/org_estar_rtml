@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.11 2004-03-12 17:15:52 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.12 2004-03-12 18:29:48 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.11 2004-03-12 17:15:52 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.12 2004-03-12 18:29:48 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.1) for eSTAR documents.
 	 */
@@ -246,37 +246,66 @@ public class RTMLCreate
 			rtmlElement.appendChild(document.createTextNode(d.getErrorString()));
 	}
 
+	/**
+	 * Create a contact node and associated sub-elements.
+	 * @param rtmlElement The RTML DOM element to add the Contact tag to.
+	 * @param contact The Java object containing the contact data to add.
+	 * @see org.estar.rtml.RTMLContact
+	 */
 	private void createContact(Element rtmlElement, RTMLContact contact)
 	{
 		Element contactElement = null;
+		Element subElement = null;
 
 		contactElement = (Element)document.createElement("Contact");
-
 		if(contact.getName() != null)
-			rtmlElement.appendChild(document.createTextNode
-						(contact.getName()));
+		{
+			subElement = (Element)document.createElement("Name");
+			subElement.appendChild(document.createTextNode(contact.getName()));
+			contactElement.appendChild(subElement);
+		}
 		if(contact.getUser() != null)
-			rtmlElement.appendChild(document.createTextNode
-						(contact.getUser()));
+		{
+			subElement = (Element)document.createElement("User");
+			subElement.appendChild(document.createTextNode(contact.getUser()));
+			contactElement.appendChild(subElement);
+		}
 		if(contact.getInstitution() != null)
-			rtmlElement.appendChild(document.createTextNode
-						(contact.getInstitution()));
+		{
+			subElement = (Element)document.createElement("Institution");
+			subElement.appendChild(document.createTextNode(contact.getInstitution()));
+			contactElement.appendChild(subElement);
+		}
 		if(contact.getAddress() != null)
-			rtmlElement.appendChild(document.createTextNode
-						(contact.getAddress()));
+		{
+			subElement = (Element)document.createElement("Address");
+			subElement.appendChild(document.createTextNode(contact.getAddress()));
+			contactElement.appendChild(subElement);
+		}
 		if(contact.getTelephone() != null)
-			rtmlElement.appendChild(document.createTextNode
-						(contact.getTelephone()));
+		{
+			subElement = (Element)document.createElement("Telephone");
+			subElement.appendChild(document.createTextNode(contact.getTelephone()));
+			contactElement.appendChild(subElement);
+		}
 		if(contact.getFax() != null)
-			rtmlElement.appendChild(document.createTextNode
-						(contact.getFax()));
+		{
+			subElement = (Element)document.createElement("Fax");
+			subElement.appendChild(document.createTextNode(contact.getFax()));
+			contactElement.appendChild(subElement);
+		}
 		if(contact.getEmail() != null)
-			rtmlElement.appendChild(document.createTextNode
-						(contact.getEmail()));
+		{
+			subElement = (Element)document.createElement("Email");
+			subElement.appendChild(document.createTextNode(contact.getEmail()));
+			contactElement.appendChild(subElement);
+		}
 		if(contact.getUrl() != null)
-			rtmlElement.appendChild(document.createTextNode
-						(contact.getUrl().toString()));
-
+		{
+			subElement = (Element)document.createElement("Url");
+			subElement.appendChild(document.createTextNode(contact.getUrl().toString()));
+			contactElement.appendChild(subElement);
+		}
 		rtmlElement.appendChild(contactElement);
 	}
 
@@ -476,6 +505,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.11  2004/03/12 17:15:52  cjm
+** reformatted.
+**
 ** Revision 1.10  2004/03/12 11:01:28  je
 ** Added imports and fixed typo
 **
