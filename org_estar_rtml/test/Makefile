@@ -14,7 +14,7 @@ DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 SRCS = TestParser.java TestCreate.java
 OBJS = $(SRCS:%.java=$(LIBDIR)/$(PACKAGEDIR)/%.class)
 DOCS = $(SRCS:%.java=$(DOCSDIR)/$(PACKAGEDIR)/%.html)
-CONFIGS = 
+CONFIGS = test_create.csh
 CONFIGSBIN = $(CONFIGS:%=$(LIBDIR)/%)
 
 top: jar configs
