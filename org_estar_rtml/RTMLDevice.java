@@ -1,18 +1,20 @@
 // RTMLDevice.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDevice.java,v 1.1 2004-03-11 13:27:33 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDevice.java,v 1.2 2005-01-19 11:54:09 cjm Exp $
 package org.estar.rtml;
+
+import java.io.*;
 
 /**
  * This class is a data container for information contained in the device nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-public class RTMLDevice
+public class RTMLDevice implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDevice.java,v 1.1 2004-03-11 13:27:33 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDevice.java,v 1.2 2005-01-19 11:54:09 cjm Exp $";
 	/**
 	 * The type of device this is. See the dtd: %deviceTypes;.
 	 */
@@ -30,6 +32,10 @@ public class RTMLDevice
 	 * This is actually part of the FilterType tag in the Filter tag.
 	 */
 	private String filterType = null;
+	/**
+	 * Detector information associated with this device.
+	 */
+	private RTMLDetector detector = null;
 
 	/**
 	 * Default constructor.
@@ -105,6 +111,16 @@ public class RTMLDevice
 		return filterType;
 	}
 
+	public void setDetector(RTMLDetector d)
+	{
+		detector = d;
+	}
+
+	public RTMLDetector getDetector()
+	{
+		return detector;
+	}
+
 	/**
 	 * Method to print out a string representation of this node.
 	 * @see #toString(java.lang.String)
@@ -136,10 +152,15 @@ public class RTMLDevice
 			sb.append(prefix+"\tName: "+name+"\n");
 		if(filterType != null)
 			sb.append(prefix+"\tFilter: type = "+filterType+"\n");
+		if(detector != null)
+			sb.append(prefix+detector.toString("\t")+"\n");
 		return sb.toString();
 	}
 
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2004/03/11 13:27:33  cjm
+** Initial revision
+**
 */
