@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.3 2004-03-10 12:00:08 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.4 2004-03-11 13:06:34 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.3 2004-03-10 12:00:08 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.4 2004-03-11 13:06:34 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.1) for eSTAR documents.
 	 */
@@ -204,6 +204,7 @@ public class RTMLCreate
 	 * @see #createProject
 	 * @see #createTelescope
 	 * @see #createIntelligentAgent
+	 * @see #createDevice
 	 * @see #createObservation
 	 * @see #createScore
 	 * @see #createCompletionTime
@@ -222,6 +223,8 @@ public class RTMLCreate
 		createTelescope(rtmlElement);
 		if(d.getIntelligentAgent() != null)
 			createIntelligentAgent(rtmlElement,d.getIntelligentAgent());
+		if(d.getDevice() != null)
+			createDevice(rtmlElement,d.getDevice());
 		for(int i = 0; i < d.getObservationListCount(); i++)
 		{
 			obs = d.getObservation(i);
@@ -272,6 +275,32 @@ public class RTMLCreate
 		iaElement.setAttribute("port",""+rtmlIA.getPort());
 		iaElement.appendChild(document.createTextNode(rtmlIA.getId()));
 		rtmlElement.appendChild(iaElement);
+	}
+
+	private void createDevice(Element rtmlElement,RTMLDevice device)
+	{
+		Element deviceElement = null;
+		Element filterElement = null;
+		Element filterTypeElement = null;
+
+		deviceElement = (Element)document.createElement("Device");
+		if(device.getType() != null)
+			deviceElement.setAttribute("type",device.getType());
+		if(device.getSpectralRegion() != null)
+			deviceElement.setAttribute("region",""+device.getSpectralRegion());
+		deviceElement.appendChild(document.createTextNode(device.getName()));
+		// filter type sub-element(s)
+		if(device.getFilterType() != null)
+		{
+			// filter node/tag
+			filterElement = (Element)document.createElement("Filter");
+			deviceElement.appendChild(filterElement);
+			// filter type node/tag
+			filterTypeElement = (Element)document.createElement("FilterType");
+			filterTypeElement.setAttribute("type",device.getFilterType());
+			filterElement.appendChild(filterTypeElement);
+		}
+		rtmlElement.appendChild(deviceElement);
 	}
 
 	/**
@@ -415,6 +444,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2004/03/10 12:00:08  cjm
+** Added error string creation.
+**
 ** Revision 1.2  2004/03/10 11:43:44  cjm
 ** Added createImageData.
 **
