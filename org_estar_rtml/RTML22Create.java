@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.18 2005-01-18 19:37:58 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.19 2005-01-19 12:06:21 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.19 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.18 2005-01-18 19:37:58 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.19 2005-01-19 12:06:21 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.1) for eSTAR documents.
 	 */
@@ -355,6 +355,7 @@ public class RTMLCreate
 	 * @param rtmlElement The RTML DOM element to add the Contact tag to.
 	 * @param device The Java object containing the device (instrument) data to add.
 	 * @see org.estar.rtml.RTMLDevice
+	 * @see #createDetector
 	 */
 	private void createDevice(Element rtmlElement,RTMLDevice device)
 	{
@@ -380,10 +381,35 @@ public class RTMLCreate
 			if(device.getFilterType() != null)
 				filterTypeElement.appendChild(document.createTextNode(device.getFilterType()));
 		}
+		if(device.getDetector() != null)
+			createDetector(deviceElement,device.getDetector());
 		if(device.getName() != null)
 			deviceElement.appendChild(document.createTextNode(device.getName()));
 		rtmlElement.appendChild(deviceElement);
 	}
+
+	/**
+	 * Method to create the Detector tags.
+	 * Create a detector node and associated sub-elements.
+	 * @param rtmlElement The RTML DOM element to add the Detector tag to.
+	 * @param detector The Java object containing the detector (instrument) data to add.
+	 * @see org.estar.rtml.RTMLDetector
+	 * @see #createDetector
+	 */
+	private void createDetector(Element rtmlElement,RTMLDetector detector)
+	{
+		Element detectorElement = null;
+		Element binningElement = null;
+
+		detectorElement = (Element)document.createElement("Detector");
+		// binning node/tag
+		binningElement = (Element)document.createElement("Binning");
+		detectorElement.appendChild(binningElement);
+		binningElement.setAttribute("rows",""+detector.getRowBinning());
+		binningElement.setAttribute("columns",""+detector.getColumnBinning());
+		rtmlElement.appendChild(detectorElement);
+	}
+
 
 	/**
 	 * Method to create XML in the Observation tag.
@@ -391,6 +417,7 @@ public class RTMLCreate
 	 * @param observation The Java object containing the observation data to add.
 	 * @see #document
 	 * @see #createTarget
+	 * @see #createDevice
 	 * @see #createSchedule
 	 * @see #createImageData
 	 */
@@ -401,6 +428,8 @@ public class RTMLCreate
 		observationElement = (Element)document.createElement("Observation");
 		if(observation.getTarget() != null)
 			createTarget(observationElement,observation.getTarget());
+		if(observation.getDevice() != null)
+			createDevice(observationElement,observation.getDevice());
 		if(observation.getSchedule() != null)
 			createSchedule(observationElement,observation.getSchedule());
 		if((observation.getImageDataURL() != null)||(observation.getImageDataType() != null))
@@ -545,6 +574,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.18  2005/01/18 19:37:58  cjm
+** FilterType now has type as PCDATA rather than an attribute.
+**
 ** Revision 1.17  2005/01/18 15:31:23  cjm
 ** Added null protection for project.
 **
