@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.12 2004-03-12 18:29:48 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.13 2004-03-12 19:55:42 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.12 2004-03-12 18:29:48 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.13 2004-03-12 19:55:42 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.1) for eSTAR documents.
 	 */
@@ -338,6 +338,13 @@ public class RTMLCreate
 		rtmlElement.appendChild(iaElement);
 	}
 
+	/**
+	 * Method to create the Device tags.
+	 * Create a contact node and associated sub-elements.
+	 * @param rtmlElement The RTML DOM element to add the Contact tag to.
+	 * @param device The Java object containing the device (instrument) data to add.
+	 * @see org.estar.rtml.RTMLDevice
+	 */
 	private void createDevice(Element rtmlElement,RTMLDevice device)
 	{
 		Element deviceElement = null;
@@ -349,7 +356,8 @@ public class RTMLCreate
 			deviceElement.setAttribute("type",device.getType());
 		if(device.getSpectralRegion() != null)
 			deviceElement.setAttribute("region",""+device.getSpectralRegion());
-		deviceElement.appendChild(document.createTextNode(device.getName()));
+		if(device.getName() != null)
+			deviceElement.appendChild(document.createTextNode(device.getName()));
 		// filter type sub-element(s)
 		if(device.getFilterType() != null)
 		{
@@ -505,6 +513,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.12  2004/03/12 18:29:48  cjm
+** Made createContact create sub-elemetn tags correctly.
+**
 ** Revision 1.11  2004/03/12 17:15:52  cjm
 ** reformatted.
 **
