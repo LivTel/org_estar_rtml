@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.4 2004-03-11 13:06:34 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.5 2004-03-11 13:10:31 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.4 2004-03-11 13:06:34 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.5 2004-03-11 13:10:31 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.1) for eSTAR documents.
 	 */
@@ -271,9 +271,11 @@ public class RTMLCreate
 		Element iaElement = null;
 
 		iaElement = (Element)document.createElement("IntelligentAgent");
-		iaElement.setAttribute("host",rtmlIA.getHostname());
+		if(rtmlIA.getHostname() != null)
+			iaElement.setAttribute("host",rtmlIA.getHostname());
 		iaElement.setAttribute("port",""+rtmlIA.getPort());
-		iaElement.appendChild(document.createTextNode(rtmlIA.getId()));
+		if(rtmlIA.getId() !+ null)
+			iaElement.appendChild(document.createTextNode(rtmlIA.getId()));
 		rtmlElement.appendChild(iaElement);
 	}
 
@@ -444,6 +446,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2004/03/11 13:06:34  cjm
+** Added Device/Filter creation.
+**
 ** Revision 1.3  2004/03/10 12:00:08  cjm
 ** Added error string creation.
 **
