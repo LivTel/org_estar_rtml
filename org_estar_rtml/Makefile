@@ -15,10 +15,12 @@ SRCS = RTMLException.java RTMLErrorHandler.java RTMLIntelligentAgent.java \
 	RTMLDocument.java RTMLParser.java RTMLCreate.java
 OBJS = $(SRCS:%.java=$(LIBDIR)/$(PACKAGEDIR)/%.class)
 DOCS = $(SRCS:%.java=$(DOCSDIR)/$(PACKAGEDIR)/%.html)
+CONFIGS = xml_environment.csh
+CONFIGSBIN = $(CONFIGS:%=$(LIBDIR)/%)
 
 DIRS = test
 
-top: jar 
+top: jar configs
 	@for i in $(DIRS); \
 	do \
 		(echo making in $$i...; cd $$i; $(MAKE) ); \
@@ -39,6 +41,11 @@ docs: $(DOCS)
 
 $(DOCSDIR)/$(PACKAGEDIR)/%.html: %.java
 	$(JAVADOC) -sourcepath ../../..:$(CLASSPATH) -d $(DOCSDIR) $(DOCFLAGS) $(PACKAGENAME)
+
+configs: $(CONFIGSBIN)
+
+$(LIBDIR)/%: %
+	$(CP) $< $@
 
 checkout:
 	$(CO) $(CO_OPTIONS) $(SRCS)
