@@ -1,5 +1,5 @@
 // RTMLObservation.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLObservation.java,v 1.1 2003-02-24 13:19:56 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLObservation.java,v 1.2 2004-03-18 17:32:34 cjm Exp $
 package org.estar.rtml;
 
 import java.net.*;
@@ -7,14 +7,14 @@ import java.net.*;
 /**
  * This class is a data container for information contained in the observation nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RTMLObservation
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLObservation.java,v 1.1 2003-02-24 13:19:56 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLObservation.java,v 1.2 2004-03-18 17:32:34 cjm Exp $";
 	/**
 	 * The target of this observation.
 	 */
@@ -31,6 +31,11 @@ public class RTMLObservation
 	 * A string, containing the contents of a cluster format object list file.
 	 */
 	private String objectListClusterString = null;
+	/**
+	 * The ImageData type string containing the format of the image data.
+	 * Should be a valid %imageFormats; ENTITY, see DTD.
+	 */
+	private String imageDataType = null;
 	/**
 	 * The URL containing the location of the image data.
 	 */
@@ -111,6 +116,29 @@ public class RTMLObservation
 		return objectListClusterString;
 	}
 
+
+	/**
+	 * Routine to set the image data Type.
+	 * @param s The string containing a valid type. See %imageFormats; ENTITY in DTD.
+	 * @exception RTMLException Thrown if the image data type string is not a valid type.
+	 * @see #imageDataType
+	 */
+	public void setImageDataType(String s) throws RTMLException
+	{
+		if(!(s.equals("FITS")||s.equals("FITS16")||s.equals("gif")||s.equals("jpg")||s.equals("JPEG")))
+			throw new RTMLException(this.getClass().getName()+":setImageDataType:Illegal Type:"+s);
+		imageDataType = s;
+	}
+
+	/**
+	 * Get the image data type.
+	 * @see #imageDataType
+	 */
+	public String getImageDataType()
+	{
+		return imageDataType;
+	}
+
 	/**
 	 * Routine to set the image data URL.
 	 * @param s The string to create a URL from.
@@ -158,6 +186,7 @@ public class RTMLObservation
 	 * @see #schedule
 	 * @see #objectListClusterString
 	 * @see #objectListType
+	 * @see #imageDataType
 	 * @see #imageDataURL
 	 * @see #fitsHeader
 	 */
@@ -176,6 +205,8 @@ public class RTMLObservation
 			sb.append(prefix+"\tObjectList: type = cluster\n");
 			sb.append(prefix+"\t"+objectListClusterString+"\n");
 		}
+		if(imageDataType != null)
+			sb.append(prefix+"\tImageDataType: "+imageDataType+"\n");
 		if(imageDataURL != null)
 			sb.append(prefix+"\tImageData: "+imageDataURL+"\n");
 		if(fitsHeader != null)
@@ -185,4 +216,7 @@ public class RTMLObservation
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2003/02/24 13:19:56  cjm
+** Initial revision
+**
 */
