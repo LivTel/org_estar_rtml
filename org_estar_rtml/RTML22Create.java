@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.16 2005-01-18 15:24:54 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.17 2005-01-18 15:31:23 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.17 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.16 2005-01-18 15:24:54 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.17 2005-01-18 15:31:23 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.1) for eSTAR documents.
 	 */
@@ -227,7 +227,8 @@ public class RTMLCreate
 		rtmlElement.setAttribute("type",d.getType());
 		if(d.getContact() != null)
 			createContact(rtmlElement,d.getContact());
-		createProject(rtmlElement,d.getProject());
+		if(d.getProject() != null)
+			createProject(rtmlElement,d.getProject());
 		createTelescope(rtmlElement);
 		if(d.getIntelligentAgent() != null)
 			createIntelligentAgent(rtmlElement,d.getIntelligentAgent());
@@ -316,7 +317,7 @@ public class RTMLCreate
 	 * @param project The Java object containing the project data to add.
 	 * @see org.estar.rtml.RTMLProject
 	 */
-	private void createProject(Element rtmlElement, RTMLProject project)
+	private void createProject(Element rtmlElement,RTMLProject project)
 	{
 		Element projectElement = null;
 
@@ -541,6 +542,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.16  2005/01/18 15:24:54  cjm
+** Added project element details.
+**
 ** Revision 1.15  2004/03/18 17:33:53  cjm
 ** Changed creation of <ImageData> node. Now created if image data type, or image data url,
 ** is present. Either can be null.
