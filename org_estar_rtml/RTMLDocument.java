@@ -1,5 +1,5 @@
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.1 2003-02-24 13:19:56 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.2 2004-03-11 13:27:28 cjm Exp $
 package org.estar.rtml;
 
 import java.text.*;
@@ -8,14 +8,14 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RTMLDocument
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.1 2003-02-24 13:19:56 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.2 2004-03-11 13:27:28 cjm Exp $";
 	/**
 	 * The type of the document, as specified in the RTML node's "type" attribute.
 	 */
@@ -24,6 +24,10 @@ public class RTMLDocument
 	 * The details contained in the IntelligentAgent tag/node.
 	 */
 	public RTMLIntelligentAgent intelligentAgent = null;
+	/**
+	 * The instrument device this document wants to use.
+	 */
+	public RTMLDevice device = null;
 	/**
 	 * List containing observations.
 	 */
@@ -69,6 +73,16 @@ public class RTMLDocument
 	public RTMLIntelligentAgent getIntelligentAgent()
 	{
 		return intelligentAgent;
+	}
+
+	public void setDevice(RTMLDevice d)
+	{
+		device = d;
+	}
+
+	public RTMLDevice getDevice()
+	{
+		return device;
 	}
 
 	/**
@@ -221,6 +235,7 @@ public class RTMLDocument
 	 * @param prefix A string to prefix to each line of data we print out.
 	 * @see #getType
 	 * @see #getIntelligentAgent
+	 * @see #getDevice
 	 * @see #getObservationListCount
 	 * @see #getObservation
 	 * @see #getScore
@@ -236,6 +251,8 @@ public class RTMLDocument
 		sb.append(prefix+"RTML : type = "+getType()+"\n");
 		if(getIntelligentAgent() != null)
 			sb.append(prefix+getIntelligentAgent().toString("\t")+"\n");
+		if(getDevice() != null)
+			sb.append(prefix+getDevice().toString("\t")+"\n");
 		for(int i = 0; i < getObservationListCount();i++)
 		{
 			ob = getObservation(i);
@@ -252,4 +269,7 @@ public class RTMLDocument
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2003/02/24 13:19:56  cjm
+** Initial revision
+**
 */
