@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.7 2004-03-19 16:59:40 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.8 2005-01-18 15:17:54 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -30,14 +30,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.7 2004-03-19 16:59:40 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.8 2005-01-18 15:17:54 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -262,13 +262,13 @@ public class RTMLParser
 			
 			if(childNode.getNodeType() == Node.ELEMENT_NODE)
 			{
-				//
-				// added by je to use Contact and User tags
-				if( childNode.getNodeName() == "Contact" )
-					parseContactNode( rtmlDocument, childNode );
-				if(childNode.getNodeName() == "IntelligentAgent")
+				if(childNode.getNodeName() == "Contact")
+					parseContactNode(rtmlDocument,childNode);
+				else if(childNode.getNodeName() == "Project")
+					parseProjectNode(rtmlDocument,childNode);
+				else if(childNode.getNodeName() == "IntelligentAgent")
 					parseIntelligentAgentNode(rtmlDocument,childNode);
-				if(childNode.getNodeName() == "Device")
+				else if(childNode.getNodeName() == "Device")
 					parseDeviceNode(rtmlDocument,childNode);
 				else if(childNode.getNodeName() == "Observation")
 					parseObservationNode(rtmlDocument,childNode);
@@ -287,15 +287,13 @@ public class RTMLParser
 		return rtmlDocument;
 	}
 
-
 	/**
 	 * Internal method to parse an Contact node.
 	 * @param rtmlDocument The document to add the Contact to.
 	 * @param contactNode The XML DOM node for the Contact tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node.
 	 */
-	private void parseContactNode( RTMLDocument rtmlDocument, Node contactNode )
-		throws RTMLException
+	private void parseContactNode(RTMLDocument rtmlDocument,Node contactNode) throws RTMLException
 	{
 		Node childNode;
 		NodeList childList;
@@ -347,6 +345,51 @@ public class RTMLParser
 		rtmlDocument.setContact( contact );
 	}
 
+	/**
+	 * Internal method to parse an Project node.
+	 * @param rtmlDocument The document to add the Project to.
+	 * @param projectNode The XML DOM node for the Project tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node.
+	 */
+	private void parseProjectNode(RTMLDocument rtmlDocument,Node projectNode) throws RTMLException
+	{
+		Node childNode;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(projectNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseProjectNode:Illegal Node:"+
+						projectNode);
+		}
+		if(projectNode.getNodeName() != "Project")
+		{
+			throw new RTMLException(this.getClass().getName()+":parseProjectNode:Illegal Node Name:"+
+						projectNode.getNodeName());
+		}
+		// add project node
+		RTMLProject project = new RTMLProject();
+		// go through child nodes
+		childList = projectNode.getChildNodes();
+		for( int i = 0; i < childList.getLength(); i++ )
+		{
+			childNode = childList.item( i );
+
+			if(childNode.getNodeType() == Node.TEXT_NODE)
+			{
+				project.setProject(childNode.getNodeValue());
+			}
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				//if( childNode.getNodeName() == "User" )
+				//	parseUserNode( contact, childNode );
+				//else
+					System.err.println("parseProjectNode:ELEMENT:"+childNode);
+			}
+		}
+		// Set project in RTML document.
+		rtmlDocument.setProject(project);
+	}
 
 	/**
 	 * Internal method to parse a Contact.User node
@@ -1491,6 +1534,10 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.7  2004/03/19 16:59:40  cjm
+** Fixed bug in device and contact nodes, if attributes do not exist.
+** Test attribute is non-null.
+**
 ** Revision 1.6  2004/03/18 17:33:10  cjm
 ** Added parsing of ImageData "type" attribute.
 **
