@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.2 2003-05-19 15:31:53 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.3 2004-03-11 13:28:18 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -27,14 +27,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.2 2003-05-19 15:31:53 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.3 2004-03-11 13:28:18 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -223,6 +223,7 @@ public class RTMLParser
 	 * @exception RTMLException Thrown if a strange child is in the node, 
 	 *            or the score/completion time fails to parse.
 	 * @see #parseIntelligentAgentNode
+	 * @see #parseDeviceNode
 	 * @see #parseObservationNode
 	 * @see #parseScoreNode
 	 * @see #parseCompletionTimeNode
@@ -260,6 +261,8 @@ public class RTMLParser
 			{
 				if(childNode.getNodeName() == "IntelligentAgent")
 					parseIntelligentAgentNode(rtmlDocument,childNode);
+				if(childNode.getNodeName() == "Device")
+					parseDeviceNode(rtmlDocument,childNode);
 				else if(childNode.getNodeName() == "Observation")
 					parseObservationNode(rtmlDocument,childNode);
 				else if(childNode.getNodeName() == "Score")
@@ -326,6 +329,108 @@ public class RTMLParser
 		}
 		// set intelligentAgent in RTML document.
 		rtmlDocument.setIntelligentAgent(intelligentAgent);
+	}
+
+	/**
+	 * Internal method to parse a Device node.
+	 * @param rtmlDocument The document to add the device to.
+	 * @param deviceNode The XML DOM node for the IntelligentAgent tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node.
+	 */
+	private void parseDeviceNode(RTMLDocument rtmlDocument,Node deviceNode) 
+		throws RTMLException
+	{
+		RTMLDevice device = null;
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(deviceNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseDeviceNode:Illegal Node:"+
+						deviceNode);
+		}
+		if(deviceNode.getNodeName() != "Device")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseDeviceNode:Illegal Node Name:"+
+						deviceNode.getNodeName());
+		}
+		// add Device node
+		device = new RTMLDevice();
+		// go through attribute list
+		attributeList = deviceNode.getAttributes();
+		// type
+		attributeNode = attributeList.getNamedItem("type");
+		device.setType(attributeNode.getNodeValue());
+		// spectral region
+		attributeNode = attributeList.getNamedItem("region");
+		device.setSpectralRegion(attributeNode.getNodeValue());
+		// go through child nodes
+		childList = deviceNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "Filter")
+					parseFilterNode(device,childNode);
+			}
+			if(childNode.getNodeType() == Node.TEXT_NODE)
+			{
+				device.setName(childNode.getNodeValue());
+			}
+		}
+		// set device in RTML document.
+		rtmlDocument.setDevice(device);
+	}
+
+	/**
+	 * Internal method to parse a Filter node. Also parses the FilterType node internally.
+	 * @param device The device to add the filter to.
+	 * @param filterNode The XML DOM node for the Filter tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node.
+	 */
+	private void parseFilterNode(RTMLDevice device,Node filterNode) 
+		throws RTMLException
+	{
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode,filterTypeNode;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(filterNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseFilterNode:Illegal Node:"+
+						filterNode);
+		}
+		if(filterNode.getNodeName() != "Filter")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseFilterNode:Illegal Node Name:"+
+						filterNode.getNodeName());
+		}
+		// go through child nodes
+		childList = filterNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "FilterType")
+				{
+					filterTypeNode = childNode;
+					// go through attribute list
+					attributeList = filterTypeNode.getAttributes();
+					// type
+					attributeNode = attributeList.getNamedItem("type");
+					device.setFilterType(attributeNode.getNodeValue());
+				}
+			}
+		}
 	}
 
 	/**
@@ -986,6 +1091,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2003/05/19 15:31:53  cjm
+** Added completion time "never" parsing.
+**
 ** Revision 1.1  2003/02/24 13:19:56  cjm
 ** Initial revision
 **
