@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.6 2004-03-18 17:33:10 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.7 2004-03-19 16:59:40 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -30,14 +30,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.6 2004-03-18 17:33:10 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.7 2004-03-19 16:59:40 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -759,10 +759,12 @@ public class RTMLParser
 		attributeList = deviceNode.getAttributes();
 		// type
 		attributeNode = attributeList.getNamedItem("type");
-		device.setType(attributeNode.getNodeValue());
+		if(attributeNode != null)
+			device.setType(attributeNode.getNodeValue());
 		// spectral region
 		attributeNode = attributeList.getNamedItem("region");
-		device.setSpectralRegion(attributeNode.getNodeValue());
+		if(attributeNode != null)
+			device.setSpectralRegion(attributeNode.getNodeValue());
 		// go through child nodes
 		childList = deviceNode.getChildNodes();
 		for(int i = 0; i < childList.getLength(); i++)
@@ -823,7 +825,8 @@ public class RTMLParser
 					attributeList = filterTypeNode.getAttributes();
 					// type
 					attributeNode = attributeList.getNamedItem("type");
-					device.setFilterType(attributeNode.getNodeValue());
+					if(attributeNode != null)
+						device.setFilterType(attributeNode.getNodeValue());
 				}
 			}
 		}
@@ -1488,6 +1491,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.6  2004/03/18 17:33:10  cjm
+** Added parsing of ImageData "type" attribute.
+**
 ** Revision 1.5  2004/03/12 17:28:35  je
 ** Added RTMLContact stuff
 **
