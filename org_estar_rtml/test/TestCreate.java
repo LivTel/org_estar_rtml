@@ -1,5 +1,5 @@
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.3 2004-03-12 18:30:01 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.4 2005-01-18 15:36:27 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -12,14 +12,14 @@ import org.estar.rtml.*;
 /**
  * This class tests RTMLCreate.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.3 2004-03-12 18:30:01 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.4 2005-01-18 15:36:27 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
@@ -32,6 +32,10 @@ public class TestCreate
 	 * RTML contact data.
 	 */
 	RTMLContact contact = null;
+	/**
+	 * RTML project data.
+	 */
+	RTMLProject project = null;
 	/**
 	 * RTML intelligent agent data.
 	 */
@@ -58,6 +62,7 @@ public class TestCreate
 		super();
 		document = new RTMLDocument();
 		ia = new RTMLIntelligentAgent();
+		project = new RTMLProject();
 		observation = null;
 		document.setIntelligentAgent(ia);
 	}
@@ -415,6 +420,22 @@ public class TestCreate
 				target.setEquinox("J2000");
 				schedule = new RTMLSchedule();
 			}
+			else if(args[i].equals("-project"))
+			{
+				if((i+1) < args.length)
+				{
+					project = new RTMLProject();
+					document.setProject(project);
+					project.setProject(args[i+1]);
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Project needs a value.");
+					System.exit(3);
+				}
+			}
 			else if(args[i].equals("-ra"))
 			{
 				if((i+1) < args.length)
@@ -528,6 +549,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2004/03/12 18:30:01  cjm
+** Added contact details.
+**
 ** Revision 1.2  2004/03/11 13:01:14  cjm
 ** Added device node creation.
 **
