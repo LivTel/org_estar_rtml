@@ -1,5 +1,5 @@
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.4 2005-01-18 15:36:27 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.5 2005-01-19 12:07:11 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -12,14 +12,14 @@ import org.estar.rtml.*;
 /**
  * This class tests RTMLCreate.
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.4 2005-01-18 15:36:27 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.5 2005-01-19 12:07:11 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
@@ -45,6 +45,10 @@ public class TestCreate
 	 */
 	RTMLDevice device = null;
 	/**
+	 * RTML detector data.
+	 */
+	RTMLDetector detector = null;
+	/**
 	 * RTML observation data.
 	 */
 	RTMLObservation observation = null;
@@ -62,7 +66,6 @@ public class TestCreate
 		super();
 		document = new RTMLDocument();
 		ia = new RTMLIntelligentAgent();
-		project = new RTMLProject();
 		observation = null;
 		document.setIntelligentAgent(ia);
 	}
@@ -81,7 +84,33 @@ public class TestCreate
 		}
 		for(int i = 0; i < args.length; i++)
 		{
-			if(args[i].equals("-contact"))
+			if(args[i].equals("-binning"))
+			{
+				if (device != null)
+				{
+					if((i+2) < args.length)
+					{
+						detector = new RTMLDetector();
+						device.setDetector(detector);
+						detector.setRowBinning(args[i+1]);
+						detector.setColumnBinning(args[i+2]);
+						i+= 2;
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:Binning needs row and column values.");
+						System.exit(3);
+					}
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Binning:Device was null.");
+					System.exit(4);
+				}
+			}
+			else if(args[i].equals("-contact"))
 			{
 				contact = new RTMLContact();
 				document.setContact(contact);
@@ -302,7 +331,12 @@ public class TestCreate
 					device.setType(args[i+2]);
 					device.setSpectralRegion(args[i+3]);
 					device.setFilterType(args[i+4]);
-					document.setDevice(device);
+					// add device to observation if it exists,
+					// otherwise make it the generic document device
+					if(observation != null)
+						observation.setDevice(device);
+					else
+						document.setDevice(device);
 					i+= 4;
 				}
 				else
@@ -517,10 +551,12 @@ public class TestCreate
 	{
 		System.err.println("java -Dhttp.proxyHost=wwwcache.livjm.ac.uk -Dhttp.proxyPort=8080 org.estar.rtml.test.TestCreate");
 		System.err.println("\t<-request|-score><-iahost <hostname><-iaid <id>><-iaport <number>>[-help]");
+		System.err.println("\t[-project <proposal id>]");
 		System.err.println("\t[-contact [-contact_address <address>][-contact_email <email>]");
 		System.err.println("\t\t[-contact_fax <fax>][-contact_institution <institute>][-contact_name <name>]");
 		System.err.println("\t\t[-contact_telephone <telno>][-contact_url <URL>][-contact_user <user>]]");
-		System.err.println("\t[-device <name> <device type> <spectral region> <filter type>]");
+		System.err.println("\t[-device <name> <device type> <spectral region> <filter type>");
+		System.err.println("\t\t[-binning <x> <y>]]");
 		System.err.println("\t<-observation <-name <string>> <-ra <HH:MM:SS>> <-dec <[+|-]DD:MM:SS>> [-toop]");
 		System.err.println("\t\t<-exposure <length> <units>>>");
 	}
@@ -549,6 +585,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2005/01/18 15:36:27  cjm
+** Added project.
+**
 ** Revision 1.3  2004/03/12 18:30:01  cjm
 ** Added contact details.
 **
