@@ -1,4 +1,4 @@
-include ../../../Makefile.common
+#include ../../../Makefile.common
 include ../Makefile.common
 #
 # Specfic options
@@ -8,7 +8,7 @@ PACKAGEDIR 	=org/$(ESTAR_NAME)/$(RTML_NAME)
 PACKAGENAME	=org.$(ESTAR_NAME).$(RTML_NAME)
 JAR_FILE	=org_$(ESTAR_NAME)_$(RTML_NAME).jar
 JAVACFLAGS 	= -d $(LIBDIR) -sourcepath ../../../ -classpath $(LIBDIR):$(CLASSPATH)
-DOCSDIR 	= /home/dev/public_html/robonet/javadocs/$(PACKAGEDIR)
+DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 
 SRCS = RTMLException.java RTMLErrorHandler.java RTMLIntelligentAgent.java \
 	RTMLTarget.java RTMLSchedule.java RTMLObservation.java \
