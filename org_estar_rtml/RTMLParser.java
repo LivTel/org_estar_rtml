@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.9 2005-01-18 19:37:56 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.10 2005-01-19 11:52:45 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -30,14 +30,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLParser.java,v 1.9 2005-01-18 19:37:56 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLParser.java,v 1.10 2005-01-19 11:52:45 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -772,11 +772,12 @@ public class RTMLParser
 
 	/**
 	 * Internal method to parse a Device node.
-	 * @param rtmlDocument The document to add the device to.
+	 * @param rtmlDeviceHolder The object to add the device to - either an instance of RTMLDocument or 
+	 *                         RTMLObservation.
 	 * @param deviceNode The XML DOM node for the IntelligentAgent tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node.
 	 */
-	private void parseDeviceNode(RTMLDocument rtmlDocument,Node deviceNode) 
+	private void parseDeviceNode(RTMLDeviceHolder rtmlDeviceHolder,Node deviceNode) 
 		throws RTMLException
 	{
 		RTMLDevice device = null;
@@ -818,14 +819,16 @@ public class RTMLParser
 			{
 				if(childNode.getNodeName() == "Filter")
 					parseFilterNode(device,childNode);
+				if(childNode.getNodeName() == "Detector")
+					parseDetectorNode(device,childNode);
 			}
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
 				device.setName(childNode.getNodeValue());
 			}
 		}
-		// set device in RTML document.
-		rtmlDocument.setDevice(device);
+		// set device in device holder (RTML document/RTML Observation).
+		rtmlDeviceHolder.setDevice(device);
 	}
 
 	/**
@@ -905,6 +908,62 @@ public class RTMLParser
 	}
 
 	/**
+	 * Internal method to parse a Detector node.
+	 * @param device The device to add the detector to.
+	 * @param detectorNode The XML DOM node for the Detector tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node.
+	 */
+	private void parseDetectorNode(RTMLDevice device,Node detectorNode) 
+		throws RTMLException
+	{
+		RTMLDetector detector = null;
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode,binningNode;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(detectorNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseDetectorNode:Illegal Node:"+
+						detectorNode);
+		}
+		if(detectorNode.getNodeName() != "Detector")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseDetectorNode:Illegal Node Name:"+
+						detectorNode.getNodeName());
+		}
+		// add Detector node
+		detector = new RTMLDetector();
+		// go through child nodes
+		childList = detectorNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "Binning")
+				{
+					binningNode = childNode;
+					// go through attribute list
+					attributeList = binningNode.getAttributes();
+					// row binning
+					attributeNode = attributeList.getNamedItem("rows");
+					if(attributeNode != null)
+						detector.setRowBinning(attributeNode.getNodeValue());
+					// column binning
+					attributeNode = attributeList.getNamedItem("columns");
+					if(attributeNode != null)
+						detector.setColumnBinning(attributeNode.getNodeValue());
+				}
+			}
+		}
+		// set detector in device.
+		device.setDetector(detector);
+	}
+
+	/**
 	 * Internal method to parse an Observation node.
 	 * @param rtmlDocument The document to add the observation to.
 	 * @param observationNode The XML DOM node for the Observation tag node.
@@ -942,7 +1001,9 @@ public class RTMLParser
 			
 			if(childNode.getNodeType() == Node.ELEMENT_NODE)
 			{
-				if(childNode.getNodeName() == "Target")
+				if(childNode.getNodeName() == "Device")
+					parseDeviceNode(observation,childNode);
+				else if(childNode.getNodeName() == "Target")
 					parseTargetNode(observation,childNode);
 				else if(childNode.getNodeName() == "Schedule")
 					parseScheduleNode(observation,childNode);
@@ -1563,6 +1624,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.9  2005/01/18 19:37:56  cjm
+** FilterType now has type as PCDATA rather than an attribute.
+**
 ** Revision 1.8  2005/01/18 15:17:54  cjm
 ** Added project node parsing.
 **
