@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.15 2004-03-18 17:33:53 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.16 2005-01-18 15:24:54 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.15 2004-03-18 17:33:53 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.16 2005-01-18 15:24:54 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.1) for eSTAR documents.
 	 */
@@ -227,7 +227,7 @@ public class RTMLCreate
 		rtmlElement.setAttribute("type",d.getType());
 		if(d.getContact() != null)
 			createContact(rtmlElement,d.getContact());
-		createProject(rtmlElement);
+		createProject(rtmlElement,d.getProject());
 		createTelescope(rtmlElement);
 		if(d.getIntelligentAgent() != null)
 			createIntelligentAgent(rtmlElement,d.getIntelligentAgent());
@@ -310,12 +310,20 @@ public class RTMLCreate
 		rtmlElement.appendChild(contactElement);
 	}
 
-	private void createProject(Element rtmlElement)
+	/**
+	 * Create RTML Project node.
+	 * @param rtmlElement The RTML DOM element to add the Project tag to.
+	 * @param project The Java object containing the project data to add.
+	 * @see org.estar.rtml.RTMLProject
+	 */
+	private void createProject(Element rtmlElement, RTMLProject project)
 	{
-		Element e = null;
+		Element projectElement = null;
 
-		e = (Element)document.createElement("Project");
-		rtmlElement.appendChild(e);
+		projectElement = (Element)document.createElement("Project");
+		if(project.getProject() != null)
+			projectElement.appendChild(document.createTextNode(project.getProject()));
+		rtmlElement.appendChild(projectElement);
 	}
 
 	private void createTelescope(Element rtmlElement)
@@ -533,6 +541,10 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.15  2004/03/18 17:33:53  cjm
+** Changed creation of <ImageData> node. Now created if image data type, or image data url,
+** is present. Either can be null.
+**
 ** Revision 1.14  2004/03/15 12:24:08  je
 ** Changed http://www.estar.org.uk/estar/documents/rtml2.1.dtd for http://www.astro.livjm.ac.uk/~je/rtml2.1.dtd
 **
