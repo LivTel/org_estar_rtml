@@ -1,21 +1,22 @@
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.5 2005-01-18 15:08:21 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.6 2005-01-19 11:51:27 cjm Exp $
 package org.estar.rtml;
 
+import java.io.*;
 import java.text.*;
 import java.util.*;
 
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
-public class RTMLDocument
+public class RTMLDocument implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.5 2005-01-18 15:08:21 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.6 2005-01-19 11:51:27 cjm Exp $";
 	/**
 	 * The type of the document, as specified in the RTML node's "type" attribute.
 	 */
@@ -103,11 +104,19 @@ public class RTMLDocument
 		return intelligentAgent;
 	}
 
+	/**
+	 * Set the device.
+	 * @param device The device to set.
+	 */
 	public void setDevice(RTMLDevice d)
 	{
 		device = d;
 	}
 
+	/**
+	 * Get the device.
+	 * @return The device.
+	 */
 	public RTMLDevice getDevice()
 	{
 		return device;
@@ -302,6 +311,9 @@ public class RTMLDocument
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.5  2005/01/18 15:08:21  cjm
+** Added project.
+**
 ** Revision 1.4  2004/03/12 17:15:52  cjm
 ** reformatted.
 **
