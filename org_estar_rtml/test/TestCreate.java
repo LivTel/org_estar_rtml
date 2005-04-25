@@ -1,5 +1,5 @@
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.5 2005-01-19 12:07:11 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.6 2005-04-25 10:31:50 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -12,14 +12,14 @@ import org.estar.rtml.*;
 /**
  * This class tests RTMLCreate.
  * @author Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.5 2005-01-19 12:07:11 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.6 2005-04-25 10:31:50 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
@@ -501,6 +501,29 @@ public class TestCreate
 			{
 				document.setType("score");
 			}
+			else if(args[i].equals("-target_ident"))
+			{
+				if((i+1) < args.length)
+				{
+					if(target != null)
+					{
+						target.setIdent(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:Target Ident:Target was null.");
+						System.exit(4);
+					}
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Target ident needs an ident.");
+					System.exit(2);
+				}
+			}
 			else if(args[i].equals("-toop"))
 			{
 				if(target != null)
@@ -557,7 +580,8 @@ public class TestCreate
 		System.err.println("\t\t[-contact_telephone <telno>][-contact_url <URL>][-contact_user <user>]]");
 		System.err.println("\t[-device <name> <device type> <spectral region> <filter type>");
 		System.err.println("\t\t[-binning <x> <y>]]");
-		System.err.println("\t<-observation <-name <string>> <-ra <HH:MM:SS>> <-dec <[+|-]DD:MM:SS>> [-toop]");
+		System.err.println("\t<-observation <-name <string>> <-target_ident <string>> ");
+		System.err.println("\t\t<-ra <HH:MM:SS>> <-dec <[+|-]DD:MM:SS>> [-toop]");
 		System.err.println("\t\t<-exposure <length> <units>>>");
 	}
 
@@ -585,6 +609,11 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.5  2005/01/19 12:07:11  cjm
+** Added -project print.
+** Added detector/binning.
+** Allowed device to be added to either document or observation.
+**
 ** Revision 1.4  2005/01/18 15:36:27  cjm
 ** Added project.
 **
