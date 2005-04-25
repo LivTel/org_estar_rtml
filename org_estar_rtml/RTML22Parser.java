@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.10 2005-01-19 11:52:45 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.11 2005-04-25 10:32:36 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -30,14 +30,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.10 2005-01-19 11:52:45 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.11 2005-04-25 10:32:36 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -1054,6 +1054,12 @@ public class RTMLParser
 		// type
 		attributeNode = attributeList.getNamedItem("type");
 		target.setType(attributeNode.getNodeValue());
+		// ident
+		attributeNode = attributeList.getNamedItem("ident");
+		if(attributeNode != null)
+			target.setIdent(attributeNode.getNodeValue());
+		else
+			target.setIdent(null);
 		// go through child nodes
 		childList = targetNode.getChildNodes();
 		for(int i = 0; i < childList.getLength(); i++)
@@ -1624,6 +1630,10 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.10  2005/01/19 11:52:45  cjm
+** Now uses RTMLDeviceHolder in parseDeviceNode, as Device can occur
+** in RTMLDocuments and RTMLObservations.
+**
 ** Revision 1.9  2005/01/18 19:37:56  cjm
 ** FilterType now has type as PCDATA rather than an attribute.
 **
