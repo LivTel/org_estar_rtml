@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.19 2005-01-19 12:06:21 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.20 2005-04-25 10:32:18 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.20 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.19 2005-01-19 12:06:21 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.20 2005-04-25 10:32:18 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.1) for eSTAR documents.
 	 */
@@ -440,6 +440,12 @@ public class RTMLCreate
 		rtmlElement.appendChild(observationElement);
 	}
 
+	/**
+	 * Create a Target element and append it to the specified Observation element.
+	 * @param observationElement The observation to append the new Target element to.
+	 * @param target The RTMLTarget object containing target information.
+	 * @see #RTMLTarget
+	 */
 	private void createTarget(Element observationElement,RTMLTarget target)
 	{
 		Element targetElement = null;
@@ -453,6 +459,9 @@ public class RTMLCreate
 		targetElement = (Element)document.createElement("Target");
 		// type attribute
 		targetElement.setAttribute("type",target.getType());
+		// ident attribute
+		if(target.getIdent() != null)
+			targetElement.setAttribute("ident",target.getIdent());
 		// target name sub-element
 		if(target.getName() != null)
 		{
@@ -574,6 +583,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.19  2005/01/19 12:06:21  cjm
+** Reordered Observation node creation to match DTD - apparently this is important.
+**
 ** Revision 1.18  2005/01/18 19:37:58  cjm
 ** FilterType now has type as PCDATA rather than an attribute.
 **
