@@ -1,21 +1,24 @@
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.2 2005-01-19 15:30:38 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.3 2005-04-26 11:25:53 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
+import java.text.*;
+import java.util.Date;
+
 import org.estar.astrometry.*;
 
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class RTMLSchedule implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.2 2005-01-19 15:30:38 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.3 2005-04-26 11:25:53 cjm Exp $";
 	/**
 	 * The type of the Exposure, the "type" attribute in the Exposure tag. Should be either "time" or
 	 * "snr".
@@ -29,6 +32,16 @@ public class RTMLSchedule implements Serializable
 	 * The length of the Exposure, the Exposure tag's text.
 	 */
 	private double exposureLength = 0.0;
+	/**
+	 * The date this observation can be scheduled from. i.e.
+	 * the observation should be started AFTER this time.
+	 */
+	private Date startDate = null;
+	/**
+	 * The date this observation can be scheduled until. i.e.
+	 * the observation should be started BEFORE this time.
+	 */
+	private Date endDate = null;
 	/**
 	 * The calibration data that may be contained a a sub-tag.
 	 */
@@ -139,6 +152,90 @@ public class RTMLSchedule implements Serializable
 	}
 
 	/**
+	 * Set the date the observation can be scheduled AFTER.
+	 * @param d A date.
+	 * @see #startDate
+	 */
+	public void setStartDate(Date d)
+	{
+		startDate = d;
+	}
+
+	/**
+	 * Set the date the observation can be scheduled AFTER.
+	 * @param s A string, in the format yyyy-MM-dd'T'HH:mm:ss.
+	 * @see #startDate
+	 * @exception RTMLException Thrown if the string is not a valid date/time, 
+	 *            using the format specified above.
+	 */
+	public void setStartDate(String s) throws RTMLException
+	{
+		DateFormat dateFormat = null;
+
+		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		try
+		{
+			startDate = dateFormat.parse(s);
+		}
+		catch(ParseException e)
+		{
+			throw new RTMLException(this.getClass().getName()+":setStartDate:Illegal Date/Time:"+s+":",e);
+		}
+	}
+
+	/**
+	 * Get the date the observation can be scheduled AFTER.
+	 * @return A date.
+	 * @see #startDate
+	 */
+	public Date getStartDate()
+	{
+		return startDate;
+	}
+
+	/**
+	 * Set the date the observation should be scheduled BEFORE.
+	 * @param d A date.
+	 * @see #endDate
+	 */
+	public void setEndDate(Date d)
+	{
+		endDate = d;
+	}
+
+	/**
+	 * Set the date the observation should be scheduled BEFORE.
+	 * @param s A string, in the format yyyy-MM-dd'T'HH:mm:ss.
+	 * @exception RTMLException Thrown if the string is not a valid date/time, 
+	 *            using the format specified above.
+	 * @see #startDate
+	 */
+	public void setEndDate(String s) throws RTMLException
+	{
+		DateFormat dateFormat = null;
+
+		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		try
+		{
+			endDate = dateFormat.parse(s);
+		}
+		catch(ParseException e)
+		{
+			throw new RTMLException(this.getClass().getName()+":setEndDate:Illegal Date/Time:"+s+":",e);
+		}
+	}
+
+	/**
+	 * Get the date the observation should be scheduled BEFORE.
+	 * @return A date.
+	 * @see #endDate
+	 */
+	public Date getEndDate()
+	{
+		return endDate;
+	}
+
+	/**
 	 * Method to print out a string representation of this node.
 	 */
 	public String toString()
@@ -152,6 +249,8 @@ public class RTMLSchedule implements Serializable
 	 * @see #exposureType
 	 * @see #exposureUnits
 	 * @see #exposureLength
+	 * @see #startDate
+	 * @see #endDate
 	 */
 	public String toString(String prefix)
 	{
@@ -161,11 +260,15 @@ public class RTMLSchedule implements Serializable
 		sb.append(prefix+"Schedule:\n");
 		sb.append(prefix+"\tExposure: type = "+exposureType+": units = "+exposureUnits+"\n");
 		sb.append(prefix+"\t\tLength:"+exposureLength+"\n");
+		sb.append(prefix+"\tBetween:"+startDate+" and "+endDate+"\n");
 		return sb.toString();
 	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2005/01/19 15:30:38  cjm
+** Added Serializable.
+**
 ** Revision 1.1  2003/02/24 13:19:56  cjm
 ** Initial revision
 **
