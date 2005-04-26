@@ -1,8 +1,9 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.11 2005-04-25 10:32:36 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.12 2005-04-26 11:26:44 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
+import java.text.*;
 import java.util.*;
 
 import java.net.URL;
@@ -30,14 +31,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.11 2005-04-25 10:32:36 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.12 2005-04-26 11:26:44 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -1330,6 +1331,7 @@ public class RTMLParser
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
 	 * @see #parseExposureNode
 	 * @see #parseCalibrationNode
+	 * @see #parseTimeConstraintNode
 	 */
 	private void parseScheduleNode(RTMLObservation observation,Node scheduleNode) throws RTMLException
 	{
@@ -1362,6 +1364,8 @@ public class RTMLParser
 					parseExposureNode(schedule,childNode);
 				else if(childNode.getNodeName() == "Calibaration")
 					parseCalibrationNode(schedule,childNode);
+				else if(childNode.getNodeName() == "TimeConstraint")
+					parseTimeConstraintNode(schedule,childNode);
 			}
 		}
 		// add scheule to observation
@@ -1417,6 +1421,96 @@ public class RTMLParser
 
 	private void parseCalibrationNode(RTMLSchedule schedule,Node calibrationNode) throws RTMLException
 	{
+	}
+
+	/**
+	 * Internal method to parse a TimeConstraint node.
+	 * @param schedule The instance of RTMLSchedule to set the time constrints for.
+	 * @param timeConstraintNode The XML DOM node for the TimeConstrint tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @see #RTMLSchedule
+	 */
+	private void parseTimeConstraintNode(RTMLSchedule schedule,Node timeConstraintNode) throws RTMLException
+	{
+		Node childNode;
+		NodeList childList;
+		Date date = null;
+
+		// check current XML node is correct
+		if(timeConstraintNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseTimeConstraintNode:Illegal Node:"+
+						timeConstraintNode);
+		}
+		if(timeConstraintNode.getNodeName() != "TimeConstraint")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseTimeConstraintNode:Illegal Node Name:"+
+						timeConstraintNode.getNodeName());
+		}
+		// go through child nodes
+		childList = timeConstraintNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+			
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "StartDateTime")
+				{
+					date = parseDateTimeNode(childNode);
+					schedule.setStartDate(date);
+				}
+				else if(childNode.getNodeName() == "EndDateTime")
+				{
+					date = parseDateTimeNode(childNode);
+					schedule.setEndDate(date);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Parse a date time node. This is a node (such as StartDateTime, EndDateTime) containing a date
+	 * formatted in the form: 2001-05-29T12:00:00. The keyword 'never' returns a null date.
+	 * @param dateTimeNode The XML node containing a date to parse as it's CDATA.
+	 * @return The parsed date is returned, or null if 'never' was specified.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 */
+	private Date parseDateTimeNode(Node dateTimeNode) throws RTMLException
+	{
+		Node childNode;
+		NodeList childList;
+		Date date = null;
+		DateFormat dateFormat = null;
+		String s = null;
+
+		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		childList = dateTimeNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+			if(childNode.getNodeType() == Node.TEXT_NODE)
+			{
+				childNode.getNodeValue();
+				s = childNode.getNodeValue();
+				if(s.equals("never"))
+					date = null;
+				else
+				{
+					try
+					{
+						date = dateFormat.parse(s);
+					}
+					catch(ParseException e)
+					{
+						throw new RTMLException(this.getClass().getName()+
+								    ":parseDateTimeNode:Illegal Date/Time:"+s+":",e);
+					}
+				}
+			}
+		}
+		return date;
 	}
 
 	/**
@@ -1630,6 +1724,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.11  2005/04/25 10:32:36  cjm
+** Added parsing of Target ident attribute.
+**
 ** Revision 1.10  2005/01/19 11:52:45  cjm
 ** Now uses RTMLDeviceHolder in parseDeviceNode, as Device can occur
 ** in RTMLDocuments and RTMLObservations.
