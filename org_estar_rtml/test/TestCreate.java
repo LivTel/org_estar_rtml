@@ -1,5 +1,5 @@
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.7 2005-04-26 11:27:16 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.8 2005-04-26 15:02:35 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -12,48 +12,65 @@ import org.estar.rtml.*;
 /**
  * This class tests RTMLCreate.
  * @author Chris Mottram
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.7 2005-04-26 11:27:16 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.8 2005-04-26 15:02:35 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
-	RTMLCreate create = null;
+	protected RTMLCreate create = null;
 	/**
 	 * The document structure used by the create.
 	 */
-	RTMLDocument document = null;
+	protected RTMLDocument document = null;
 	/**
 	 * RTML contact data.
 	 */
-	RTMLContact contact = null;
+	protected RTMLContact contact = null;
 	/**
 	 * RTML project data.
 	 */
-	RTMLProject project = null;
+	protected RTMLProject project = null;
 	/**
 	 * RTML intelligent agent data.
 	 */
-	RTMLIntelligentAgent ia = null;
+	protected RTMLIntelligentAgent ia = null;
 	/**
 	 * RTML device data.
 	 */
-	RTMLDevice device = null;
+	protected RTMLDevice device = null;
 	/**
 	 * RTML detector data.
 	 */
-	RTMLDetector detector = null;
+	protected RTMLDetector detector = null;
 	/**
 	 * RTML observation data.
 	 */
-	RTMLObservation observation = null;
-	RTMLTarget target = null;
-	RTMLSchedule schedule = null;
+	protected RTMLObservation observation = null;
+	/**
+	 * RTML target data.
+	 */
+	protected RTMLTarget target = null;
+	/**
+	 * RTML schedule data.
+	 */
+	protected RTMLSchedule schedule = null;
+	/**
+	 * Version string used to set RTML Element's version attribute.
+	 * Leaving as null causes RTMLCreate to use the default.
+	 */
+	protected String rtmlVersionString = null;
+	/**
+	 * Doctype system ID - This is the URL of the RTML DTD. e.g.
+	 * http://www.estar.org.uk/documents/rtml2.2.dtd
+	 * Leaving as null causes RTMLCreate to use the default.
+	 */
+	protected String doctypeSystemID = null;
 
 	/**
 	 * Default constructor. Initialise document.
@@ -74,6 +91,8 @@ public class TestCreate
 	 * Parse arguments.
 	 * @param args An array of arguments to parse.
 	 * @exception RTMLException Thrown if an error occurs during parsing.
+	 * @see #rtmlVersionString
+	 * @see #doctypeSystemID
 	 */
 	public void parseArguments(String args[]) throws RTMLException,Exception
 	{
@@ -346,6 +365,20 @@ public class TestCreate
 					System.exit(5);
 				}
 			}
+			else if(args[i].equals("-doctype_system_id"))
+			{
+				if((i+1) < args.length)
+				{
+					doctypeSystemID = args[i+1];
+					i+= 1;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:doctype_system_id needs a URL string.");
+					System.exit(2);
+				}
+			}
 			else if(args[i].equals("-end_date"))
 			{
 				if((i+1) < args.length)
@@ -520,6 +553,20 @@ public class TestCreate
 			{
 				document.setType("request");
 			}
+			else if(args[i].equals("-rtml_version"))
+			{
+				if((i+1) < args.length)
+				{
+					rtmlVersionString = args[i+1];
+					i+= 1;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:rtml_version needs a string.");
+					System.exit(2);
+				}
+			}
 			else if(args[i].equals("-score"))
 			{
 				document.setType("score");
@@ -604,11 +651,17 @@ public class TestCreate
 	 * run method.
 	 * @see #create
 	 * @see #document
+	 * @see #rtmlVersionString
+	 * @see #doctypeSystemID
 	 */
 	public void run() throws Exception
 	{
 		create = new RTMLCreate();
 		//System.out.println(document);
+		if(rtmlVersionString != null)
+			create.setRTMLVersionString(rtmlVersionString);
+		if(doctypeSystemID != null)
+			create.setDoctypeSystemID(doctypeSystemID);
 		create.create(document);
 		create.toStream(System.out);
 	}
@@ -619,6 +672,8 @@ public class TestCreate
 	public void help()
 	{
 		System.err.println("java -Dhttp.proxyHost=wwwcache.livjm.ac.uk -Dhttp.proxyPort=8080 org.estar.rtml.test.TestCreate");
+		System.err.println("\t[-doctype_system_id <url string>]");
+		System.err.println("\t[-rtml_version <string>]");
 		System.err.println("\t<-request|-score><-iahost <hostname><-iaid <id>><-iaport <number>>[-help]");
 		System.err.println("\t[-project <proposal id>]");
 		System.err.println("\t[-contact [-contact_address <address>][-contact_email <email>]");
@@ -626,11 +681,11 @@ public class TestCreate
 		System.err.println("\t\t[-contact_telephone <telno>][-contact_url <URL>][-contact_user <user>]]");
 		System.err.println("\t[-device <name> <device type> <spectral region> <filter type>");
 		System.err.println("\t\t[-binning <x> <y>]]");
-		System.err.println("\t<-observation <-name <string>> <-target_ident <string>> ");
+		System.err.println("\t<-observation <-name <string>> [-target_ident <string>] ");
 		System.err.println("\t\t<-ra <HH:MM:SS>> <-dec <[+|-]DD:MM:SS>> [-toop]");
-		System.err.println("\t\t<-exposure <length> <units>>>");
+		System.err.println("\t\t<-exposure <length> <units>>");
 		System.err.println("\t\t<-start_date <yyyy-MM-ddTHH:mm:ss>>");
-		System.err.println("\t\t<-end_date <yyyy-MM-ddTHH:mm:ss>>");
+		System.err.println("\t\t<-end_date <yyyy-MM-ddTHH:mm:ss>>>");
 	}
 
 	/**
@@ -657,6 +712,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.7  2005/04/26 11:27:16  cjm
+** Added TimeConstraint -start_date and -end_date command line arguments.
+**
 ** Revision 1.6  2005/04/25 10:31:50  cjm
 ** Added target ident.
 **
