@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.20 2005-04-25 10:32:18 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.21 2005-04-26 11:27:38 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.20 $
+ * @version $Revision: 1.21 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.20 2005-04-25 10:32:18 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.21 2005-04-26 11:27:38 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.1) for eSTAR documents.
 	 */
@@ -505,6 +505,13 @@ public class RTMLCreate
 		
 	}
 
+	/**
+	 * Create a Schedule tag.
+	 * @param observationElement The observation XML node to add the schedule to.
+	 * @param schedule The RTML schedule data.
+	 * @see #createTimeConstraint
+	 * @see #RTMLSchedule
+	 */
 	private void createSchedule(Element observationElement,RTMLSchedule schedule)
 	{
 		Element scheduleElement = null;
@@ -521,8 +528,48 @@ public class RTMLCreate
 		exposureElement.appendChild(document.createTextNode(""+schedule.getExposureLength()));
 		// add exposure to a schedule
 		scheduleElement.appendChild(exposureElement);
+		// TimeConstraint
+		if((schedule.getStartDate() != null) || (schedule.getEndDate() != null))
+			createTimeConstraint(scheduleElement,schedule);
 		// add schedule to a observation
 		observationElement.appendChild(scheduleElement);		
+	}
+
+	/**
+	 * Create a TimeConstraint tag.
+	 * @param scheduleElement The schedule XML node to add the schedule to.
+	 * @param schedule The RTML schedule data (which contains time constrint data).
+	 * @see #RTMLSchedule
+	 */
+	private void createTimeConstraint(Element scheduleElement,RTMLSchedule schedule)
+	{
+		Element timeConstraintElement = null;
+		Element dateTimeElement = null;
+		DateFormat dateFormat = null;
+
+		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		// schedule element
+		timeConstraintElement = (Element)document.createElement("TimeConstraint");
+		// start date time element
+		if(schedule.getStartDate() != null)
+		{
+			dateTimeElement = (Element)document.createElement("StartDateTime");
+			dateTimeElement.appendChild(document.createTextNode(
+					     dateFormat.format(schedule.getStartDate())));
+			// add dateTimeElement to a timeConstraintElement
+			timeConstraintElement.appendChild(dateTimeElement);
+		}
+		// end date time element
+		if(schedule.getEndDate() != null)
+		{
+			dateTimeElement = (Element)document.createElement("EndDateTime");
+			dateTimeElement.appendChild(document.createTextNode(
+					     dateFormat.format(schedule.getEndDate())));
+			// add dateTimeElement to a timeConstraintElement
+			timeConstraintElement.appendChild(dateTimeElement);
+		}
+		// add timeConstraintElement to a scheduleElement
+		scheduleElement.appendChild(timeConstraintElement);		
 	}
 
 	/**
@@ -583,6 +630,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.20  2005/04/25 10:32:18  cjm
+** Added creation of Target ident attribute.
+**
 ** Revision 1.19  2005/01/19 12:06:21  cjm
 ** Reordered Observation node creation to match DTD - apparently this is important.
 **
