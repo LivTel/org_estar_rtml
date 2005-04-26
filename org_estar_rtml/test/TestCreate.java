@@ -1,5 +1,5 @@
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.6 2005-04-25 10:31:50 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.7 2005-04-26 11:27:16 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -12,14 +12,14 @@ import org.estar.rtml.*;
 /**
  * This class tests RTMLCreate.
  * @author Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.6 2005-04-25 10:31:50 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.7 2005-04-26 11:27:16 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
@@ -346,6 +346,29 @@ public class TestCreate
 					System.exit(5);
 				}
 			}
+			else if(args[i].equals("-end_date"))
+			{
+				if((i+1) < args.length)
+				{
+					if(schedule != null)
+					{
+						schedule.setEndDate(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:end_date:schedule was null.");
+						System.exit(2);
+					}
+					i+= 1;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:end_date needs a date.");
+					System.exit(2);
+				}
+			}
 			else if(args[i].equals("-exposure"))
 			{
 				if((i+2) < args.length)
@@ -501,6 +524,29 @@ public class TestCreate
 			{
 				document.setType("score");
 			}
+			else if(args[i].equals("-start_date"))
+			{
+				if((i+1) < args.length)
+				{
+					if(schedule != null)
+					{
+						schedule.setStartDate(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:start_date:schedule was null.");
+						System.exit(2);
+					}
+					i+= 1;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:start_date needs a date.");
+					System.exit(2);
+				}
+			}
 			else if(args[i].equals("-target_ident"))
 			{
 				if((i+1) < args.length)
@@ -583,6 +629,8 @@ public class TestCreate
 		System.err.println("\t<-observation <-name <string>> <-target_ident <string>> ");
 		System.err.println("\t\t<-ra <HH:MM:SS>> <-dec <[+|-]DD:MM:SS>> [-toop]");
 		System.err.println("\t\t<-exposure <length> <units>>>");
+		System.err.println("\t\t<-start_date <yyyy-MM-ddTHH:mm:ss>>");
+		System.err.println("\t\t<-end_date <yyyy-MM-ddTHH:mm:ss>>");
 	}
 
 	/**
@@ -609,6 +657,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.6  2005/04/25 10:31:50  cjm
+** Added target ident.
+**
 ** Revision 1.5  2005/01/19 12:07:11  cjm
 ** Added -project print.
 ** Added detector/binning.
