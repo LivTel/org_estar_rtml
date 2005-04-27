@@ -10,8 +10,9 @@ JAR_FILE	=org_$(ESTAR_NAME)_$(RTML_NAME).jar
 JAVACFLAGS 	= -d $(LIBDIR) -sourcepath ../../../ -classpath $(LIBDIR):$(CLASSPATH)
 DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 
-SRCS = RTMLException.java RTMLErrorHandler.java RTMLIntelligentAgent.java \
-	RTMLTarget.java RTMLSchedule.java RTMLDevice.java RTMLDetector.java RTMLObservation.java \
+SRCS = RTMLException.java RTMLErrorHandler.java RTMLPeriodFormat.java RTMLIntelligentAgent.java \
+	RTMLTarget.java RTMLSeriesConstraint.java RTMLSchedule.java \
+	RTMLDevice.java RTMLDetector.java RTMLObservation.java \
 	RTMLDocument.java RTMLParser.java RTMLCreate.java RTMLContact.java RTMLProject.java
 OBJS = $(SRCS:%.java=$(LIBDIR)/$(PACKAGEDIR)/%.class)
 DOCS = $(SRCS:%.java=$(DOCSDIR)/$(PACKAGEDIR)/%.html)
