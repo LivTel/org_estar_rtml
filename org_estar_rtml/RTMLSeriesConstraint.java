@@ -1,5 +1,5 @@
 // RTMLSeriesConstraint.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSeriesConstraint.java,v 1.2 2005-04-27 15:40:05 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSeriesConstraint.java,v 1.3 2005-04-27 15:41:56 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -17,14 +17,14 @@ import java.text.*;
  * <i>Do the observation <b>count</b> times with a time period of <b>interval</b> 
  * +/- <b>tolerance</b> between them.</i>
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class RTMLSeriesConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSeriesConstraint.java,v 1.2 2005-04-27 15:40:05 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSeriesConstraint.java,v 1.3 2005-04-27 15:41:56 cjm Exp $";
 	/**
 	 * The number of times the observation associated wit this SeriesConstraint should be executed.
 	 */
@@ -182,13 +182,18 @@ public class RTMLSeriesConstraint implements Serializable
 		sb = new StringBuffer();
 		sb.append(prefix+"Series Constrint:\n");
 		sb.append(prefix+"\tCount:"+count+"\n");
-		sb.append(prefix+"\tInterval:"+interval+" : "+interval.getMilliseconds()+" ms.\n");
-		sb.append(prefix+"\tTolerance:"+tolerance+" : "+tolerance.getMilliseconds()+" ms.\n");
+		if(interval != null)
+			sb.append(prefix+"\tInterval:"+interval+" : "+interval.getMilliseconds()+" ms.\n");
+		if(tolerance != null)
+			sb.append(prefix+"\tTolerance:"+tolerance+" : "+tolerance.getMilliseconds()+" ms.\n");
 		return sb.toString();
 	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2005/04/27 15:40:05  cjm
+** Fixed toString tabbing.
+**
 ** Revision 1.1  2005/04/27 13:46:24  cjm
 ** Initial revision
 **
