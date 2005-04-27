@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.12 2005-04-26 11:26:44 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.13 2005-04-27 15:44:27 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -31,14 +31,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.12 2005-04-26 11:26:44 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.13 2005-04-27 15:44:27 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -1350,7 +1350,7 @@ public class RTMLParser
 			throw new RTMLException(this.getClass().getName()+":parseScheduleNode:Illegal Node Name:"+
 						scheduleNode.getNodeName());
 		}
-		// add target node
+		// add schedule node
 		schedule = new RTMLSchedule();
 		// go through child nodes
 		childList = scheduleNode.getChildNodes();
@@ -1366,6 +1366,8 @@ public class RTMLParser
 					parseCalibrationNode(schedule,childNode);
 				else if(childNode.getNodeName() == "TimeConstraint")
 					parseTimeConstraintNode(schedule,childNode);
+				else if(childNode.getNodeName() == "SeriesConstraint")
+					parseSeriesConstraintNode(schedule,childNode);
 			}
 		}
 		// add scheule to observation
@@ -1492,7 +1494,6 @@ public class RTMLParser
 			childNode = childList.item(i);
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
-				childNode.getNodeValue();
 				s = childNode.getNodeValue();
 				if(s.equals("never"))
 					date = null;
@@ -1511,6 +1512,67 @@ public class RTMLParser
 			}
 		}
 		return date;
+	}
+
+	/**
+	 * Internal method to parse a SeriesConstraint node.
+	 * @param schedule The instance of RTMLSchedule to set the series constrints for.
+	 * @param seriesConstraintNode The XML DOM node for the SeriesConstrint tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @see #parseIntegerNode
+	 * @see #parsePeriodNode
+	 * @see #RTMLSchedule
+	 * @see #RTMLSeriesConstraint
+	 */
+	private void parseSeriesConstraintNode(RTMLSchedule schedule,Node seriesConstraintNode) throws RTMLException
+	{
+		RTMLSeriesConstraint seriesConstraint = null;
+		RTMLPeriodFormat period = null;
+		Node childNode;
+		NodeList childList;
+		int count;
+
+		// check current XML node is correct
+		if(seriesConstraintNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseSeriesConstraintNode:Illegal Node:"+
+						seriesConstraintNode);
+		}
+		if(seriesConstraintNode.getNodeName() != "SeriesConstraint")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseSeriesConstraintNode:Illegal Node Name:"+
+						seriesConstraintNode.getNodeName());
+		}
+		// add series constraint object
+		seriesConstraint = new RTMLSeriesConstraint();
+		// go through child nodes
+		childList = seriesConstraintNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+			
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "Count")
+				{
+					count = parseIntegerNode(childNode);
+					seriesConstraint.setCount(count);
+				}
+				else if(childNode.getNodeName() == "Interval")
+				{
+					period = parsePeriodNode(childNode);
+					seriesConstraint.setInterval(period);
+				}
+				else if(childNode.getNodeName() == "Tolerance")
+				{
+					period = parsePeriodNode(childNode);
+					seriesConstraint.setTolerance(period);
+				}
+			}
+		}
+		// add series constraint to schedule
+		schedule.setSeriesConstraint(seriesConstraint);
 	}
 
 	/**
@@ -1721,9 +1783,85 @@ public class RTMLParser
 				System.err.println("parseCompletionTimeNode:"+childNode);
 		}
 	}
+
+	/**
+	 * Parse a child node, containing a text node with an integer number. 
+	 * This is a node (such as Count) containing an integer number.
+	 * @param integerNode The XML node containing an integer to parse as it's CDATA.
+	 * @return The parsed integer is returned. Note if no text is found in the node, 0 is returned.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 */
+	private int parseIntegerNode(Node integerNode) throws RTMLException
+	{
+		Node childNode;
+		NodeList childList;
+		String s = null;
+		int number = 0;
+
+		childList = integerNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+			if(childNode.getNodeType() == Node.TEXT_NODE)
+			{
+				s = childNode.getNodeValue();
+				try
+				{
+					number = Integer.parseInt(s);
+				}
+				catch(NumberFormatException e)
+				{
+					throw new RTMLException(this.getClass().getName()+
+								":parseInteger:Illegal integer:"+s+":",e);
+				}
+			}
+		}
+		return number;
+	}
+
+	/**
+	 * Parse a child node, containing a text node with a period specification of the form:
+	 * <code>
+	 * P{(yyyy)Y{(mm)M}{(dd)D}{T{(hh)H}{(mm}M}{(ss.s..)S}
+	 * </code>
+	 * @param periodNode The XML node containing a period to parse as it's CDATA.
+	 * @return The parsed period is returned. Note if no text is found in the node, null is returned.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 */
+	private RTMLPeriodFormat parsePeriodNode(Node periodNode) throws RTMLException
+	{
+		RTMLPeriodFormat period = null;
+		Node childNode;
+		NodeList childList;
+		String s = null;
+
+		childList = periodNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+			if(childNode.getNodeType() == Node.TEXT_NODE)
+			{
+				s = childNode.getNodeValue();
+				period = new RTMLPeriodFormat();
+				try
+				{
+					period.parse(s);
+				}
+				catch(Exception e)
+				{
+					throw new RTMLException(this.getClass().getName()+
+								":parsePeriodNode:Illegal period:"+s+":",e);
+				}
+			}
+		}
+		return period;
+	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.12  2005/04/26 11:26:44  cjm
+** Added Schedule TimeConstraint parsing.
+**
 ** Revision 1.11  2005/04/25 10:32:36  cjm
 ** Added parsing of Target ident attribute.
 **
