@@ -1,5 +1,5 @@
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.8 2005-04-26 15:02:35 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.9 2005-04-27 15:45:47 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -11,15 +11,20 @@ import org.estar.rtml.*;
 
 /**
  * This class tests RTMLCreate.
+ * Use:
+ * <code>
+ * java org.estar.rtml.test.TestCreate -help
+ * </code>
+ * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.8 2005-04-26 15:02:35 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.9 2005-04-27 15:45:47 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
@@ -60,6 +65,10 @@ public class TestCreate
 	 * RTML schedule data.
 	 */
 	protected RTMLSchedule schedule = null;
+	/**
+	 * RTML schedule series constraint data.
+	 */
+	protected RTMLSeriesConstraint seriesConstraint = null;
 	/**
 	 * Version string used to set RTML Element's version attribute.
 	 * Leaving as null causes RTMLCreate to use the default.
@@ -509,6 +518,7 @@ public class TestCreate
 				target = new RTMLTarget();
 				target.setEquinox("J2000");
 				schedule = new RTMLSchedule();
+				seriesConstraint = null; // reset to blank for next schedule
 			}
 			else if(args[i].equals("-project"))
 			{
@@ -570,6 +580,90 @@ public class TestCreate
 			else if(args[i].equals("-score"))
 			{
 				document.setType("score");
+			}
+			else if(args[i].equals("-series_constraint_count"))
+			{
+				if((i+1) < args.length)
+				{
+					if(schedule != null)
+					{
+						if(seriesConstraint == null)
+						{
+							seriesConstraint = new RTMLSeriesConstraint();
+							schedule.setSeriesConstraint(seriesConstraint);
+						}
+						seriesConstraint.setCount(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+						     ":parseArguments:series_constraint_count:schedule was null.");
+						System.exit(2);
+					}
+					i+= 1;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:series_constraint_count needs a count.");
+					System.exit(2);
+				}
+			}
+			else if(args[i].equals("-series_constraint_interval"))
+			{
+				if((i+1) < args.length)
+				{
+					if(schedule != null)
+					{
+						if(seriesConstraint == null)
+						{
+							seriesConstraint = new RTMLSeriesConstraint();
+							schedule.setSeriesConstraint(seriesConstraint);
+						}
+						seriesConstraint.setInterval(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+						     ":parseArguments:series_constraint_interval:schedule was null.");
+						System.exit(2);
+					}
+					i+= 1;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+						  ":parseArguments:series_constraint_interval needs an interval.");
+					System.exit(2);
+				}
+			}
+			else if(args[i].equals("-series_constraint_tolerance"))
+			{
+				if((i+1) < args.length)
+				{
+					if(schedule != null)
+					{
+						if(seriesConstraint == null)
+						{
+							seriesConstraint = new RTMLSeriesConstraint();
+							schedule.setSeriesConstraint(seriesConstraint);
+						}
+						seriesConstraint.setTolerance(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+						     ":parseArguments:series_constraint_tolerance:schedule was null.");
+						System.exit(2);
+					}
+					i+= 1;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+						  ":parseArguments:series_constraint_tolerance needs a tolerance.");
+					System.exit(2);
+				}
 			}
 			else if(args[i].equals("-start_date"))
 			{
@@ -684,8 +778,11 @@ public class TestCreate
 		System.err.println("\t<-observation <-name <string>> [-target_ident <string>] ");
 		System.err.println("\t\t<-ra <HH:MM:SS>> <-dec <[+|-]DD:MM:SS>> [-toop]");
 		System.err.println("\t\t<-exposure <length> <units>>");
-		System.err.println("\t\t<-start_date <yyyy-MM-ddTHH:mm:ss>>");
-		System.err.println("\t\t<-end_date <yyyy-MM-ddTHH:mm:ss>>>");
+		System.err.println("\t\t[-series_constraint_count <number>]");
+		System.err.println("\t\t[-series_constraint_interval <P{(y)Y{(m)M}{(d)D}{T{(h)H}{(m}M}{(s.s..)S}>]");
+		System.err.println("\t\t[-series_constraint_tolerance <P{(y)Y{(m)M}{(d)D}{T{(h)H}{(m}M}{(s.s..)S}>]");
+		System.err.println("\t\t[-start_date <yyyy-MM-ddTHH:mm:ss]>");
+		System.err.println("\t\t[-end_date <yyyy-MM-ddTHH:mm:ss>]>");
 	}
 
 	/**
@@ -712,6 +809,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.8  2005/04/26 15:02:35  cjm
+** Added -doctype_system_id and -rtml_version arguments.
+**
 ** Revision 1.7  2005/04/26 11:27:16  cjm
 ** Added TimeConstraint -start_date and -end_date command line arguments.
 **
