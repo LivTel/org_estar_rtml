@@ -1,5 +1,5 @@
 // RTMLPeriodFormat.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLPeriodFormat.java,v 1.1 2005-04-27 13:45:48 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLPeriodFormat.java,v 1.2 2005-04-27 15:22:04 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -13,14 +13,14 @@ import java.util.*;
  * </code>
  * For the purposes of this implementation, we have assumed 30 days in 1 month, and 365 days in 1 year.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RTMLPeriodFormat implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLPeriodFormat.java,v 1.1 2005-04-27 13:45:48 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLPeriodFormat.java,v 1.2 2005-04-27 15:22:04 cjm Exp $";
 	/**
 	 * Number of milliseconds in a second. 
 	 */
@@ -131,6 +131,11 @@ public class RTMLPeriodFormat implements Serializable
 				}
 				else if(tokenString.equals("Y"))
 				{
+					if(inT)
+					{
+						throw new RTMLException(this.getClass().getName()+
+									 ":parse("+s+"):Y detected after T.");
+					}
 					i = Integer.parseInt(valueString);
 					setYears(i);
 					valueString = null;
@@ -146,6 +151,11 @@ public class RTMLPeriodFormat implements Serializable
 				}
 				else if(tokenString.equals("D"))
 				{
+					if(inT)
+					{
+						throw new RTMLException(this.getClass().getName()+
+									 ":parse("+s+"):D detected after T.");
+					}
 					i = Integer.parseInt(valueString);
 					setDays(i);
 					valueString = null;
@@ -162,12 +172,22 @@ public class RTMLPeriodFormat implements Serializable
 				}
 				else if(tokenString.equals("H"))
 				{
+					if(inT == false)
+					{
+						throw new RTMLException(this.getClass().getName()+
+									 ":parse("+s+"):H detected before T.");
+					}
 					i = Integer.parseInt(valueString);
 					setHours(i);
 					valueString = null;
 				}
 				else if(tokenString.equals("S"))
 				{
+					if(inT == false)
+					{
+						throw new RTMLException(this.getClass().getName()+
+									 ":parse("+s+"):S detected before T.");
+					}
 					d = Double.parseDouble(valueString);
 					setSeconds(d);
 					valueString = null;
@@ -463,4 +483,7 @@ public class RTMLPeriodFormat implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2005/04/27 13:45:48  cjm
+** Initial revision
+**
 */
