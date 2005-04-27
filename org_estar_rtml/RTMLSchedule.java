@@ -1,5 +1,5 @@
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.3 2005-04-26 11:25:53 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.4 2005-04-27 15:36:40 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -11,14 +11,14 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RTMLSchedule implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.3 2005-04-26 11:25:53 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.4 2005-04-27 15:36:40 cjm Exp $";
 	/**
 	 * The type of the Exposure, the "type" attribute in the Exposure tag. Should be either "time" or
 	 * "snr".
@@ -42,6 +42,11 @@ public class RTMLSchedule implements Serializable
 	 * the observation should be started BEFORE this time.
 	 */
 	private Date endDate = null;
+	/**
+	 * Object containing details of any specified series constraint.
+	 * This reference can be null, if no series constraint was specified.
+	 */
+	private RTMLSeriesConstraint seriesConstraint = null;
 	/**
 	 * The calibration data that may be contained a a sub-tag.
 	 */
@@ -235,6 +240,46 @@ public class RTMLSchedule implements Serializable
 		return endDate;
 	}
 
+
+	/**
+	 * Set the series constraint data. This data contains information on how to repeat
+	 * the observation over time (e.g. a MonitorGroup, repeat the observation <b>count</b> time 
+	 * with an elapsed time between repeats of <b>interval</b> +/- <b>tolerance</b>.
+	 * @param sc A series constrint. This can be null.
+	 * @see #seriesConstraint
+	 */
+	public void setSeriesConstraint(RTMLSeriesConstraint sc)
+	{
+		seriesConstraint = sc;
+	}
+
+	/**
+	 * Get the series constraint data.
+	 * @return A series constrint. This can be null.
+	 * @see #seriesConstraint
+	 */
+	public RTMLSeriesConstraint getSeriesConstraint()
+	{
+		return seriesConstraint;
+	}
+
+	/**
+	 * Determine whether this schedule specifies a flexibly scheduled one off observation,
+	 * or a regularily spaced monitor group observation.
+	 * Currently a schedule containing a series constraint with a count > 1 is counted as a monitor group.
+	 * Note the interval and/or tolerance can still be null in this case (suitable defaults should be used?).
+	 * @return Returns true if this is a monitor group, false otherwise.
+	 */
+	public boolean isMonitorGroup()
+	{
+		if(seriesConstraint != null)
+		{
+			if(seriesConstraint.getCount() > 1)
+				return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Method to print out a string representation of this node.
 	 */
@@ -251,21 +296,28 @@ public class RTMLSchedule implements Serializable
 	 * @see #exposureLength
 	 * @see #startDate
 	 * @see #endDate
+	 * @see #seriesConstraint
+	 * @see #isMonitorGroup
 	 */
 	public String toString(String prefix)
 	{
 		StringBuffer sb = null;
 		
 		sb = new StringBuffer();
-		sb.append(prefix+"Schedule:\n");
+		sb.append(prefix+"Schedule: (Monitor Group:"+isMonitorGroup()+")\n");
 		sb.append(prefix+"\tExposure: type = "+exposureType+": units = "+exposureUnits+"\n");
 		sb.append(prefix+"\t\tLength:"+exposureLength+"\n");
+		if(getSeriesConstraint() != null)
+			sb.append(getSeriesConstraint().toString(prefix+"\t"));
 		sb.append(prefix+"\tBetween:"+startDate+" and "+endDate+"\n");
 		return sb.toString();
 	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2005/04/26 11:25:53  cjm
+** Added time constraint : startDate and endDate.
+**
 ** Revision 1.2  2005/01/19 15:30:38  cjm
 ** Added Serializable.
 **
