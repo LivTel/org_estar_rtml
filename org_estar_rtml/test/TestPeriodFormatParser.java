@@ -1,69 +1,72 @@
-// TestParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestPeriodFormatParser.java,v 1.1 2005-04-27 11:06:42 cjm Exp $
+// TestPeriodFormatParser.java
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestPeriodFormatParser.java,v 1.2 2005-04-27 13:45:42 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
 import java.util.*;
 
-import org.estar.astrometry.*;
 import org.estar.rtml.*;
 
 /**
- * This class tests RTMLParser.
+ * This class tests the parse method in TestPeriodFormatParser.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-public class TestParser
+public class TestPeriodFormatParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestPeriodFormatParser.java,v 1.1 2005-04-27 11:06:42 cjm Exp $";
+	public final static String RCSID = "$Id: TestPeriodFormatParser.java,v 1.2 2005-04-27 13:45:42 cjm Exp $";
 	/**
-	 * Name of file to parse.
+	 * The input period to parse.
 	 */
-	private String filename = null;
+	private String inputString = null;
 	/**
 	 * Parser to use for parsing.
 	 */
-	RTMLParser parser = null;
-	/**
-	 * The document structure returned by the parser.
-	 */
-	RTMLDocument document = null;
+	private RTMLPeriodFormat periodFormat = null;
 
 	/**
 	 * Default constructor.
 	 */
-	public TestParser()
+	public TestPeriodFormatParser()
 	{
 		super();
 	}
 
 	/**
 	 * Parse arguments.
-	 * @see #filename
+	 * @see #inputString
 	 */
 	public void parseArguments(String args[])
 	{
 		if(args.length != 1)
 		{
-			System.err.println("java -Dhttp.proxyHost=wwwcache.livjm.ac.uk -Dhttp.proxyPort=8080 org.estar.rtml.test.TestParser <filename>");
+			System.err.println("java org.estar.rtml.test.TestPeriodFormatParser <input period string>");
+			System.err.println("Period string is of the form: P{(yyyy)Y{(mm)M}{(dd)D}{T{(hh)H}{(mm}M}{(ss.s..)S}");
 			System.exit(2);
 		}
-		filename = args[0];
+		inputString = args[0];
 	}
 
 	/**
 	 * run method.
-	 * @see #parser
-	 * @see #document
+	 * @see #inputString
+	 * @see #periodFormat
 	 */
 	public void run() throws Exception
 	{
-		parser = new RTMLParser();
-		document = parser.parse(new File(filename));
-		System.out.println(document);
+		periodFormat = new RTMLPeriodFormat();
+		periodFormat.parse(inputString);
+		System.out.println(periodFormat);
+		System.out.println("Years:"+periodFormat.getYears());
+		System.out.println("Months:"+periodFormat.getMonths());
+		System.out.println("Days:"+periodFormat.getDays());
+		System.out.println("Hours:"+periodFormat.getHours());
+		System.out.println("Minutes:"+periodFormat.getMinutes());
+		System.out.println("Seconds:"+periodFormat.getSeconds());
+		System.out.println("Period in milliseconds:"+periodFormat.getMilliseconds());
 	}
 
 	/**
@@ -71,17 +74,17 @@ public class TestParser
 	 */
 	public static void main(String args[])
 	{
-		TestParser testParser = null;
+		TestPeriodFormatParser testParser = null;
 
 		try
 		{
-			testParser = new TestParser();
+			testParser = new TestPeriodFormatParser();
 			testParser.parseArguments(args);
 			testParser.run();
 		}
 		catch(Exception e)
 		{
-			System.err.println("TestParser:main:"+e);
+			System.err.println("TestPeriodFormatParser:main:"+e);
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -90,6 +93,9 @@ public class TestParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2005/04/27 11:06:42  cjm
+** Initial revision
+**
 ** Revision 1.1  2003/02/24 13:23:25  cjm
 ** Initial revision
 **
