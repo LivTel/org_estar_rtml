@@ -1,5 +1,5 @@
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.4 2005-04-27 15:36:40 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.5 2005-04-28 09:40:01 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -11,14 +11,14 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class RTMLSchedule implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.4 2005-04-27 15:36:40 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.5 2005-04-28 09:40:01 cjm Exp $";
 	/**
 	 * The type of the Exposure, the "type" attribute in the Exposure tag. Should be either "time" or
 	 * "snr".
@@ -101,7 +101,7 @@ public class RTMLSchedule implements Serializable
 	 * @return Returns true if the exposure type is snr, otherwise false.
 	 * @see #exposureType
 	 */
-	public boolean isTypeSNR()
+	public boolean isExposureTypeSNR()
 	{
 		return exposureType.equals("snr");
 	}
@@ -315,6 +315,9 @@ public class RTMLSchedule implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2005/04/27 15:36:40  cjm
+** Added SeriesConstraint handling.
+**
 ** Revision 1.3  2005/04/26 11:25:53  cjm
 ** Added time constraint : startDate and endDate.
 **
