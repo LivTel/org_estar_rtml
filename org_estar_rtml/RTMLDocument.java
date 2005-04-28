@@ -1,5 +1,5 @@
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.6 2005-01-19 11:51:27 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.7 2005-04-28 09:39:41 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -9,14 +9,14 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class RTMLDocument implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.6 2005-01-19 11:51:27 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.7 2005-04-28 09:39:41 cjm Exp $";
 	/**
 	 * The type of the document, as specified in the RTML node's "type" attribute.
 	 */
@@ -44,7 +44,7 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	/**
 	 * The score of the document. Note this should be a per observation score, according to the DTD.
 	 */
-	public double score = 0.0;
+	public Double score = null;
 	/**
 	 * The completion time. Note this should be a per observation score, according to the DTD.
 	 */
@@ -160,7 +160,7 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	 */
 	public void setScore(double s)
 	{
-		score = s;
+		score = new Double(s);
 	}
 
 	/**
@@ -171,9 +171,12 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	 */
 	public void setScore(String s) throws RTMLException
 	{
+		double d;
+
 		try
 		{
-			score = Double.parseDouble(s);
+			d = Double.parseDouble(s);
+			score = new Double(d);
 		}
 		catch(NumberFormatException e)
 		{
@@ -190,7 +193,7 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	 * @return The score.
 	 * @see #score
 	 */
-	public double getScore()
+	public Double getScore()
 	{
 		return score;
 	}
@@ -301,7 +304,8 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 			if(ob != null)
 				sb.append(prefix+ob.toString("\t")+"\n");
 		}
-		sb.append(prefix+"\tScore:"+getScore()+"\n");
+		if(getScore() != null)
+			sb.append(prefix+"\tScore:"+getScore()+"\n");
 		if(getCompletionTime() != null)
 			sb.append(prefix+"\tCompletion Time:"+getCompletionTime()+"\n");
 		if(type.equals("reject") && (errorString != null))
@@ -311,6 +315,9 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.6  2005/01/19 11:51:27  cjm
+** Now implments RTMLDeviceHolder.
+**
 ** Revision 1.5  2005/01/18 15:08:21  cjm
 ** Added project.
 **
