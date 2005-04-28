@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.23 2005-04-27 15:43:27 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.24 2005-04-28 09:43:14 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.23 $
+ * @version $Revision: 1.24 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.23 2005-04-27 15:43:27 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.24 2005-04-28 09:43:14 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -276,7 +276,8 @@ public class RTMLCreate
 			obs = d.getObservation(i);
 			createObservation(rtmlElement,obs);
 		}
-		createScore(rtmlElement,d.getScore());
+		if(d.getScore() != null)
+			createScore(rtmlElement,d.getScore());
 		if(d.getCompletionTime() != null)
 		{
 			createCompletionTime(rtmlElement,d.getCompletionTime());
@@ -690,12 +691,17 @@ public class RTMLCreate
 		rtmlElement.appendChild(imageDataElement);
 	}
 
-	private void createScore(Element rtmlElement,double score)
+	/**
+	 * Create a score element.
+	 * @param rtmlElement The RTML document element to put the score element in.
+	 * @param score A Double object. This method assumes it is non-null.
+	 */
+	private void createScore(Element rtmlElement,Double score)
 	{
 		Element e = null;
 
 		e = (Element)document.createElement("Score");
-		e.appendChild(document.createTextNode(""+score));
+		e.appendChild(document.createTextNode(score.toString()));
 		rtmlElement.appendChild(e);
 	}
 
@@ -715,6 +721,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.23  2005/04/27 15:43:27  cjm
+** Added createSeriesConstrint.
+**
 ** Revision 1.22  2005/04/26 15:02:59  cjm
 ** Added setDoctypeSystemID and setRTMLVersionString, so we can override the defaults.
 **
