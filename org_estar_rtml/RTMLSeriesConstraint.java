@@ -1,5 +1,5 @@
 // RTMLSeriesConstraint.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSeriesConstraint.java,v 1.3 2005-04-27 15:41:56 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSeriesConstraint.java,v 1.4 2005-04-28 09:23:27 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -7,7 +7,7 @@ import java.text.*;
 
 /**
  * This class is a data container for information contained in the SeriesConstraint nodes/tags of an RTML document.
- * There are three main elements in a SeriesConstrint:
+ * There are three main elements in a SeriesConstraint:
  * <ul>
  * <li><b>count</b>
  * <li><b>interval</b>
@@ -17,14 +17,14 @@ import java.text.*;
  * <i>Do the observation <b>count</b> times with a time period of <b>interval</b> 
  * +/- <b>tolerance</b> between them.</i>
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RTMLSeriesConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSeriesConstraint.java,v 1.3 2005-04-27 15:41:56 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSeriesConstraint.java,v 1.4 2005-04-28 09:23:27 cjm Exp $";
 	/**
 	 * The number of times the observation associated wit this SeriesConstraint should be executed.
 	 */
@@ -180,7 +180,7 @@ public class RTMLSeriesConstraint implements Serializable
 		StringBuffer sb = null;
 		
 		sb = new StringBuffer();
-		sb.append(prefix+"Series Constrint:\n");
+		sb.append(prefix+"Series Constraint:\n");
 		sb.append(prefix+"\tCount:"+count+"\n");
 		if(interval != null)
 			sb.append(prefix+"\tInterval:"+interval+" : "+interval.getMilliseconds()+" ms.\n");
@@ -191,6 +191,9 @@ public class RTMLSeriesConstraint implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2005/04/27 15:41:56  cjm
+** Fixed toString null reference problems with interval and tolerance.
+**
 ** Revision 1.2  2005/04/27 15:40:05  cjm
 ** Fixed toString tabbing.
 **
