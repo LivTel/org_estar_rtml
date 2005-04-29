@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.24 2005-04-28 09:43:14 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.25 2005-04-29 17:18:41 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.24 $
+ * @version $Revision: 1.25 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.24 2005-04-28 09:43:14 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.25 2005-04-29 17:18:41 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -554,6 +554,7 @@ public class RTMLCreate
 	{
 		Element scheduleElement = null;
 		Element exposureElement = null;
+		Element exposureCountElement = null;
 
 		// schedule element
 		scheduleElement = (Element)document.createElement("Schedule");
@@ -563,6 +564,13 @@ public class RTMLCreate
 			exposureElement.setAttribute("type",schedule.getExposureType());
 		if(schedule.getExposureUnits() != null)
 			exposureElement.setAttribute("units",schedule.getExposureUnits());
+		// exposure count element
+		if(schedule.getExposureCount() != 1)
+		{
+			exposureCountElement = (Element)document.createElement("Count");
+			exposureCountElement.appendChild(document.createTextNode(""+schedule.getExposureCount()));
+			exposureElement.appendChild(exposureCountElement);
+		}
 		exposureElement.appendChild(document.createTextNode(""+schedule.getExposureLength()));
 		// add exposure to a schedule
 		scheduleElement.appendChild(exposureElement);
@@ -721,6 +729,10 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.24  2005/04/28 09:43:14  cjm
+** Changed createScore to reflect the fact score is now an object,
+** so we can represent the lack of a score node.
+**
 ** Revision 1.23  2005/04/27 15:43:27  cjm
 ** Added createSeriesConstrint.
 **

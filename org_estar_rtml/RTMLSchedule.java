@@ -1,5 +1,5 @@
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.5 2005-04-28 09:40:01 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.6 2005-04-29 17:18:41 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -11,14 +11,14 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class RTMLSchedule implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.5 2005-04-28 09:40:01 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.6 2005-04-29 17:18:41 cjm Exp $";
 	/**
 	 * The type of the Exposure, the "type" attribute in the Exposure tag. Should be either "time" or
 	 * "snr".
@@ -32,6 +32,11 @@ public class RTMLSchedule implements Serializable
 	 * The length of the Exposure, the Exposure tag's text.
 	 */
 	private double exposureLength = 0.0;
+	/**
+	 * The number of exposures to do of this length.
+	 * This defaults to 1.
+	 */
+	private int exposureCount = 1;
 	/**
 	 * The date this observation can be scheduled from. i.e.
 	 * the observation should be started AFTER this time.
@@ -154,6 +159,48 @@ public class RTMLSchedule implements Serializable
 	public double getExposureLength()
 	{
 		return exposureLength;
+	}
+
+	/**
+	 * Set the exposure count. 
+	 * @param s A string representing an integer, which is the number of exposures.
+	 *         The string should represent a number of at least 1.
+	 * @see #exposureCount
+	 * @see #setExposureCount
+	 * @exception NumberFormatException Thrown if the string is not a valid number.
+	 */
+	public void setExposureCount(String s) throws NumberFormatException,IllegalArgumentException
+	{
+		int i;
+
+		i = Integer.parseInt(s);
+		setExposureCount(i);
+	}
+
+	/**
+	 * Set the number of exposures to do at that length.
+	 * @param i The number of exposures. This must be at least 1.
+	 * @see #exposureCount
+	 * @exception IllegalArgumentException Thrown if the integer is not at least 1.
+	 */
+	public void setExposureCount(int i) throws IllegalArgumentException
+	{
+		if(i < 1)
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+":setExposureCount:count "+
+							   i+" less than 1.");
+		}
+		exposureCount = i;
+	}
+
+	/**
+	 * Get the exposure count.
+	 * @return The number of exposures.
+	 * @see #exposureCount
+	 */
+	public int getExposureCount()
+	{
+		return exposureCount;
 	}
 
 	/**
@@ -294,6 +341,7 @@ public class RTMLSchedule implements Serializable
 	 * @see #exposureType
 	 * @see #exposureUnits
 	 * @see #exposureLength
+	 * @see #exposureCount
 	 * @see #startDate
 	 * @see #endDate
 	 * @see #seriesConstraint
@@ -307,6 +355,7 @@ public class RTMLSchedule implements Serializable
 		sb.append(prefix+"Schedule: (Monitor Group:"+isMonitorGroup()+")\n");
 		sb.append(prefix+"\tExposure: type = "+exposureType+": units = "+exposureUnits+"\n");
 		sb.append(prefix+"\t\tLength:"+exposureLength+"\n");
+		sb.append(prefix+"\t\tCount:"+exposureCount+"\n");
 		if(getSeriesConstraint() != null)
 			sb.append(getSeriesConstraint().toString(prefix+"\t"));
 		sb.append(prefix+"\tBetween:"+startDate+" and "+endDate+"\n");
@@ -315,6 +364,9 @@ public class RTMLSchedule implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.5  2005/04/28 09:40:01  cjm
+** isTypeSNR changed to isExposureTypeSNR to be consistent.
+**
 ** Revision 1.4  2005/04/27 15:36:40  cjm
 ** Added SeriesConstraint handling.
 **

@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.13 2005-04-27 15:44:27 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.14 2005-04-29 17:18:41 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -31,14 +31,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.13 2005-04-27 15:44:27 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.14 2005-04-29 17:18:41 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -1379,6 +1379,7 @@ public class RTMLParser
 	 * @param schedule The instance of RTMLSchedule to set the exposure for.
 	 * @param exposureNode The XML DOM node for the Exposure tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @see #parseIntegerNode
 	 */
 	private void parseExposureNode(RTMLSchedule schedule,Node exposureNode) throws RTMLException
 	{
@@ -1386,6 +1387,7 @@ public class RTMLParser
 		Node childNode,attributeNode;
 		NodeList childList;
 		String units = null,type = null;
+		int count;
 
 		// check current XML node is correct
 		if(exposureNode.getNodeType() != Node.ELEMENT_NODE)
@@ -1413,8 +1415,16 @@ public class RTMLParser
 		for(int i = 0; i < childList.getLength(); i++)
 		{
 			childNode = childList.item(i);
-			
-			if(childNode.getNodeType() == Node.TEXT_NODE)
+
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "Count")
+				{
+					count = parseIntegerNode(childNode);
+					schedule.setExposureCount(count);
+				}
+			}
+			else if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
 				schedule.setExposureLength(childNode.getNodeValue());
 			}
@@ -1798,6 +1808,12 @@ public class RTMLParser
 		String s = null;
 		int number = 0;
 
+		// check current XML node is correct
+		if(integerNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseIntegerNode:Illegal Node:"+
+						integerNode);
+		}
 		childList = integerNode.getChildNodes();
 		for(int i = 0; i < childList.getLength(); i++)
 		{
@@ -1859,6 +1875,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.13  2005/04/27 15:44:27  cjm
+** Added parseSeriesConstraintNode, parseIntegerNode and parsePeriodNode.
+**
 ** Revision 1.12  2005/04/26 11:26:44  cjm
 ** Added Schedule TimeConstraint parsing.
 **
