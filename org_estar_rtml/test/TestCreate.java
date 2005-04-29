@@ -1,5 +1,5 @@
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.9 2005-04-27 15:45:47 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.10 2005-04-29 17:19:31 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -17,14 +17,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.9 2005-04-27 15:45:47 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.10 2005-04-29 17:19:31 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
@@ -137,6 +137,24 @@ public class TestCreate
 							   ":parseArguments:Binning:Device was null.");
 					System.exit(4);
 				}
+			}
+			else if(args[i].equals("-completion_time"))
+			{
+				if((i+1) < args.length)
+				{
+					document.setCompletionTime(args[i+1]);
+					i+= 1;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:completion_time needs a date.");
+					System.exit(2);
+				}
+			}
+			else if(args[i].equals("-confirmation"))
+			{
+				document.setType("confirmation");
 			}
 			else if(args[i].equals("-contact"))
 			{
@@ -388,6 +406,20 @@ public class TestCreate
 					System.exit(2);
 				}
 			}
+			else if(args[i].equals("-document_score"))
+			{
+				if((i+1) < args.length)
+				{
+					document.setScore(args[i+1]);
+					i+= 1;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:document_score needs a double.");
+					System.exit(2);
+				}
+			}
 			else if(args[i].equals("-end_date"))
 			{
 				if((i+1) < args.length)
@@ -413,12 +445,13 @@ public class TestCreate
 			}
 			else if(args[i].equals("-exposure"))
 			{
-				if((i+2) < args.length)
+				if((i+3) < args.length)
 				{
 					if(schedule != null)
 					{
 						schedule.setExposureLength(args[i+1]);
 						schedule.setExposureUnits(args[i+2]);
+						schedule.setExposureCount(args[i+3]);
 						schedule.setExposureType("time");
 					}
 					else
@@ -427,7 +460,7 @@ public class TestCreate
 								   ":parseArguments:exposure:schedule was null.");
 						System.exit(2);
 					}
-					i+= 2;
+					i+= 3;
 				}
 				else
 				{
@@ -557,6 +590,21 @@ public class TestCreate
 					System.err.println(this.getClass().getName()+
 							   ":parseArguments:RA needs value.");
 					System.exit(3);
+				}
+			}
+			else if(args[i].equals("-reject"))
+			{
+				if((i+1) < args.length)
+				{
+					document.setType("reject");
+					document.setErrorString(args[i+1]);
+					i+= 1;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:reject needs an error string.");
+					System.exit(2);
 				}
 			}
 			else if(args[i].equals("-request"))
@@ -768,7 +816,8 @@ public class TestCreate
 		System.err.println("java -Dhttp.proxyHost=wwwcache.livjm.ac.uk -Dhttp.proxyPort=8080 org.estar.rtml.test.TestCreate");
 		System.err.println("\t[-doctype_system_id <url string>]");
 		System.err.println("\t[-rtml_version <string>]");
-		System.err.println("\t<-request|-score><-iahost <hostname><-iaid <id>><-iaport <number>>[-help]");
+		System.err.println("\t<-request|-score|-confirmation|-reject <error string>>");
+		System.err.println("\t<-iahost <hostname><-iaid <id>><-iaport <number>>[-help]");
 		System.err.println("\t[-project <proposal id>]");
 		System.err.println("\t[-contact [-contact_address <address>][-contact_email <email>]");
 		System.err.println("\t\t[-contact_fax <fax>][-contact_institution <institute>][-contact_name <name>]");
@@ -777,12 +826,14 @@ public class TestCreate
 		System.err.println("\t\t[-binning <x> <y>]]");
 		System.err.println("\t<-observation <-name <string>> [-target_ident <string>] ");
 		System.err.println("\t\t<-ra <HH:MM:SS>> <-dec <[+|-]DD:MM:SS>> [-toop]");
-		System.err.println("\t\t<-exposure <length> <units>>");
+		System.err.println("\t\t<-exposure <length> <units> <count>>");
 		System.err.println("\t\t[-series_constraint_count <number>]");
 		System.err.println("\t\t[-series_constraint_interval <P{(y)Y{(m)M}{(d)D}{T{(h)H}{(m}M}{(s.s..)S}>]");
 		System.err.println("\t\t[-series_constraint_tolerance <P{(y)Y{(m)M}{(d)D}{T{(h)H}{(m}M}{(s.s..)S}>]");
 		System.err.println("\t\t[-start_date <yyyy-MM-ddTHH:mm:ss]>");
 		System.err.println("\t\t[-end_date <yyyy-MM-ddTHH:mm:ss>]>");
+		System.err.println("\t[-document_score <double>]");
+		System.err.println("\t[-completion_time <yyyy-MM-dd'T'HH:mm:ss>]");
 	}
 
 	/**
@@ -809,6 +860,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.9  2005/04/27 15:45:47  cjm
+** Added series constraint handling.
+**
 ** Revision 1.8  2005/04/26 15:02:35  cjm
 ** Added -doctype_system_id and -rtml_version arguments.
 **
