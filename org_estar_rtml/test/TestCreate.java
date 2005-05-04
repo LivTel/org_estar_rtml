@@ -1,5 +1,5 @@
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.10 2005-04-29 17:19:31 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.11 2005-05-04 18:55:28 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -17,14 +17,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.10 2005-04-29 17:19:31 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.11 2005-05-04 18:55:28 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
@@ -69,6 +69,10 @@ public class TestCreate
 	 * RTML schedule series constraint data.
 	 */
 	protected RTMLSeriesConstraint seriesConstraint = null;
+	/**
+	 * RTML observation image data.
+	 */
+	protected RTMLImageData imageData = null;
 	/**
 	 * Version string used to set RTML Element's version attribute.
 	 * Leaving as null causes RTMLCreate to use the default.
@@ -516,6 +520,31 @@ public class TestCreate
 					System.exit(2);
 				}
 			}
+			else if(args[i].equals("-image_data_url"))
+			{
+				if((i+1) < args.length)
+				{
+					if(observation != null)
+					{
+						imageData = new RTMLImageData();
+						observation.addImageData(imageData);
+						imageData.setImageDataURL(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+						     ":parseArguments:image_data_url:observation was null.");
+						System.exit(2);
+					}
+					i+= 1;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:image_data_url needs a URL.");
+					System.exit(2);
+				}
+			}
 			else if(args[i].equals("-name"))
 			{
 				if((i+1) < args.length)
@@ -552,6 +581,7 @@ public class TestCreate
 				target.setEquinox("J2000");
 				schedule = new RTMLSchedule();
 				seriesConstraint = null; // reset to blank for next schedule
+				imageData = null; // reset to blank for next image data
 			}
 			else if(args[i].equals("-project"))
 			{
@@ -832,6 +862,7 @@ public class TestCreate
 		System.err.println("\t\t[-series_constraint_tolerance <P{(y)Y{(m)M}{(d)D}{T{(h)H}{(m}M}{(s.s..)S}>]");
 		System.err.println("\t\t[-start_date <yyyy-MM-ddTHH:mm:ss]>");
 		System.err.println("\t\t[-end_date <yyyy-MM-ddTHH:mm:ss>]>");
+		System.err.println("\t\t[-image_data_url <url>");
 		System.err.println("\t[-document_score <double>]");
 		System.err.println("\t[-completion_time <yyyy-MM-dd'T'HH:mm:ss>]");
 	}
@@ -860,6 +891,11 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.10  2005/04/29 17:19:31  cjm
+** Added confirmation and reject flags.
+** Added document_score/completion time flag.
+** Added exposure count option.
+**
 ** Revision 1.9  2005/04/27 15:45:47  cjm
 ** Added series constraint handling.
 **
