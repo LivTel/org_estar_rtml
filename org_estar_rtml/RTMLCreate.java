@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.25 2005-04-29 17:18:41 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.26 2005-05-04 18:59:45 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.25 $
+ * @version $Revision: 1.26 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.25 2005-04-29 17:18:41 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.26 2005-05-04 18:59:45 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -461,6 +461,7 @@ public class RTMLCreate
 	private void createObservation(Element rtmlElement,RTMLObservation observation)
 	{
 		Element observationElement = null;
+		RTMLImageData imageData = null;
 
 		observationElement = (Element)document.createElement("Observation");
 		if(observation.getTarget() != null)
@@ -469,10 +470,10 @@ public class RTMLCreate
 			createDevice(observationElement,observation.getDevice());
 		if(observation.getSchedule() != null)
 			createSchedule(observationElement,observation.getSchedule());
-		if((observation.getImageDataURL() != null)||(observation.getImageDataType() != null))
+		for(int i = 0; i < observation.getImageDataCount(); i++)
 		{
-			createImageData(observationElement,observation.getImageDataType(),
-					observation.getImageDataURL());
+			imageData = observation.getImageData(i);
+			createImageData(observationElement,imageData);
 		}
 		rtmlElement.appendChild(observationElement);
 	}
@@ -669,19 +670,44 @@ public class RTMLCreate
 	/**
 	 * Mehtod to create image data sub-node.
 	 * @param rtmlElement The Element to add the <ImageData> node to.
-	 * @param imageDataType The type of the image data, can be null.
-	 * @param imageDataURL The URL of the image data, can be null.
+	 * @param imageData The object to construct the <ImageData> node from.
+	 * @see RTMLImageData
 	 */
-	private void createImageData(Element rtmlElement,String imageDataType,URL imageDataURL)
+	private void createImageData(Element rtmlElement,RTMLImageData imageData)
 	{
 		Element imageDataElement = null;
+		Element fitsHeaderElement = null;
+		Element objectListElement = null;
+		String imageDataType = null;
 		String s = null;
 
 		imageDataElement = (Element)document.createElement("ImageData");
-		// if URL is present, add as text node
-		if(imageDataURL != null)
+		// FITS header
+		if(imageData.getFITSHeader() != null)
 		{
-			s = imageDataURL.toString();
+			fitsHeaderElement = (Element)document.createElement("FITSHeader");
+			fitsHeaderElement.appendChild(document.createTextNode(imageData.getFITSHeader()));
+			imageDataElement.appendChild(fitsHeaderElement);
+		}
+		// Cluster
+		if(imageData.getObjectListCluster() != null)
+		{
+			objectListElement = (Element)document.createElement("ObjectList");
+			objectListElement.appendChild(document.createTextNode(imageData.getObjectListCluster()));
+			if(imageData.getObjectListType() != null)
+			{
+				objectListElement.setAttribute("type",imageData.getObjectListType());
+				objectListElement.setAttribute("format",
+					     " fn sn rah ram ras decd decm decs xpos ypos mag magerror magflag");
+			}
+			imageDataElement.appendChild(objectListElement);
+		}
+		// get image data type
+		imageDataType = imageData.getImageDataType();
+		// if URL is present, add as text node
+		if(imageData.getImageDataURL() != null)
+		{
+			s = imageData.getImageDataURL().toString();
 			imageDataElement.appendChild(document.createTextNode(s));
 			// if no imageDataType has been set, we can deduce this from the end of the URL
 			if(imageDataType == null)
@@ -729,6 +755,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.25  2005/04/29 17:18:41  cjm
+** Added exposureCount.
+**
 ** Revision 1.24  2005/04/28 09:43:14  cjm
 ** Changed createScore to reflect the fact score is now an object,
 ** so we can represent the lack of a score node.
