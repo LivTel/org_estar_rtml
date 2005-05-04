@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.14 2005-04-29 17:18:41 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.15 2005-05-04 18:58:25 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -31,14 +31,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.14 2005-04-29 17:18:41 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.15 2005-05-04 18:58:25 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -971,9 +971,7 @@ public class RTMLParser
 	 * @exception RTMLException Thrown if a strange child is in the node.
 	 * @see #parseTargetNode
 	 * @see #parseScheduleNode
-	 * @see #parseObjectListNode
 	 * @see #parseImageDataNode
-	 * @see #parseFITSHeaderNode
 	 */
 	private void parseObservationNode(RTMLDocument rtmlDocument,Node observationNode) throws RTMLException
 	{
@@ -1008,12 +1006,8 @@ public class RTMLParser
 					parseTargetNode(observation,childNode);
 				else if(childNode.getNodeName() == "Schedule")
 					parseScheduleNode(observation,childNode);
-				else if(childNode.getNodeName() == "ObjectList")
-					parseObjectListNode(observation,childNode);
 				else if(childNode.getNodeName() == "ImageData")
 					parseImageDataNode(observation,childNode);
-				else if(childNode.getNodeName() == "FITSHeader")
-					parseFITSHeaderNode(observation,childNode);
 				else
 					System.err.println("parseObservationNode:ELEMENT:"+childNode);
 			}
@@ -1426,7 +1420,13 @@ public class RTMLParser
 			}
 			else if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
-				schedule.setExposureLength(childNode.getNodeValue());
+				if(childNode.getNodeValue() != null)
+				{
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						schedule.setExposureLength(childNode.getNodeValue());
+					}
+				}
 			}
 		}
 	}
@@ -1586,57 +1586,16 @@ public class RTMLParser
 	}
 
 	/**
-	 * Internal method to parse an ObjectList node.
-	 * @param observation The instance of RTMLObservation to set the object list for.
-	 * @param objectListNode The XML DOM node for the ObjectList tag node.
-	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
-	 */
-	private void parseObjectListNode(RTMLObservation observation,Node objectListNode) throws RTMLException
-	{
-		NamedNodeMap attributeList = null;
-		Node childNode,attributeNode;
-		NodeList childList;
-		String units = null,type = null;
-
-		// check current XML node is correct
-		if(objectListNode.getNodeType() != Node.ELEMENT_NODE)
-		{
-			throw new RTMLException(this.getClass().getName()+":parseObjectListNode:Illegal Node:"+
-						objectListNode);
-		}
-		if(objectListNode.getNodeName() != "ObjectList")
-		{
-			throw new RTMLException(this.getClass().getName()+":parseObjectListNode:Illegal Node Name:"+
-						objectListNode.getNodeName());
-		}
-		// go through attribute list
-		attributeList = objectListNode.getAttributes();
-		// type
-		attributeNode = attributeList.getNamedItem("type");
-		type = attributeNode.getNodeValue();
-		observation.setObjectListType(type);
-		// go through child nodes
-		childList = objectListNode.getChildNodes();
-		for(int i = 0; i < childList.getLength(); i++)
-		{
-			childNode = childList.item(i);
-			
-			if(childNode.getNodeType() == Node.TEXT_NODE)
-			{
-				if(type.equals("cluster"))
-					observation.setObjectListCluster(childNode.getNodeValue());
-			}
-		}
-	}
-
-	/**
 	 * Internal method to parse an ImageData node.
 	 * @param observation The instance of RTMLObservation to set the image data for.
 	 * @param imageDataNode The XML DOM node for the ImageData tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @see #parseFITSHeaderNode
+	 * @see #parseObjectListNode
 	 */
 	private void parseImageDataNode(RTMLObservation observation,Node imageDataNode) throws RTMLException
 	{
+		RTMLImageData imageData = null;
 		NamedNodeMap attributeList = null;
 		Node childNode,attributeNode;
 		NodeList childList;
@@ -1653,12 +1612,14 @@ public class RTMLParser
 			throw new RTMLException(this.getClass().getName()+":parseImageDataNode:Illegal Node Name:"+
 						imageDataNode.getNodeName());
 		}
+		// create new image data
+		imageData = new RTMLImageData();
 		// go through attribute list
 		attributeList = imageDataNode.getAttributes();
 		// type
 		attributeNode = attributeList.getNamedItem("type");
 		type = attributeNode.getNodeValue();
-		observation.setImageDataType(type);
+		imageData.setImageDataType(type);
 		// go through child nodes
 		childList = imageDataNode.getChildNodes();
 		for(int i = 0; i < childList.getLength(); i++)
@@ -1667,18 +1628,27 @@ public class RTMLParser
 			
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
-				observation.setImageDataURL(childNode.getNodeValue());
+				imageData.setImageDataURL(childNode.getNodeValue());
+			}
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "ObjectList")
+					parseObjectListNode(imageData,childNode);
+				else if(childNode.getNodeName() == "FITSHeader")
+					parseFITSHeaderNode(imageData,childNode);
 			}
 		}
+		// add image data to observation
+		observation.addImageData(imageData);
 	}
 
 	/**
 	 * Internal method to parse an FITSHeader node.
-	 * @param observation The instance of RTMLObservation to set the FITS header for.
+	 * @param imageData The instance of RTMLImageData to set the FITS header for.
 	 * @param fitsHeaderNode The XML DOM node for the FITSHeader tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
 	 */
-	private void parseFITSHeaderNode(RTMLObservation observation,Node fitsHeaderNode) throws RTMLException
+	private void parseFITSHeaderNode(RTMLImageData imageData,Node fitsHeaderNode) throws RTMLException
 	{
 		NamedNodeMap attributeList = null;
 		Node childNode,attributeNode;
@@ -1709,7 +1679,51 @@ public class RTMLParser
 			
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
-				observation.setFITSHeader(childNode.getNodeValue());
+				imageData.setFITSHeader(childNode.getNodeValue());
+			}
+		}
+	}
+
+	/**
+	 * Internal method to parse an ObjectList node.
+	 * @param imageData The instance of RTMLImageData to set the object list for.
+	 * @param objectListNode The XML DOM node for the ObjectList tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 */
+	private void parseObjectListNode(RTMLImageData imageData,Node objectListNode) throws RTMLException
+	{
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+		String units = null,type = null;
+
+		// check current XML node is correct
+		if(objectListNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseObjectListNode:Illegal Node:"+
+						objectListNode);
+		}
+		if(objectListNode.getNodeName() != "ObjectList")
+		{
+			throw new RTMLException(this.getClass().getName()+":parseObjectListNode:Illegal Node Name:"+
+						objectListNode.getNodeName());
+		}
+		// go through attribute list
+		attributeList = objectListNode.getAttributes();
+		// type
+		attributeNode = attributeList.getNamedItem("type");
+		type = attributeNode.getNodeValue();
+		imageData.setObjectListType(type);
+		// go through child nodes
+		childList = objectListNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+			
+			if(childNode.getNodeType() == Node.TEXT_NODE)
+			{
+				if(type.equals("cluster"))
+					imageData.setObjectListCluster(childNode.getNodeValue());
 			}
 		}
 	}
@@ -1875,6 +1889,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.14  2005/04/29 17:18:41  cjm
+** Added exposureCount.
+**
 ** Revision 1.13  2005/04/27 15:44:27  cjm
 ** Added parseSeriesConstraintNode, parseIntegerNode and parsePeriodNode.
 **
