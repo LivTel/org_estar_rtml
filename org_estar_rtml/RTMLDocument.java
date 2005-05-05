@@ -1,5 +1,5 @@
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.7 2005-04-28 09:39:41 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.8 2005-05-05 15:02:39 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -9,14 +9,14 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class RTMLDocument implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.7 2005-04-28 09:39:41 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.8 2005-05-05 15:02:39 cjm Exp $";
 	/**
 	 * The type of the document, as specified in the RTML node's "type" attribute.
 	 */
@@ -241,15 +241,6 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	}
 
 	/**
-	 * Method to print out a string representation of this node.
-	 * @see #toString(java.lang.String)
-	 */
-	public String toString()
-	{
-		return toString("");
-	}
-
-	/**
 	 * Set the error string. The error String is the TEXT node in the RTML element, if 
 	 * the document has type "reject".
 	 * @param s The error string.
@@ -268,6 +259,32 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	public String getErrorString()
 	{
 		return errorString;
+	}
+
+	/**
+	 * Clone the document and all it's sub elements.
+	 * @return a deep clone of the document.
+	 */
+	public Object deepClone() throws Exception
+	{
+		ByteArrayOutputStream b = new ByteArrayOutputStream();
+		ObjectOutputStream out = new ObjectOutputStream(b);
+		out.writeObject(this);
+		out.close();
+		ByteArrayInputStream bIn = new ByteArrayInputStream(b.toByteArray());
+		ObjectInputStream oi = new ObjectInputStream(bIn);
+		oi.close();
+		return oi.readObject();
+	}
+ 
+
+	/**
+	 * Method to print out a string representation of this node.
+	 * @see #toString(java.lang.String)
+	 */
+	public String toString()
+	{
+		return toString("");
 	}
 
 	/**
@@ -315,6 +332,10 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.7  2005/04/28 09:39:41  cjm
+** Changed score from primitive to object type.
+** This allows us to specify exactley when the score element is present, and when it isn't.
+**
 ** Revision 1.6  2005/01/19 11:51:27  cjm
 ** Now implments RTMLDeviceHolder.
 **
