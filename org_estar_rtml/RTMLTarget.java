@@ -1,5 +1,5 @@
 // RTMLTarget.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLTarget.java,v 1.3 2005-04-25 10:32:00 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLTarget.java,v 1.4 2005-05-12 10:07:02 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -8,14 +8,14 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the target nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RTMLTarget implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLTarget.java,v 1.3 2005-04-25 10:32:00 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLTarget.java,v 1.4 2005-05-12 10:07:02 cjm Exp $";
 	/**
 	 * The type of the Target, the type attribute in the Target tag. Should be either "normal" or
 	 * "toop".
@@ -157,8 +157,9 @@ public class RTMLTarget implements Serializable
 	 * Set the target right ascension.
 	 * @param s A string representing the right ascension, in colon separated format.
 	 * @see #ra
+	 * @exception IllegalArgumentException Thrown if there is a problem with the parsing.
 	 */
-	public void setRA(String s)
+	public void setRA(String s) throws IllegalArgumentException
 	{
 		ra = new RA();
 		ra.parseColon(s);
@@ -185,14 +186,16 @@ public class RTMLTarget implements Serializable
 	}
 
 	/**
-	 * Set the target declination.
+	 * Set the target declination. Now allows declinations with no sign character, assumes positive.
 	 * @param s A string representing the declination, in colon separated format.
 	 * @see #dec
+	 * @see org.estar.astrometry.Dec#parseColon(java.lang.String,boolean)
+	 * @exception IllegalArgumentException Thrown if there is a problem with the parsing.
 	 */
-	public void setDec(String s)
+	public void setDec(String s) throws IllegalArgumentException
 	{
 		dec = new Dec();
-		dec.parseColon(s);
+		dec.parseColon(s,false);
 	}
 
 	/**
@@ -264,6 +267,9 @@ public class RTMLTarget implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2005/04/25 10:32:00  cjm
+** Added ident attribute.
+**
 ** Revision 1.2  2005/01/19 15:30:38  cjm
 ** Added Serializable.
 **
