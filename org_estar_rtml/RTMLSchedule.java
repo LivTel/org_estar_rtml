@@ -1,5 +1,5 @@
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.6 2005-04-29 17:18:41 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.7 2005-05-26 13:23:00 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -11,14 +11,14 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class RTMLSchedule implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.6 2005-04-29 17:18:41 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.7 2005-05-26 13:23:00 cjm Exp $";
 	/**
 	 * The type of the Exposure, the "type" attribute in the Exposure tag. Should be either "time" or
 	 * "snr".
@@ -135,6 +135,8 @@ public class RTMLSchedule implements Serializable
 	 * Set the exposure length. What this value actually means is based on the units and type fields.
 	 * @param s The length, either as a length or a signal to noise ratio.
 	 * @see #exposureLength
+	 * @see #exposureType
+	 * @see #exposureUnits
 	 */
 	public void setExposureLength(String s) throws NumberFormatException
 	{
@@ -145,6 +147,8 @@ public class RTMLSchedule implements Serializable
 	 * Set the exposure length. What this value actually means is based on the units and type fields.
 	 * @param s The length, either as a length or a signal to noise ratio.
 	 * @see #exposureLength
+	 * @see #exposureType
+	 * @see #exposureUnits
 	 */
 	public void setExposureLength(double d)
 	{
@@ -155,10 +159,65 @@ public class RTMLSchedule implements Serializable
 	 * Get the exposure length.
 	 * @return The length.
 	 * @see #exposureLength
+	 * @see #exposureType
+	 * @see #exposureUnits
 	 */
 	public double getExposureLength()
 	{
 		return exposureLength;
+	}
+
+	/**
+	 * Get the exposure length as milliseconds.
+	 * Supported values for exposure units are defined in the DTD. All %timeUnits are supported, 
+	 * except those defined in the %calendarUnits and %timeSystemUnits sub-entities.
+	 * @return The length in milliseconds.
+	 * @see #exposureLength
+	 * @see #exposureType
+	 * @see #exposureUnits
+	 * @exception IllegalArgumentException Thrown if exposureType is "snr", or the units specified in exposureUnits
+	 *          are not supported.
+	 */
+	public double getExposureLengthMilliseconds() throws IllegalArgumentException
+	{
+		if(exposureType.equals("snr"))
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":getExposureLengthMilliseconds:Exposure Type is SNR.");
+		}
+		// see RTML DTD timeUnits entity, which also contains %calendarUnits and %timeSystemUnits
+		// We only support a (sensible) subset here
+		if(exposureUnits.equals("ms") ||
+		   exposureUnits.equals("msec") ||
+		   exposureUnits.equals("msecs") ||
+		   exposureUnits.equals("millisecond") ||
+		   exposureUnits.equals("milliseconds"))
+			return exposureLength;
+		else if(exposureUnits.equals("microsec") ||
+			exposureUnits.equals("microsecs") ||
+			exposureUnits.equals("microsecond") ||
+			exposureUnits.equals("microseconds"))
+			return exposureLength/1000.0;
+		else if(exposureUnits.equals("s") ||
+			exposureUnits.equals("sec") ||
+			exposureUnits.equals("secs") ||
+			exposureUnits.equals("second") ||
+			exposureUnits.equals("seconds"))
+			return exposureLength*1000.0;
+		else if(exposureUnits.equals("min") ||
+			exposureUnits.equals("mins") ||
+			exposureUnits.equals("minutes"))
+			return exposureLength*60.0*1000.0;
+		else if(exposureUnits.equals("hr") ||
+			exposureUnits.equals("hrs") ||
+			exposureUnits.equals("hour") ||
+			exposureUnits.equals("hours"))
+			return exposureLength*60.0*60.0*1000.0;
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+				":getExposureLengthMilliseconds:Exposure Units "+exposureUnits+" not supported.");
+		}
 	}
 
 	/**
@@ -364,6 +423,9 @@ public class RTMLSchedule implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.6  2005/04/29 17:18:41  cjm
+** Added exposureCount.
+**
 ** Revision 1.5  2005/04/28 09:40:01  cjm
 ** isTypeSNR changed to isExposureTypeSNR to be consistent.
 **
