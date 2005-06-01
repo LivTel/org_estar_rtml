@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.26 2005-05-04 18:59:45 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.27 2005-06-01 16:30:22 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.26 $
+ * @version $Revision: 1.27 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.26 2005-05-04 18:59:45 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.27 2005-06-01 16:30:22 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -686,6 +686,7 @@ public class RTMLCreate
 		if(imageData.getFITSHeader() != null)
 		{
 			fitsHeaderElement = (Element)document.createElement("FITSHeader");
+			fitsHeaderElement.setAttribute("type","all");// all fits headers
 			fitsHeaderElement.appendChild(document.createTextNode(imageData.getFITSHeader()));
 			imageDataElement.appendChild(fitsHeaderElement);
 		}
@@ -700,6 +701,8 @@ public class RTMLCreate
 				objectListElement.setAttribute("format",
 					     " fn sn rah ram ras decd decm decs xpos ypos mag magerror magflag");
 			}
+			else
+				objectListElement.setAttribute("type","cluster");
 			imageDataElement.appendChild(objectListElement);
 		}
 		// get image data type
@@ -755,6 +758,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.26  2005/05/04 18:59:45  cjm
+** Changed creation of ImageData, ObjectList and FITSHeader nodes.
+**
 ** Revision 1.25  2005/04/29 17:18:41  cjm
 ** Added exposureCount.
 **
