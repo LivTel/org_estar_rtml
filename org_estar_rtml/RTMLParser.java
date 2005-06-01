@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.15 2005-05-04 18:58:25 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.16 2005-06-01 16:30:13 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -31,14 +31,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLParser.java,v 1.15 2005-05-04 18:58:25 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLParser.java,v 1.16 2005-06-01 16:30:13 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -378,7 +378,14 @@ public class RTMLParser
 
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
-				project.setProject(childNode.getNodeValue());
+				if(childNode.getNodeValue() != null)
+				{
+					// ensure it is not all whitespace
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						project.setProject(childNode.getNodeValue());
+					}
+				}
 			}
 			if(childNode.getNodeType() == Node.ELEMENT_NODE)
 			{
@@ -425,7 +432,14 @@ public class RTMLParser
 			
 			if( childNode.getNodeType() == Node.TEXT_NODE )
 			{
-				contact.setUser( childNode.getNodeValue() );
+				if(childNode.getNodeValue() != null)
+				{
+					// ensure it is not all whitespace
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						contact.setUser( childNode.getNodeValue() );
+					}
+				}
 			}
 		}
 	}
@@ -464,7 +478,14 @@ public class RTMLParser
 			
 			if( childNode.getNodeType() == Node.TEXT_NODE )
 			{
-				contact.setName( childNode.getNodeValue() );
+				if(childNode.getNodeValue() != null)
+				{
+					// ensure it is not all whitespace
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						contact.setName( childNode.getNodeValue() );
+					}
+				}
 			}
 		}
 	}
@@ -503,7 +524,14 @@ public class RTMLParser
 			
 			if( childNode.getNodeType() == Node.TEXT_NODE )
 			{
-				contact.setInstitution( childNode.getNodeValue() );
+				if(childNode.getNodeValue() != null)
+				{
+					// ensure it is not all whitespace
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						contact.setInstitution( childNode.getNodeValue() );
+					}
+				}
 			}
 		}
 	}
@@ -542,7 +570,14 @@ public class RTMLParser
 			
 			if( childNode.getNodeType() == Node.TEXT_NODE )
 			{
-				contact.setAddress( childNode.getNodeValue() );
+				if(childNode.getNodeValue() != null)
+				{
+					// ensure it is not all whitespace
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						contact.setAddress( childNode.getNodeValue() );
+					}
+				}
 			}
 		}
 	}
@@ -581,7 +616,14 @@ public class RTMLParser
 			
 			if( childNode.getNodeType() == Node.TEXT_NODE )
 			{
-				contact.setTelephone( childNode.getNodeValue() );
+				if(childNode.getNodeValue() != null)
+				{
+					// ensure it is not all whitespace
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						contact.setTelephone( childNode.getNodeValue() );
+					}
+				}
 			}
 		}
 	}
@@ -620,7 +662,14 @@ public class RTMLParser
 			
 			if( childNode.getNodeType() == Node.TEXT_NODE )
 			{
-				contact.setFax( childNode.getNodeValue() );
+				if(childNode.getNodeValue() != null)
+				{
+					// ensure it is not all whitespace
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						contact.setFax( childNode.getNodeValue() );
+					}
+				}
 			}
 		}
 	}
@@ -659,7 +708,14 @@ public class RTMLParser
 			
 			if( childNode.getNodeType() == Node.TEXT_NODE )
 			{
-				contact.setEmail( childNode.getNodeValue() );
+				if(childNode.getNodeValue() != null)
+				{
+					// ensure it is not all whitespace
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						contact.setEmail( childNode.getNodeValue() );
+					}
+				}
 			}
 		}
 	}
@@ -698,22 +754,26 @@ public class RTMLParser
 			
 			if( childNode.getNodeType() == Node.TEXT_NODE )
 			{
-				URL url = null;
-				String urlString = childNode.getNodeValue();
-
-				if( ( urlString != null )&&( ! urlString.equals( "" ) ) )
+				if(childNode.getNodeValue() != null)
 				{
-					try
+					// ensure it is not all whitespace
+					if(childNode.getNodeValue().trim().length() > 0)
 					{
-						url = new URL( urlString );
-					}
-					catch( MalformedURLException e )
-					{
-						throw new RTMLException
+						URL url = null;
+						String urlString = childNode.getNodeValue();
+
+						try
+						{
+							url = new URL( urlString );
+						}
+						catch( MalformedURLException e )
+						{
+							throw new RTMLException
 							( this.getClass().getName()+":parseUrlNode:Illegal URL ["+
 							  urlString+"]", e );
+						}
+						contact.setUrl( url );
 					}
-					contact.setUrl( url );
 				}
 			}
 		}
@@ -764,7 +824,13 @@ public class RTMLParser
 			
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
-				intelligentAgent.setId(childNode.getNodeValue());
+				if(childNode.getNodeValue() != null)
+				{
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						intelligentAgent.setId(childNode.getNodeValue());
+					}
+				}
 			}
 		}
 		// set intelligentAgent in RTML document.
@@ -825,7 +891,13 @@ public class RTMLParser
 			}
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
-				device.setName(childNode.getNodeValue());
+				if(childNode.getNodeValue() != null)
+				{
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						device.setName(childNode.getNodeValue());
+					}
+				}
 			}
 		}
 		// set device in device holder (RTML document/RTML Observation).
@@ -903,7 +975,13 @@ public class RTMLParser
 
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
-				device.setFilterType(childNode.getNodeValue());
+				if(childNode.getNodeValue() != null)
+				{
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						device.setFilterType(childNode.getNodeValue());
+					}
+				}
 			}
 		}
 	}
@@ -1105,7 +1183,13 @@ public class RTMLParser
 			
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
-				target.setName(childNode.getNodeValue());
+				if(childNode.getNodeValue() != null)
+				{
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						target.setName(childNode.getNodeValue());
+					}
+				}
 			}
 		}
 	}
@@ -1313,7 +1397,13 @@ public class RTMLParser
 			
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
-				target.setEquinox(childNode.getNodeValue());
+				if(childNode.getNodeValue() != null)
+				{
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						target.setEquinox(childNode.getNodeValue());
+					}
+				}
 			}
 		}
 	}
@@ -1628,7 +1718,14 @@ public class RTMLParser
 			
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
-				imageData.setImageDataURL(childNode.getNodeValue());
+				if(childNode.getNodeValue() != null)
+				{
+					// ensure it is not all whitespace
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						imageData.setImageDataURL(childNode.getNodeValue());
+					}
+				}
 			}
 			if(childNode.getNodeType() == Node.ELEMENT_NODE)
 			{
@@ -1670,6 +1767,11 @@ public class RTMLParser
 		attributeList = fitsHeaderNode.getAttributes();
 		// type
 		attributeNode = attributeList.getNamedItem("type");
+		if(attributeNode == null)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseFITSHeaderNode:type attribute does not exist.");
+		}
 		type = attributeNode.getNodeValue();
 		// go through child nodes
 		childList = fitsHeaderNode.getChildNodes();
@@ -1712,6 +1814,11 @@ public class RTMLParser
 		attributeList = objectListNode.getAttributes();
 		// type
 		attributeNode = attributeList.getNamedItem("type");
+		if(attributeNode == null)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseObjectListNode:type attribute does not exist.");
+		}
 		type = attributeNode.getNodeValue();
 		imageData.setObjectListType(type);
 		// go through child nodes
@@ -1889,6 +1996,10 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.15  2005/05/04 18:58:25  cjm
+** Changed parsing of ObjectList, FITSHeader and ImageData nodes,
+** to reflect new design of RTMLObservation.
+**
 ** Revision 1.14  2005/04/29 17:18:41  cjm
 ** Added exposureCount.
 **
