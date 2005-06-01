@@ -1,5 +1,5 @@
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.8 2005-05-05 15:02:39 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.9 2005-06-01 16:30:22 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -9,14 +9,14 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class RTMLDocument implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.8 2005-05-05 15:02:39 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.9 2005-06-01 16:30:22 cjm Exp $";
 	/**
 	 * The type of the document, as specified in the RTML node's "type" attribute.
 	 */
@@ -130,6 +130,15 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	public void addObservation(RTMLObservation ob)
 	{
 		observationList.add(ob);
+	}
+
+	/**
+	 * Clear the observations from the document.
+	 * @see #observationList
+	 */
+	public void clearObservationList()
+	{
+		observationList = null;
 	}
 
 	/**
@@ -332,6 +341,9 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.8  2005/05/05 15:02:39  cjm
+** Added deepClone.
+**
 ** Revision 1.7  2005/04/28 09:39:41  cjm
 ** Changed score from primitive to object type.
 ** This allows us to specify exactley when the score element is present, and when it isn't.
