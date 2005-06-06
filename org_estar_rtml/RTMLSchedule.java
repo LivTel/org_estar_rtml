@@ -1,5 +1,5 @@
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.7 2005-05-26 13:23:00 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.8 2005-06-06 10:33:15 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -11,14 +11,22 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class RTMLSchedule implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.7 2005-05-26 13:23:00 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.8 2005-06-06 10:33:15 cjm Exp $";
+	/**
+	 * Schedule priority attribute. Accordin to the DTD, The required
+	 * priority attribute is an integer: 0=Target-of-Opportunity
+	 * (highest priority), 1=high priority, 2=lower priority, etc.
+	 * Though eSTAR have changed the attribute to implied, not required.
+	 * See also RTMLTarget type atrribute, which eSTAR uses to distinguish TOOP vs. non-toop. 
+	 */
+	private int priority = 1;
 	/**
 	 * The type of the Exposure, the "type" attribute in the Exposure tag. Should be either "time" or
 	 * "snr".
@@ -63,6 +71,36 @@ public class RTMLSchedule implements Serializable
 	public RTMLSchedule()
 	{
 		super();
+	}
+
+	/**
+	 * Set the schedule priority.
+	 * @param i The priority.
+	 * @see #priority
+	 */
+	public void setPriority(int i)
+	{
+		priority = i;
+	}
+
+	/**
+	 * Set the schedule priority.
+	 * @param s A string representing an integer, the priority.
+	 * @see #priority
+	 */
+	public void setPriority(String s) throws NumberFormatException
+	{
+		priority = Integer.parseInt(s);
+	}
+
+	/**
+	 * Get the schedule priority.
+	 * @return The priority.
+	 * @see #priority
+	 */
+	public int getPriority()
+	{
+		return priority;
 	}
 
 	/**
@@ -397,6 +435,7 @@ public class RTMLSchedule implements Serializable
 	/**
 	 * Method to print out a string representation of this node, with a prefix.
 	 * @param prefix A string to prefix to each line of data we print out.
+	 * @see #priority
 	 * @see #exposureType
 	 * @see #exposureUnits
 	 * @see #exposureLength
@@ -412,6 +451,7 @@ public class RTMLSchedule implements Serializable
 		
 		sb = new StringBuffer();
 		sb.append(prefix+"Schedule: (Monitor Group:"+isMonitorGroup()+")\n");
+		sb.append(prefix+"\tPriority: "+priority+"\n");
 		sb.append(prefix+"\tExposure: type = "+exposureType+": units = "+exposureUnits+"\n");
 		sb.append(prefix+"\t\tLength:"+exposureLength+"\n");
 		sb.append(prefix+"\t\tCount:"+exposureCount+"\n");
@@ -423,6 +463,9 @@ public class RTMLSchedule implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.7  2005/05/26 13:23:00  cjm
+** Added getExposureLengthMilliseconds.
+**
 ** Revision 1.6  2005/04/29 17:18:41  cjm
 ** Added exposureCount.
 **
