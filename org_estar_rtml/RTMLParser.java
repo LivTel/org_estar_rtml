@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.16 2005-06-01 16:30:13 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.17 2005-06-06 10:33:41 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -31,14 +31,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.17 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLParser.java,v 1.16 2005-06-01 16:30:13 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLParser.java,v 1.17 2005-06-06 10:33:41 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -1413,15 +1413,20 @@ public class RTMLParser
 	 * @param observation The instance of RTMLObservation to set the schedule for.
 	 * @param scheduleNode The XML DOM node for the Schedule tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @exception NumberFormatException Thrown if the priority number parsing fails.
 	 * @see #parseExposureNode
 	 * @see #parseCalibrationNode
 	 * @see #parseTimeConstraintNode
 	 */
-	private void parseScheduleNode(RTMLObservation observation,Node scheduleNode) throws RTMLException
+	private void parseScheduleNode(RTMLObservation observation,Node scheduleNode) throws RTMLException, 
+											     NumberFormatException
 	{
 		RTMLSchedule schedule = null;
 		Node childNode;
 		NodeList childList;
+		NamedNodeMap attributeList = null;
+		Node attributeNode;
+		String priorityString = null;
 
 		// check current XML node is correct
 		if(scheduleNode.getNodeType() != Node.ELEMENT_NODE)
@@ -1436,6 +1441,16 @@ public class RTMLParser
 		}
 		// add schedule node
 		schedule = new RTMLSchedule();
+		// get schedule attributes
+		attributeList = scheduleNode.getAttributes();
+		// parse priority attribute
+		attributeNode = attributeList.getNamedItem("priority");
+		if(attributeNode != null)
+		{
+			priorityString = attributeNode.getNodeValue();
+			if(priorityString != null)
+				schedule.setPriority(priorityString);
+		}
 		// go through child nodes
 		childList = scheduleNode.getChildNodes();
 		for(int i = 0; i < childList.getLength(); i++)
@@ -1996,6 +2011,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.16  2005/06/01 16:30:13  cjm
+** Reformatting.
+**
 ** Revision 1.15  2005/05/04 18:58:25  cjm
 ** Changed parsing of ObjectList, FITSHeader and ImageData nodes,
 ** to reflect new design of RTMLObservation.
