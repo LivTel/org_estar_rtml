@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.27 2005-06-01 16:30:22 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.28 2005-06-06 10:33:29 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.28 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.27 2005-06-01 16:30:22 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.28 2005-06-06 10:33:29 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -559,6 +559,7 @@ public class RTMLCreate
 
 		// schedule element
 		scheduleElement = (Element)document.createElement("Schedule");
+		scheduleElement.setAttribute("priority",""+schedule.getPriority());
 		// exposure element
 		exposureElement = (Element)document.createElement("Exposure");
 		if(schedule.getExposureType() != null)
@@ -758,6 +759,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.27  2005/06/01 16:30:22  cjm
+** Added FITS header type to all or cluster.
+**
 ** Revision 1.26  2005/05/04 18:59:45  cjm
 ** Changed creation of ImageData, ObjectList and FITSHeader nodes.
 **

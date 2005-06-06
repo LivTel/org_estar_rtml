@@ -1,5 +1,5 @@
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.12 2005-06-01 16:31:30 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.13 2005-06-06 10:33:07 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -17,14 +17,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.12 2005-06-01 16:31:30 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.13 2005-06-06 10:33:07 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
@@ -642,6 +642,29 @@ public class TestCreate
 				seriesConstraint = null; // reset to blank for next schedule
 				imageData = null; // reset to blank for next image data
 			}
+			else if(args[i].equals("-priority"))
+			{
+				if((i+1) < args.length)
+				{
+					if(schedule != null)
+					{
+						schedule.setPriority(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:priority:schedule was null.");
+						System.exit(2);
+					}
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Schedule priority needs a number.");
+					System.exit(2);
+				}
+			}
 			else if(args[i].equals("-project"))
 			{
 				if((i+1) < args.length)
@@ -955,6 +978,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.12  2005/06/01 16:31:30  cjm
+** Added image data options.
+**
 ** Revision 1.11  2005/05/04 18:55:28  cjm
 ** Removed objectListType, objectListClusterString, imageDataType, imageDataURL, fitsHeader.
 ** Added imageDataList, a list of RTMLImageData entries.
