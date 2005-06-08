@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.17 2005-06-06 10:33:41 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.18 2005-06-08 11:38:09 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -31,14 +31,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.17 2005-06-06 10:33:41 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.18 2005-06-08 11:38:09 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -143,7 +143,7 @@ public class RTMLParser
 
 	/**
 	 * Method to set a custom error handler. Should be called after init (constructor), before parse is called.
-	 * @param RTMLErrorHandler The error handler to use. Must be a sub-class of RTMLErrorHandler, this
+	 * @param e The error handler to use. Must be a sub-class of RTMLErrorHandler, this
 	 *        should really be org.xml.sax.ErrorHandler.
 	 * @see #errorHandler
 	 * @see #builder
@@ -1545,7 +1545,7 @@ public class RTMLParser
 	 * @param schedule The instance of RTMLSchedule to set the time constrints for.
 	 * @param timeConstraintNode The XML DOM node for the TimeConstrint tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
-	 * @see #RTMLSchedule
+	 * @see RTMLSchedule
 	 */
 	private void parseTimeConstraintNode(RTMLSchedule schedule,Node timeConstraintNode) throws RTMLException
 	{
@@ -1636,8 +1636,8 @@ public class RTMLParser
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
 	 * @see #parseIntegerNode
 	 * @see #parsePeriodNode
-	 * @see #RTMLSchedule
-	 * @see #RTMLSeriesConstraint
+	 * @see RTMLSchedule
+	 * @see RTMLSeriesConstraint
 	 */
 	private void parseSeriesConstraintNode(RTMLSchedule schedule,Node seriesConstraintNode) throws RTMLException
 	{
@@ -2011,6 +2011,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.17  2005/06/06 10:33:41  cjm
+** Added Schedule Priority.
+**
 ** Revision 1.16  2005/06/01 16:30:13  cjm
 ** Reformatting.
 **

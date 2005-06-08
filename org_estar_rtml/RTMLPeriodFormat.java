@@ -1,5 +1,5 @@
 // RTMLPeriodFormat.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLPeriodFormat.java,v 1.2 2005-04-27 15:22:04 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLPeriodFormat.java,v 1.3 2005-06-08 11:39:01 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -13,14 +13,14 @@ import java.util.*;
  * </code>
  * For the purposes of this implementation, we have assumed 30 days in 1 month, and 365 days in 1 year.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class RTMLPeriodFormat implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLPeriodFormat.java,v 1.2 2005-04-27 15:22:04 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLPeriodFormat.java,v 1.3 2005-06-08 11:39:01 cjm Exp $";
 	/**
 	 * Number of milliseconds in a second. 
 	 */
@@ -372,7 +372,7 @@ public class RTMLPeriodFormat implements Serializable
 
 	/**
 	 * Set method.
-	 * @param i A double.
+	 * @param d A double.
 	 * @see #seconds
 	 * @exception IllegalArgumentException Thrown if the input number is out of range.
 	 */
@@ -483,6 +483,9 @@ public class RTMLPeriodFormat implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2005/04/27 15:22:04  cjm
+** Added parse checks, ensure Y/D apppear before T, ensure H/S appear after T.
+**
 ** Revision 1.1  2005/04/27 13:45:48  cjm
 ** Initial revision
 **

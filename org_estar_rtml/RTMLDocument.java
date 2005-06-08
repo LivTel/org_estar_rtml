@@ -1,5 +1,5 @@
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.9 2005-06-01 16:30:22 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.10 2005-06-08 11:37:11 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -9,14 +9,14 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class RTMLDocument implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.9 2005-06-01 16:30:22 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.10 2005-06-08 11:37:11 cjm Exp $";
 	/**
 	 * The type of the document, as specified in the RTML node's "type" attribute.
 	 */
@@ -106,7 +106,7 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 
 	/**
 	 * Set the device.
-	 * @param device The device to set.
+	 * @param d The device to set.
 	 */
 	public void setDevice(RTMLDevice d)
 	{
@@ -341,6 +341,9 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.9  2005/06/01 16:30:22  cjm
+** Added clearObservationList method.
+**
 ** Revision 1.8  2005/05/05 15:02:39  cjm
 ** Added deepClone.
 **

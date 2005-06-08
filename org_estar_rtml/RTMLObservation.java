@@ -1,5 +1,5 @@
 // RTMLObservation.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLObservation.java,v 1.6 2005-05-12 12:08:59 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLObservation.java,v 1.7 2005-06-08 11:38:51 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -9,14 +9,14 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the observation nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class RTMLObservation implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLObservation.java,v 1.6 2005-05-12 12:08:59 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLObservation.java,v 1.7 2005-06-08 11:38:51 cjm Exp $";
 	/**
 	 * The device (instrument) of this observation.
 	 * This can be null, in which case pick up the generic document device information.
@@ -48,7 +48,7 @@ public class RTMLObservation implements Serializable, RTMLDeviceHolder
 
 	/**
 	 * Set the device.
-	 * @param device The device to set.
+	 * @param d The device to set.
 	 * @see #device
 	 */
 	public void setDevice(RTMLDevice d)
@@ -218,6 +218,9 @@ public class RTMLObservation implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.6  2005/05/12 12:08:59  cjm
+** Fixed clearImageDataList.
+**
 ** Revision 1.5  2005/05/04 18:56:52  cjm
 ** Removed objectListType, objectListClusterString, imageDataType, imageDataURL, fitsHeader.
 ** Added imageDataList, a list of RTMLImageData.

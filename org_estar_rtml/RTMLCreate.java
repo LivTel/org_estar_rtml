@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.28 2005-06-06 10:33:29 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.29 2005-06-08 11:36:55 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.29 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.28 2005-06-06 10:33:29 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.29 2005-06-08 11:36:55 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -199,7 +199,7 @@ public class RTMLCreate
 
 	/**
 	 * Method to set a custom error handler. Should be called after init (constructor), before create is called.
-	 * @param RTMLErrorHandler The error handler to use. Must be a sub-class of RTMLErrorHandler, this
+	 * @param e The error handler to use. Must be a sub-class of RTMLErrorHandler, this
 	 *        should really be org.xml.sax.ErrorHandler.
 	 * @see #errorHandler
 	 * @see #builder
@@ -482,7 +482,7 @@ public class RTMLCreate
 	 * Create a Target element and append it to the specified Observation element.
 	 * @param observationElement The observation to append the new Target element to.
 	 * @param target The RTMLTarget object containing target information.
-	 * @see #RTMLTarget
+	 * @see RTMLTarget
 	 */
 	private void createTarget(Element observationElement,RTMLTarget target)
 	{
@@ -549,7 +549,7 @@ public class RTMLCreate
 	 * @param schedule The RTML schedule data.
 	 * @see #createTimeConstraint
 	 * @see #createSeriesConstrint
-	 * @see #RTMLSchedule
+	 * @see RTMLSchedule
 	 */
 	private void createSchedule(Element observationElement,RTMLSchedule schedule)
 	{
@@ -590,7 +590,7 @@ public class RTMLCreate
 	 * Create a TimeConstraint tag.
 	 * @param scheduleElement The schedule XML node to add the schedule to.
 	 * @param schedule The RTML schedule data (which contains time constrint data).
-	 * @see #RTMLSchedule
+	 * @see RTMLSchedule
 	 */
 	private void createTimeConstraint(Element scheduleElement,RTMLSchedule schedule)
 	{
@@ -626,8 +626,8 @@ public class RTMLCreate
 	/**
 	 * Create a SeriesConstraint tag.
 	 * @param scheduleElement The schedule XML node to add the series constraint to.
-	 * @param schedule The RTML series constraint data.
-	 * @see #RTMLSeriesConstraint
+	 * @param seriesConstraint The RTML series constraint data.
+	 * @see RTMLSeriesConstraint
 	 */
 	private void createSeriesConstrint(Element scheduleElement,RTMLSeriesConstraint seriesConstraint)
 	{
@@ -759,6 +759,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.28  2005/06/06 10:33:29  cjm
+** Added Schedule priority.
+**
 ** Revision 1.27  2005/06/01 16:30:22  cjm
 ** Added FITS header type to all or cluster.
 **
