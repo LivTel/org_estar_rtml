@@ -1,5 +1,5 @@
 // RTMLDetector.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDetector.java,v 1.1 2005-01-19 11:53:42 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDetector.java,v 1.2 2005-06-08 11:38:29 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -7,14 +7,14 @@ import java.io.*;
 /**
  * This class is a data container for information contained in the Detector nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RTMLDetector implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDetector.java,v 1.1 2005-01-19 11:53:42 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDetector.java,v 1.2 2005-06-08 11:38:29 cjm Exp $";
 	/**
 	 * The Detector Binning row number.
 	 */
@@ -121,20 +121,24 @@ public class RTMLDetector implements Serializable
 	/**
 	 * String representation of this Detector, with specified prefix.
 	 * @param prefix A string to prefix to each line of data we print out.
-	 * @see #getDetector
+	 * @see #rowBinning
+	 * @see #columnBinning
 	 */
-	public String toString( String prefix )
+	public String toString(String prefix)
 	{
 		StringBuffer sb = new StringBuffer();
 		
-		sb.append( prefix+"Detector :\n" );
-		sb.append( prefix+"\t       Row Binning : "+rowBinning+"\n" );
-		sb.append( prefix+"\t       Column Binning : "+columnBinning+"\n" );
-		return( sb.toString() );
+		sb.append(prefix+"Detector :\n");
+		sb.append(prefix+"\tRow Binning : "+rowBinning+"\n");
+		sb.append(prefix+"\tColumn Binning : "+columnBinning+"\n");
+		return(sb.toString());
 	}
 }
 //
 // $Log: not supported by cvs2svn $
+// Revision 1.1  2005/01/19 11:53:42  cjm
+// Initial revision
+//
 // Revision 1.1  2005/01/18 15:08:28  cjm
 // Initial revision
 //
