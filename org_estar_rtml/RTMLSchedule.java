@@ -1,5 +1,5 @@
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.9 2005-06-08 11:39:30 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.10 2005-06-08 13:57:46 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -11,14 +11,14 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class RTMLSchedule implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.9 2005-06-08 11:39:30 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.10 2005-06-08 13:57:46 cjm Exp $";
 	/**
 	 * Schedule priority attribute. Accordin to the DTD, The required
 	 * priority attribute is an integer: 0=Target-of-Opportunity
@@ -418,7 +418,7 @@ public class RTMLSchedule implements Serializable
 	 * @param sc A seeing constrint. This can be null.
 	 * @see #seeingConstraint
 	 */
-	public void setSeriesConstraint(RTMLSeeingConstraint sc)
+	public void setSeeingConstraint(RTMLSeeingConstraint sc)
 	{
 		seeingConstraint = sc;
 	}
@@ -492,6 +492,10 @@ public class RTMLSchedule implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.9  2005/06/08 11:39:30  cjm
+** Fixed comments.
+** Added seeing constraints.
+**
 ** Revision 1.8  2005/06/06 10:33:15  cjm
 ** Added priority.
 **
