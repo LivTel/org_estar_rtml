@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.18 2005-06-08 11:38:09 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.19 2005-06-08 13:58:00 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -31,14 +31,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.19 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLParser.java,v 1.18 2005-06-08 11:38:09 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLParser.java,v 1.19 2005-06-08 13:58:00 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -1417,6 +1417,8 @@ public class RTMLParser
 	 * @see #parseExposureNode
 	 * @see #parseCalibrationNode
 	 * @see #parseTimeConstraintNode
+	 * @see #parseSeriesConstraintNode
+	 * @see #parseSeeingConstraintNode
 	 */
 	private void parseScheduleNode(RTMLObservation observation,Node scheduleNode) throws RTMLException, 
 											     NumberFormatException
@@ -1467,6 +1469,8 @@ public class RTMLParser
 					parseTimeConstraintNode(schedule,childNode);
 				else if(childNode.getNodeName() == "SeriesConstraint")
 					parseSeriesConstraintNode(schedule,childNode);
+				else if(childNode.getNodeName() == "SeeingConstraint")
+					parseSeeingConstraintNode(schedule,childNode);
 			}
 		}
 		// add scheule to observation
@@ -1688,6 +1692,74 @@ public class RTMLParser
 		}
 		// add series constraint to schedule
 		schedule.setSeriesConstraint(seriesConstraint);
+	}
+
+	/**
+	 * Internal method to parse a SeeingConstraint node.
+	 * @param schedule The instance of RTMLSchedule to set the seeing constrints for.
+	 * @param seeingConstraintNode The XML DOM node for the SeeingConstrint tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @exception NumberFormatException Thrown if a parse error occurs when parsing the numeric attributes.
+	 * @see RTMLSchedule
+	 * @see RTMLSeeingConstraint
+	 */
+	private void parseSeeingConstraintNode(RTMLSchedule schedule,Node seeingConstraintNode) throws RTMLException, 
+											   NumberFormatException
+	{
+		RTMLSeeingConstraint seeingConstraint = null;
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+		String s = null;
+
+		// check current XML node is correct
+		if(seeingConstraintNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseSeeingConstraintNode:Illegal Node:"+
+						seeingConstraintNode);
+		}
+		if(seeingConstraintNode.getNodeName() != "SeeingConstraint")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseSeeingConstraintNode:Illegal Node Name:"+
+						seeingConstraintNode.getNodeName());
+		}
+		// add seeing constraint object
+		seeingConstraint = new RTMLSeeingConstraint();
+		// go through attribute list
+		attributeList = seeingConstraintNode.getAttributes();
+		// minimum
+		attributeNode = attributeList.getNamedItem("minimum");
+		if(attributeNode != null)
+		{
+			s = attributeNode.getNodeValue();
+			if(s != null)
+				seeingConstraint.setMinimum(s);
+		}
+		// maximum
+		attributeNode = attributeList.getNamedItem("maximum");
+		if(attributeNode != null)
+		{
+			s = attributeNode.getNodeValue();
+			if(s != null)
+				seeingConstraint.setMaximum(s);
+		}
+		// go through child nodes
+		childList = seeingConstraintNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "ExposureFactor")
+				{
+					// not used atm
+				}
+			}
+		}
+		// add seeing constraint to schedule
+		schedule.setSeeingConstraint(seeingConstraint);
 	}
 
 	/**
@@ -2011,6 +2083,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.18  2005/06/08 11:38:09  cjm
+** Fixed comments.
+**
 ** Revision 1.17  2005/06/06 10:33:41  cjm
 ** Added Schedule Priority.
 **
