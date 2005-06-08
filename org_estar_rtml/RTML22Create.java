@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.29 2005-06-08 11:36:55 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.30 2005-06-08 13:58:24 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.29 $
+ * @version $Revision: 1.30 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.29 2005-06-08 11:36:55 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.30 2005-06-08 13:58:24 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -548,7 +548,8 @@ public class RTMLCreate
 	 * @param observationElement The observation XML node to add the schedule to.
 	 * @param schedule The RTML schedule data.
 	 * @see #createTimeConstraint
-	 * @see #createSeriesConstrint
+	 * @see #createSeriesConstraint
+	 * @see #createSeeingConstraint
 	 * @see RTMLSchedule
 	 */
 	private void createSchedule(Element observationElement,RTMLSchedule schedule)
@@ -581,7 +582,10 @@ public class RTMLCreate
 			createTimeConstraint(scheduleElement,schedule);
 		// SeriesConstraint
 		if(schedule.getSeriesConstraint() != null)
-			createSeriesConstrint(scheduleElement,schedule.getSeriesConstraint());
+			createSeriesConstraint(scheduleElement,schedule.getSeriesConstraint());
+		// SeeingConstraint
+		if(schedule.getSeeingConstraint() != null)
+			createSeeingConstraint(scheduleElement,schedule.getSeeingConstraint());
 		// add schedule to a observation
 		observationElement.appendChild(scheduleElement);		
 	}
@@ -629,7 +633,7 @@ public class RTMLCreate
 	 * @param seriesConstraint The RTML series constraint data.
 	 * @see RTMLSeriesConstraint
 	 */
-	private void createSeriesConstrint(Element scheduleElement,RTMLSeriesConstraint seriesConstraint)
+	private void createSeriesConstraint(Element scheduleElement,RTMLSeriesConstraint seriesConstraint)
 	{
 		Element seriesConstraintElement = null;
 		Element countElement = null;
@@ -666,6 +670,26 @@ public class RTMLCreate
 		}
 		// add seriesConstraintElement to a scheduleElement
 		scheduleElement.appendChild(seriesConstraintElement);		
+	}
+
+	/**
+	 * Create a SeeingConstraint tag.
+	 * @param scheduleElement The schedule XML node to add the seeing constraint to.
+	 * @param seeingConstraint The RTML seeing constraint data.
+	 * @see RTMLSeeingConstraint
+	 */
+	private void createSeeingConstraint(Element scheduleElement,RTMLSeeingConstraint seeingConstraint)
+	{
+		Element seeingConstraintElement = null;
+		DecimalFormat nf = null;
+
+		nf = new DecimalFormat("#####0.0#");
+		// seeing constraint element
+		seeingConstraintElement = (Element)document.createElement("SeeingConstraint");
+		seeingConstraintElement.setAttribute("minimum",nf.format(seeingConstraint.getMinimum()));
+		seeingConstraintElement.setAttribute("maximum",nf.format(seeingConstraint.getMaximum()));
+		// add seeingConstraintElement to a scheduleElement
+		scheduleElement.appendChild(seeingConstraintElement);		
 	}
 
 	/**
@@ -759,6 +783,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.29  2005/06/08 11:36:55  cjm
+** Fixed comments.
+**
 ** Revision 1.28  2005/06/06 10:33:29  cjm
 ** Added Schedule priority.
 **
@@ -776,7 +803,7 @@ public class RTMLCreate
 ** so we can represent the lack of a score node.
 **
 ** Revision 1.23  2005/04/27 15:43:27  cjm
-** Added createSeriesConstrint.
+** Added createSeriesConstraint.
 **
 ** Revision 1.22  2005/04/26 15:02:59  cjm
 ** Added setDoctypeSystemID and setRTMLVersionString, so we can override the defaults.
