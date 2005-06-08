@@ -1,5 +1,5 @@
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.8 2005-06-06 10:33:15 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.9 2005-06-08 11:39:30 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -11,14 +11,14 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class RTMLSchedule implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.8 2005-06-06 10:33:15 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.9 2005-06-08 11:39:30 cjm Exp $";
 	/**
 	 * Schedule priority attribute. Accordin to the DTD, The required
 	 * priority attribute is an integer: 0=Target-of-Opportunity
@@ -60,6 +60,11 @@ public class RTMLSchedule implements Serializable
 	 * This reference can be null, if no series constraint was specified.
 	 */
 	private RTMLSeriesConstraint seriesConstraint = null;
+	/**
+	 * Object containing details of any specified seeing constraint.
+	 * This reference can be null, if no seeing constraint was specified.
+	 */
+	private RTMLSeeingConstraint seeingConstraint = null;
 	/**
 	 * The calibration data that may be contained a a sub-tag.
 	 */
@@ -183,7 +188,7 @@ public class RTMLSchedule implements Serializable
 
 	/**
 	 * Set the exposure length. What this value actually means is based on the units and type fields.
-	 * @param s The length, either as a length or a signal to noise ratio.
+	 * @param d The length, either as a length or a signal to noise ratio.
 	 * @see #exposureLength
 	 * @see #exposureType
 	 * @see #exposureUnits
@@ -408,6 +413,27 @@ public class RTMLSchedule implements Serializable
 	}
 
 	/**
+	 * Set the seeing constraint data. This constrains the observation to be done when the seeing
+	 * conditions match the specified criteria.
+	 * @param sc A seeing constrint. This can be null.
+	 * @see #seeingConstraint
+	 */
+	public void setSeriesConstraint(RTMLSeeingConstraint sc)
+	{
+		seeingConstraint = sc;
+	}
+
+	/**
+	 * Get the seeing constraint data.
+	 * @return A seeing constrint. This can be null.
+	 * @see #seeingConstraint
+	 */
+	public RTMLSeeingConstraint getSeeingConstraint()
+	{
+		return seeingConstraint;
+	}
+
+	/**
 	 * Determine whether this schedule specifies a flexibly scheduled one off observation,
 	 * or a regularily spaced monitor group observation.
 	 * Currently a schedule containing a series constraint with a count > 1 is counted as a monitor group.
@@ -443,6 +469,7 @@ public class RTMLSchedule implements Serializable
 	 * @see #startDate
 	 * @see #endDate
 	 * @see #seriesConstraint
+	 * @see #seeingConstraint
 	 * @see #isMonitorGroup
 	 */
 	public String toString(String prefix)
@@ -457,12 +484,17 @@ public class RTMLSchedule implements Serializable
 		sb.append(prefix+"\t\tCount:"+exposureCount+"\n");
 		if(getSeriesConstraint() != null)
 			sb.append(getSeriesConstraint().toString(prefix+"\t"));
+		if(getSeeingConstraint() != null)
+			sb.append(getSeeingConstraint().toString(prefix+"\t"));
 		sb.append(prefix+"\tBetween:"+startDate+" and "+endDate+"\n");
 		return sb.toString();
 	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.8  2005/06/06 10:33:15  cjm
+** Added priority.
+**
 ** Revision 1.7  2005/05/26 13:23:00  cjm
 ** Added getExposureLengthMilliseconds.
 **
