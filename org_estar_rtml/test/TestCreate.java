@@ -1,5 +1,5 @@
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.13 2005-06-06 10:33:07 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.14 2005-06-08 14:39:15 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -17,14 +17,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.13 2005-06-06 10:33:07 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.14 2005-06-08 14:39:15 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
@@ -69,6 +69,10 @@ public class TestCreate
 	 * RTML schedule series constraint data.
 	 */
 	protected RTMLSeriesConstraint seriesConstraint = null;
+	/**
+	 * RTML schedule seeing constraint data.
+	 */
+	protected RTMLSeeingConstraint seeingConstraint = null;
 	/**
 	 * RTML observation image data.
 	 */
@@ -741,6 +745,32 @@ public class TestCreate
 			{
 				document.setType("score");
 			}
+			else if(args[i].equals("-seeing_constraint"))
+			{
+				if((i+2) < args.length)
+				{
+					if(schedule != null)
+					{
+						seeingConstraint = new RTMLSeeingConstraint();
+						schedule.setSeeingConstraint(seeingConstraint);
+						seeingConstraint.setMinimum(args[i+1]);
+						seeingConstraint.setMaximum(args[i+2]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+						     ":parseArguments:seeing_constraint:schedule was null.");
+						System.exit(2);
+					}
+					i+= 2;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+						 ":parseArguments:seeing_constraint needs a <minimum> and <maximum>.");
+					System.exit(2);
+				}
+			}
 			else if(args[i].equals("-series_constraint_count"))
 			{
 				if((i+1) < args.length)
@@ -948,6 +978,7 @@ public class TestCreate
 		System.err.println("\t\t[-series_constraint_tolerance <P{(y)Y{(m)M}{(d)D}{T{(h)H}{(m}M}{(s.s..)S}>]");
 		System.err.println("\t\t[-start_date <yyyy-MM-ddTHH:mm:ss>]");
 		System.err.println("\t\t[-end_date <yyyy-MM-ddTHH:mm:ss>]");
+		System.err.println("\t\t[-seeing_constraint <min arcsec> <max arcsec>]");
 		System.err.println("\t\t[-image_data_url <url> [-image_data_fits_header <string>]");
 		System.err.println("\t\t\t[-image_data_object_list <string>]]");
 		System.err.println("\t[-document_score <double>]");
@@ -978,6 +1009,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.13  2005/06/06 10:33:07  cjm
+** Added Schedule priority.
+**
 ** Revision 1.12  2005/06/01 16:31:30  cjm
 ** Added image data options.
 **
