@@ -1,5 +1,5 @@
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.10 2005-06-08 11:37:11 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.11 2005-06-20 10:48:49 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -9,14 +9,14 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class RTMLDocument implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.10 2005-06-08 11:37:11 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.11 2005-06-20 10:48:49 cjm Exp $";
 	/**
 	 * The type of the document, as specified in the RTML node's "type" attribute.
 	 */
@@ -251,13 +251,13 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 
 	/**
 	 * Set the error string. The error String is the TEXT node in the RTML element, if 
-	 * the document has type "reject".
+	 * the document has type "reject","fail" or "abort".
 	 * @param s The error string.
-	 * @exception RTMLException Thrown if the document type was not "reject".
+	 * @exception RTMLException Thrown if the document type was not "reject","fail" or "abort".
 	 */
 	public void setErrorString(String s) throws RTMLException
 	{
-		if(type.equals("reject") == false)
+		if((type.equals("reject") == false)&&(type.equals("fail") == false)&&(type.equals("abort") == false))
 		{
 			throw new RTMLException(this.getClass().getName()+
 				    ":setErrorString:Trying to set error string in document of wrong type:"+type+".");
@@ -341,6 +341,9 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.10  2005/06/08 11:37:11  cjm
+** Fixed comments.
+**
 ** Revision 1.9  2005/06/01 16:30:22  cjm
 ** Added clearObservationList method.
 **
