@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.19 2005-06-08 13:58:00 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.20 2005-06-20 10:55:04 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -31,14 +31,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.20 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLParser.java,v 1.19 2005-06-08 13:58:00 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLParser.java,v 1.20 2005-06-20 10:55:04 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -280,7 +280,7 @@ public class RTMLParser
 			}
 			else if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
-				if(type.equals("reject"))
+				if((type.equals("reject"))||(type.equals("fail"))||(type.equals("abort")))
 					rtmlDocument.setErrorString(childNode.getNodeValue());
 			}
 		}
@@ -2083,6 +2083,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.19  2005/06/08 13:58:00  cjm
+** Added parseSeeingConstraintNode.
+**
 ** Revision 1.18  2005/06/08 11:38:09  cjm
 ** Fixed comments.
 **
