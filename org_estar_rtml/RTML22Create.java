@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.30 2005-06-08 13:58:24 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.31 2005-06-20 10:55:05 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.30 $
+ * @version $Revision: 1.31 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.30 2005-06-08 13:58:24 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.31 2005-06-20 10:55:05 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -282,7 +282,8 @@ public class RTMLCreate
 		{
 			createCompletionTime(rtmlElement,d.getCompletionTime());
 		}
-		if((d.getType().equals("reject")) && (d.getErrorString() != null))
+		if((d.getType().equals("reject") || d.getType().equals("fail") || d.getType().equals("abort")) && 
+		   (d.getErrorString() != null))
 			rtmlElement.appendChild(document.createTextNode(d.getErrorString()));
 	}
 
@@ -783,6 +784,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.30  2005/06/08 13:58:24  cjm
+** Added createSeeingConstraint.
+**
 ** Revision 1.29  2005/06/08 11:36:55  cjm
 ** Fixed comments.
 **
