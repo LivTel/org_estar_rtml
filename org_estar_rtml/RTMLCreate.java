@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.31 2005-06-20 10:55:05 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.32 2005-08-19 17:01:06 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.31 $
+ * @version $Revision: 1.32 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.31 2005-06-20 10:55:05 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.32 2005-08-19 17:01:06 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -716,19 +716,24 @@ public class RTMLCreate
 			fitsHeaderElement.appendChild(document.createTextNode(imageData.getFITSHeader()));
 			imageDataElement.appendChild(fitsHeaderElement);
 		}
+		// ObjectList types
 		// Cluster
-		if(imageData.getObjectListCluster() != null)
+		if(imageData.isObjectListTypeCluster())
 		{
 			objectListElement = (Element)document.createElement("ObjectList");
 			objectListElement.appendChild(document.createTextNode(imageData.getObjectListCluster()));
-			if(imageData.getObjectListType() != null)
-			{
-				objectListElement.setAttribute("type",imageData.getObjectListType());
-				objectListElement.setAttribute("format",
+			objectListElement.setAttribute("type",imageData.getObjectListType());
+			objectListElement.setAttribute("format",
 					     " fn sn rah ram ras decd decm decs xpos ypos mag magerror magflag");
-			}
-			else
-				objectListElement.setAttribute("type","cluster");
+			imageDataElement.appendChild(objectListElement);
+		}
+		// VOTableURL
+		if(imageData.isObjectListTypeVOTableURL())
+		{
+			objectListElement = (Element)document.createElement("ObjectList");
+			objectListElement.appendChild(document.createTextNode(imageData.getObjectListVOTableURL().
+									      toString()));
+			objectListElement.setAttribute("type",imageData.getObjectListType());
 			imageDataElement.appendChild(objectListElement);
 		}
 		// get image data type
@@ -784,6 +789,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.31  2005/06/20 10:55:05  cjm
+** Error string now created for documents of type fail and abort, as well as reject.
+**
 ** Revision 1.30  2005/06/08 13:58:24  cjm
 ** Added createSeeingConstraint.
 **

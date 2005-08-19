@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.20 2005-06-20 10:55:04 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.21 2005-08-19 17:01:09 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -31,14 +31,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.20 $
+ * @version $Revision: 1.21 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.20 2005-06-20 10:55:04 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.21 2005-08-19 17:01:09 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -1918,6 +1918,12 @@ public class RTMLParser
 			{
 				if(type.equals("cluster"))
 					imageData.setObjectListCluster(childNode.getNodeValue());
+				if(type.equals("votable-url"))
+				{
+					// ensure it is not all whitespace
+					if(childNode.getNodeValue().trim().length() > 0)
+						imageData.setObjectListVOTableURL(childNode.getNodeValue());
+				}
 			}
 		}
 	}
@@ -2083,6 +2089,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.20  2005/06/20 10:55:04  cjm
+** Error string now parsed for documents of type fail and abort, as well as reject.
+**
 ** Revision 1.19  2005/06/08 13:58:00  cjm
 ** Added parseSeeingConstraintNode.
 **

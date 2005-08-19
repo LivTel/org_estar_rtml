@@ -1,5 +1,5 @@
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.14 2005-06-08 14:39:15 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.15 2005-08-19 17:01:07 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -7,6 +7,7 @@ import java.net.*;
 import java.util.*;
 
 import org.estar.astrometry.*;
+import org.estar.cluster.*;
 import org.estar.rtml.*;
 
 /**
@@ -17,14 +18,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.14 2005-06-08 14:39:15 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.15 2005-08-19 17:01:07 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
@@ -107,7 +108,8 @@ public class TestCreate
 	/**
 	 * Parse arguments.
 	 * @param args An array of arguments to parse.
-	 * @exception RTMLException Thrown if an error occurs during parsing.
+	 * @exception RTMLException Thrown if an error occurs during parsing command line arguments.
+	 * @exception Exception Thrown if an error occurs.
 	 * @see #rtmlVersionString
 	 * @see #doctypeSystemID
 	 */
@@ -583,11 +585,28 @@ public class TestCreate
 			}
 			else if(args[i].equals("-image_data_object_list"))
 			{
-				if((i+1) < args.length)
+				if((i+2) < args.length)
 				{
 					if(imageData != null)
 					{
-						imageData.setObjectListCluster(args[i+1]);
+						if(args[i+1].equals("cluster"))
+						{
+							Cluster cluster = Cluster.load(args[i+2]);
+							imageData.setObjectListType("cluster");
+							imageData.setObjectListCluster(cluster.toString());
+						}
+						else if(args[i+1].equals("votable-url"))
+						{
+							imageData.setObjectListType("votable-url");
+							imageData.setObjectListVOTableURL(args[i+2]);
+						}
+						else
+						{
+							System.err.println(this.getClass().getName()+
+							      ":parseArguments:image_data_object_list:Unknown type "+
+									   args[i+1]+".");
+							System.exit(3);
+						}
 					}
 					else
 					{
@@ -595,12 +614,12 @@ public class TestCreate
 						     ":parseArguments:image_data_object_list:imageData was null.");
 						System.exit(2);
 					}
-					i+= 1;
+					i+= 2;
 				}
 				else
 				{
 					System.err.println(this.getClass().getName()+
-			       			   ":parseArguments:image_data_object_list needs an object list.");
+		 ":parseArguments:image_data_object_list <type(cluster/votable-url)> <cluster filename/votable url>.");
 					System.exit(2);
 				}
 			}
@@ -980,7 +999,7 @@ public class TestCreate
 		System.err.println("\t\t[-end_date <yyyy-MM-ddTHH:mm:ss>]");
 		System.err.println("\t\t[-seeing_constraint <min arcsec> <max arcsec>]");
 		System.err.println("\t\t[-image_data_url <url> [-image_data_fits_header <string>]");
-		System.err.println("\t\t\t[-image_data_object_list <string>]]");
+		System.err.println("\t\t\t[-image_data_object_list <cluster|votable-url> <filename/url>]]");
 		System.err.println("\t[-document_score <double>]");
 		System.err.println("\t[-completion_time <yyyy-MM-dd'T'HH:mm:ss>]");
 	}
@@ -1009,6 +1028,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.14  2005/06/08 14:39:15  cjm
+** Added seeing_constraint support.
+**
 ** Revision 1.13  2005/06/06 10:33:07  cjm
 ** Added Schedule priority.
 **
