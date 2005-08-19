@@ -1,5 +1,5 @@
 // RTMLImageData.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLImageData.java,v 1.1 2005-05-04 18:54:26 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLImageData.java,v 1.2 2005-08-19 17:00:44 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -8,22 +8,26 @@ import java.net.*;
 /**
  * This class is a data container for information contained in the ImageData nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RTMLImageData implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLImageData.java,v 1.1 2005-05-04 18:54:26 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLImageData.java,v 1.2 2005-08-19 17:00:44 cjm Exp $";
 	/**
-	 * The type of the object list belonging to this observation. Either "xml" or "cluster".
+	 * The type of the object list belonging to this observation. Either "xml", "cluster" or "votable-url".
 	 */
 	private String objectListType = null;
 	/**
 	 * A string, containing the contents of a cluster format object list file.
 	 */
 	private String objectListClusterString = null;
+	/**
+	 * The URL containing the location of a VOTable containing information about objects in the image.
+	 */
+	private URL objectListVOTableURL = null;
 	/**
 	 * The ImageData type string containing the format of the image data.
 	 * Should be a valid %imageFormats; ENTITY, see DTD.
@@ -48,13 +52,14 @@ public class RTMLImageData implements Serializable
 
 	/**
 	 * Set the object list type.
-	 * @param s The type of the object list. Should be either "cluster", or "xml". See DTD, %objectListTypes;.
+	 * @param s The type of the object list. Should be either "cluster", "xml" or "votable-url". 
+	 *          See DTD, %objectListTypes;.
 	 * @exception IllegalArgumentException Thrown if the type is nor legal.
 	 * @see #objectListType
 	 */
 	public void setObjectListType(String s)
 	{
-		if((s.equals("xml") == false)&&(s.equals("cluster") == false))
+		if((s.equals("xml") == false)&&(s.equals("cluster") == false)&&(s.equals("votable-url") == false))
 		{
 			throw new IllegalArgumentException(this.getClass().getName()+
 							   ":setObjectListType:Object List Type "+
@@ -90,6 +95,54 @@ public class RTMLImageData implements Serializable
 	public String getObjectListCluster()
 	{
 		return objectListClusterString;
+	}
+
+	/**
+	 * Return whether the object list type is "votable-url".
+	 * @return True if the object list type is votable-url, false if it is not, or has not been set yet.
+	 */
+	public boolean isObjectListTypeVOTableURL()
+	{
+		if(objectListType == null)
+			return false;
+		return objectListType.equals("votable-url");
+	}
+
+	/**
+	 * Set the VOTable URL.
+	 * @param u The URL.
+	 * @see #objectListVOTableURL
+	 */
+	public void setObjectListVOTableURL(URL u)
+	{
+		objectListVOTableURL = u;
+	}
+
+	/**
+	 * Routine to set the VOTable URL.
+	 * @param s The string to create a URL from.
+	 * @exception RTMLException Thrown if the string is not a valid URL.
+	 */
+	public void setObjectListVOTableURL(String s) throws RTMLException
+	{
+		try
+		{
+			objectListVOTableURL = new URL(s);
+		}
+		catch(MalformedURLException e)
+		{
+			throw new RTMLException(this.getClass().getName()+"setObjectListVOTableURL:Malformed URL:"+s,e);
+		}
+	}
+
+	/**
+	 * Get the VOTable URL.
+	 * @return The URL.
+	 * @see #objectListVOTableURL
+	 */
+	public URL getObjectListVOTableURL()
+	{
+		return objectListVOTableURL;
 	}
 
 	/**
@@ -158,6 +211,7 @@ public class RTMLImageData implements Serializable
 	 * Method to print out a string representation of this node, with a prefix.
 	 * @param prefix A string to prefix to each line of data we print out.
 	 * @see #objectListClusterString
+	 * @see #objectListVOTableURL
 	 * @see #objectListType
 	 * @see #imageDataType
 	 * @see #imageDataURL
@@ -174,6 +228,11 @@ public class RTMLImageData implements Serializable
 			sb.append(prefix+"\tObjectList: type = cluster\n");
 			sb.append(prefix+"\t"+objectListClusterString+"\n");
 		}
+		if(isObjectListTypeVOTableURL()&&(objectListVOTableURL != null))
+		{
+			sb.append(prefix+"\tObjectList: type = votable-url\n");
+			sb.append(prefix+"\t"+objectListVOTableURL+"\n");
+		}
 		if(imageDataType != null)
 			sb.append(prefix+"\tImageDataType: "+imageDataType+"\n");
 		if(imageDataURL != null)
@@ -185,4 +244,7 @@ public class RTMLImageData implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2005/05/04 18:54:26  cjm
+** Initial revision
+**
 */
