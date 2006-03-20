@@ -1,5 +1,5 @@
 // RTMLDateFormat.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDateFormat.java,v 1.1 2006-03-20 15:23:11 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDateFormat.java,v 1.2 2006-03-20 16:10:20 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -15,17 +15,17 @@ import java.util.*;
  * ISO8601 dates without a timezone should be parsed as being UTC dates, but we currently parse them in the parser's
  * locale timezone , which makes specifying local-relative dates easy.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RTMLDateFormat implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDateFormat.java,v 1.1 2006-03-20 15:23:11 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDateFormat.java,v 1.2 2006-03-20 16:10:20 cjm Exp $";
 	/**
 	 * Instance of SimpleDateFormat setup to parse ISO8601 dates with a timezone field e.g.:
-	 * 2006-02-28T18:00:00+11:00
+	 * 2006-02-28T18:00:00+1100
 	 */
 	protected SimpleDateFormat timezoneDateFormat = null;
 	/**
@@ -83,4 +83,7 @@ public class RTMLDateFormat implements Serializable
 }
 //
 // $Log: not supported by cvs2svn $
+// Revision 1.1  2006/03/20 15:23:11  cjm
+// Initial revision
+//
 //
