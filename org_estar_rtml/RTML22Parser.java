@@ -1,5 +1,5 @@
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.21 2005-08-19 17:01:09 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.22 2006-03-20 16:21:28 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -31,14 +31,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.21 $
+ * @version $Revision: 1.22 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.21 2005-08-19 17:01:09 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.22 2006-03-20 16:21:28 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -213,8 +213,8 @@ public class RTMLParser
 					//System.err.println(childNode);
 					break;
 				default:
-					throw new RTMLException(this.getClass().getName()+":parseDocument:Illegal Child:"+
-								childNode);
+					throw new RTMLException(this.getClass().getName()+
+								":parseDocument:Illegal Child:"+childNode);
 			}
 		}
 		return rtmlDocument;
@@ -1593,20 +1593,21 @@ public class RTMLParser
 
 	/**
 	 * Parse a date time node. This is a node (such as StartDateTime, EndDateTime) containing a date
-	 * formatted in the form: 2001-05-29T12:00:00. The keyword 'never' returns a null date.
+	 * formatted in the form: 2001-05-29T12:00:00-1100. The keyword 'never' returns a null date.
 	 * @param dateTimeNode The XML node containing a date to parse as it's CDATA.
 	 * @return The parsed date is returned, or null if 'never' was specified.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @see RTMLDateFormat
 	 */
 	private Date parseDateTimeNode(Node dateTimeNode) throws RTMLException
 	{
 		Node childNode;
 		NodeList childList;
 		Date date = null;
-		DateFormat dateFormat = null;
+		RTMLDateFormat dateFormat = null;
 		String s = null;
 
-		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		dateFormat = new RTMLDateFormat();
 		childList = dateTimeNode.getChildNodes();
 		for(int i = 0; i < childList.getLength(); i++)
 		{
@@ -2089,6 +2090,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.21  2005/08/19 17:01:09  cjm
+** Added VOTable URL support to ImageData.
+**
 ** Revision 1.20  2005/06/20 10:55:04  cjm
 ** Error string now parsed for documents of type fail and abort, as well as reject.
 **
