@@ -1,5 +1,5 @@
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.10 2005-06-08 13:57:46 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.11 2006-03-20 16:22:13 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -11,14 +11,14 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class RTMLSchedule implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.10 2005-06-08 13:57:46 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.11 2006-03-20 16:22:13 cjm Exp $";
 	/**
 	 * Schedule priority attribute. Accordin to the DTD, The required
 	 * priority attribute is an integer: 0=Target-of-Opportunity
@@ -317,16 +317,17 @@ public class RTMLSchedule implements Serializable
 
 	/**
 	 * Set the date the observation can be scheduled AFTER.
-	 * @param s A string, in the format yyyy-MM-dd'T'HH:mm:ss.
+	 * @param s A string, in the format yyyy-MM-dd'T'HH:mm:ssZ.
 	 * @see #startDate
 	 * @exception RTMLException Thrown if the string is not a valid date/time, 
 	 *            using the format specified above.
+	 * @see RTMLDateFormat
 	 */
 	public void setStartDate(String s) throws RTMLException
 	{
-		DateFormat dateFormat = null;
+		RTMLDateFormat dateFormat = null;
 
-		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		dateFormat = new RTMLDateFormat();
 		try
 		{
 			startDate = dateFormat.parse(s);
@@ -359,16 +360,17 @@ public class RTMLSchedule implements Serializable
 
 	/**
 	 * Set the date the observation should be scheduled BEFORE.
-	 * @param s A string, in the format yyyy-MM-dd'T'HH:mm:ss.
+	 * @param s A string, in the format yyyy-MM-dd'T'HH:mm:ssZ.
 	 * @exception RTMLException Thrown if the string is not a valid date/time, 
 	 *            using the format specified above.
 	 * @see #startDate
+	 * @see RTMLDateFormat
 	 */
 	public void setEndDate(String s) throws RTMLException
 	{
-		DateFormat dateFormat = null;
+		RTMLDateFormat dateFormat = null;
 
-		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		dateFormat = new RTMLDateFormat();
 		try
 		{
 			endDate = dateFormat.parse(s);
@@ -492,6 +494,9 @@ public class RTMLSchedule implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.10  2005/06/08 13:57:46  cjm
+** Fixed setSeeingConstraint method.
+**
 ** Revision 1.9  2005/06/08 11:39:30  cjm
 ** Fixed comments.
 ** Added seeing constraints.
