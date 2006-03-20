@@ -1,5 +1,5 @@
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.32 2005-08-19 17:01:06 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.33 2006-03-20 16:21:52 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -40,14 +40,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.32 $
+ * @version $Revision: 1.33 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.32 2005-08-19 17:01:06 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.33 2006-03-20 16:21:52 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -596,14 +596,15 @@ public class RTMLCreate
 	 * @param scheduleElement The schedule XML node to add the schedule to.
 	 * @param schedule The RTML schedule data (which contains time constrint data).
 	 * @see RTMLSchedule
+	 * @see RTMLDateFormat
 	 */
 	private void createTimeConstraint(Element scheduleElement,RTMLSchedule schedule)
 	{
 		Element timeConstraintElement = null;
 		Element dateTimeElement = null;
-		DateFormat dateFormat = null;
+		RTMLDateFormat dateFormat = null;
 
-		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		dateFormat = new RTMLDateFormat();
 		// schedule element
 		timeConstraintElement = (Element)document.createElement("TimeConstraint");
 		// start date time element
@@ -773,13 +774,19 @@ public class RTMLCreate
 		rtmlElement.appendChild(e);
 	}
 
+	/**
+	 * Create the completion time node.
+	 * @param rtmlElement The RTML document element to put the completion time element in.
+	 * @param completionTime The date to use.
+	 * @see RTMLDateFormat
+	 */
 	private void createCompletionTime(Element rtmlElement,Date completionTime)
 	{
 		Element e = null;
 		String dateString = null;
-		DateFormat dateFormat = null;
+		RTMLDateFormat dateFormat = null;
 
-		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		dateFormat = new RTMLDateFormat();
 		e = (Element)document.createElement("CompletionTime");
 		dateString = dateFormat.format(completionTime);
 		e.appendChild(document.createTextNode(dateString));
@@ -789,6 +796,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.32  2005/08/19 17:01:06  cjm
+** Added VOTable URL support to ImageData.
+**
 ** Revision 1.31  2005/06/20 10:55:05  cjm
 ** Error string now created for documents of type fail and abort, as well as reject.
 **
