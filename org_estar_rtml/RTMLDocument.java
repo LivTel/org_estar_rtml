@@ -1,5 +1,5 @@
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.11 2005-06-20 10:48:49 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.12 2006-03-20 16:22:33 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -9,14 +9,14 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class RTMLDocument implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.11 2005-06-20 10:48:49 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.12 2006-03-20 16:22:33 cjm Exp $";
 	/**
 	 * The type of the document, as specified in the RTML node's "type" attribute.
 	 */
@@ -218,17 +218,18 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	}
 
 	/**
-	 * Set the documents completion time, based on a string of the form "yyyy-MM-dd'T'HH:mm:ss".
+	 * Set the documents completion time, based on a string of the form "yyyy-MM-dd'T'HH:mm:ssZ".
 	 * @param s The completion time string.
 	 * @exception RTMLException Thrown if the string is not a valid completion time, 
 	 *            using the format specified above.
 	 * @see #completionTime
+	 * @see RTMLDateFormat
 	 */
 	public void setCompletionTime(String s) throws RTMLException
 	{
-		DateFormat dateFormat = null;
+		RTMLDateFormat dateFormat = null;
 
-		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		dateFormat = new RTMLDateFormat();
 		try
 		{
 			completionTime = dateFormat.parse(s);
@@ -341,6 +342,9 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.11  2005/06/20 10:48:49  cjm
+** setErrorString now works for fail and abort type documents as well as reject.
+**
 ** Revision 1.10  2005/06/08 11:37:11  cjm
 ** Fixed comments.
 **
