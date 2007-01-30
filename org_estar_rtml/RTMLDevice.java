@@ -1,5 +1,24 @@
+/*   
+    Copyright 2006, Astrophysics Research Institute, Liverpool John Moores University.
+
+    This file is part of org.estar.rtml.
+
+    org.estar.rtml is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    org.estar.rtml is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with org.estar.rtml; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 // RTMLDevice.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDevice.java,v 1.2 2005-01-19 11:54:09 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDevice.java,v 1.3 2007-01-30 18:31:13 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -7,14 +26,14 @@ import java.io.*;
 /**
  * This class is a data container for information contained in the device nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class RTMLDevice implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDevice.java,v 1.2 2005-01-19 11:54:09 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDevice.java,v 1.3 2007-01-30 18:31:13 cjm Exp $";
 	/**
 	 * The type of device this is. See the dtd: %deviceTypes;.
 	 */
@@ -160,6 +179,9 @@ public class RTMLDevice implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2005/01/19 11:54:09  cjm
+** Added detector to device.
+**
 ** Revision 1.1  2004/03/11 13:27:33  cjm
 ** Initial revision
 **

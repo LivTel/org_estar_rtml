@@ -1,5 +1,24 @@
+/*   
+    Copyright 2006, Astrophysics Research Institute, Liverpool John Moores University.
+
+    This file is part of org.estar.rtml.test.
+
+    org.estar.rtml.test is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    org.estar.rtml.test is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with org.estar.rtml.test; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 // TestSimpleDateFormat.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestSimpleDateFormat.java,v 1.2 2007-01-30 14:50:26 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestSimpleDateFormat.java,v 1.3 2007-01-30 18:31:42 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -11,14 +30,14 @@ import org.estar.rtml.*;
 /**
  * This class tests the parse and format methods in SimpleDateFormat.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TestSimpleDateFormat
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestSimpleDateFormat.java,v 1.2 2007-01-30 14:50:26 cjm Exp $";
+	public final static String RCSID = "$Id: TestSimpleDateFormat.java,v 1.3 2007-01-30 18:31:42 cjm Exp $";
 	/**
 	 * Default SimpleDateFormat pattern.
 	 */
@@ -215,6 +234,9 @@ public class TestSimpleDateFormat
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2007/01/30 14:50:26  cjm
+** New version.
+**
 ** Revision 1.1  2006/02/28 17:47:20  cjm
 ** Initial revision
 **

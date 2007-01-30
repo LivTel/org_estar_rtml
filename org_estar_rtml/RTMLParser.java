@@ -1,5 +1,24 @@
+/*   
+    Copyright 2006, Astrophysics Research Institute, Liverpool John Moores University.
+
+    This file is part of org.estar.rtml.
+
+    org.estar.rtml is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    org.estar.rtml is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with org.estar.rtml; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.22 2006-03-20 16:21:28 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.23 2007-01-30 18:31:18 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -31,14 +50,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.22 $
+ * @version $Revision: 1.23 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLParser.java,v 1.22 2006-03-20 16:21:28 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLParser.java,v 1.23 2007-01-30 18:31:18 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -2090,6 +2109,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.22  2006/03/20 16:21:28  cjm
+** Updated date time parsing to use RTMLDateFormat.
+**
 ** Revision 1.21  2005/08/19 17:01:09  cjm
 ** Added VOTable URL support to ImageData.
 **

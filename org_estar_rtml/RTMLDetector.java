@@ -1,5 +1,24 @@
+/*   
+    Copyright 2006, Astrophysics Research Institute, Liverpool John Moores University.
+
+    This file is part of org.estar.rtml.
+
+    org.estar.rtml is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    org.estar.rtml is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with org.estar.rtml; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 // RTMLDetector.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDetector.java,v 1.2 2005-06-08 11:38:29 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDetector.java,v 1.3 2007-01-30 18:31:11 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -7,14 +26,14 @@ import java.io.*;
 /**
  * This class is a data container for information contained in the Detector nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class RTMLDetector implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDetector.java,v 1.2 2005-06-08 11:38:29 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDetector.java,v 1.3 2007-01-30 18:31:11 cjm Exp $";
 	/**
 	 * The Detector Binning row number.
 	 */
@@ -136,6 +155,10 @@ public class RTMLDetector implements Serializable
 }
 //
 // $Log: not supported by cvs2svn $
+// Revision 1.2  2005/06/08 11:38:29  cjm
+// Fixed comments.
+// Reformatted.
+//
 // Revision 1.1  2005/01/19 11:53:42  cjm
 // Initial revision
 //

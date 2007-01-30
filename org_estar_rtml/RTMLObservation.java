@@ -1,5 +1,24 @@
+/*   
+    Copyright 2006, Astrophysics Research Institute, Liverpool John Moores University.
+
+    This file is part of org.estar.rtml.
+
+    org.estar.rtml is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    org.estar.rtml is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with org.estar.rtml; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 // RTMLObservation.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLObservation.java,v 1.7 2005-06-08 11:38:51 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLObservation.java,v 1.8 2007-01-30 18:31:17 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -9,14 +28,14 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the observation nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class RTMLObservation implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLObservation.java,v 1.7 2005-06-08 11:38:51 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLObservation.java,v 1.8 2007-01-30 18:31:17 cjm Exp $";
 	/**
 	 * The device (instrument) of this observation.
 	 * This can be null, in which case pick up the generic document device information.
@@ -218,6 +237,9 @@ public class RTMLObservation implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.7  2005/06/08 11:38:51  cjm
+** Fixed comments.
+**
 ** Revision 1.6  2005/05/12 12:08:59  cjm
 ** Fixed clearImageDataList.
 **

@@ -1,5 +1,24 @@
+/*   
+    Copyright 2006, Astrophysics Research Institute, Liverpool John Moores University.
+
+    This file is part of org.estar.rtml.
+
+    org.estar.rtml is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    org.estar.rtml is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with org.estar.rtml; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 // RTMLSeriesConstraint.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSeriesConstraint.java,v 1.4 2005-04-28 09:23:27 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSeriesConstraint.java,v 1.5 2007-01-30 18:31:22 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -17,14 +36,14 @@ import java.text.*;
  * <i>Do the observation <b>count</b> times with a time period of <b>interval</b> 
  * +/- <b>tolerance</b> between them.</i>
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class RTMLSeriesConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSeriesConstraint.java,v 1.4 2005-04-28 09:23:27 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSeriesConstraint.java,v 1.5 2007-01-30 18:31:22 cjm Exp $";
 	/**
 	 * The number of times the observation associated wit this SeriesConstraint should be executed.
 	 */
@@ -191,6 +210,9 @@ public class RTMLSeriesConstraint implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2005/04/28 09:23:27  cjm
+** spell check fix.
+**
 ** Revision 1.3  2005/04/27 15:41:56  cjm
 ** Fixed toString null reference problems with interval and tolerance.
 **
