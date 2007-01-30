@@ -1,26 +1,28 @@
 // TestSimpleDateFormat.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestSimpleDateFormat.java,v 1.1 2006-02-28 17:47:20 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestSimpleDateFormat.java,v 1.2 2007-01-30 14:50:26 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
 import java.util.*;
 import java.text.*;
 
+import org.estar.rtml.*;
+
 /**
  * This class tests the parse and format methods in SimpleDateFormat.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestSimpleDateFormat
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestSimpleDateFormat.java,v 1.1 2006-02-28 17:47:20 cjm Exp $";
+	public final static String RCSID = "$Id: TestSimpleDateFormat.java,v 1.2 2007-01-30 14:50:26 cjm Exp $";
 	/**
 	 * Default SimpleDateFormat pattern.
 	 */
-	public final static String DEFAULT_SIMPLE_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+	public final static String DEFAULT_SIMPLE_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 	/**
 	 * The input to parse.
 	 */
@@ -47,6 +49,10 @@ public class TestSimpleDateFormat
 	 * Formatter to use for output date formatting.
 	 */
 	private SimpleDateFormat outputSimpleDateFormat = null;
+	/**
+	 * Parser/Formatter based on the current RTML parser standard.
+	 */
+	private RTMLDateFormat rtmlDateFormat = null;
 
 	/**
 	 * Default constructor.
@@ -57,7 +63,7 @@ public class TestSimpleDateFormat
 	public TestSimpleDateFormat()
 	{
 		super();
-		inputPatternString = DEFAULT_SIMPLE_DATE_FORMAT;
+		inputPatternString = null;
 		outputPatternString = DEFAULT_SIMPLE_DATE_FORMAT;
 	}
 
@@ -75,6 +81,7 @@ public class TestSimpleDateFormat
 			System.err.println("java org.estar.rtml.test.TestSimpleDateFormat -ip <input pattern> -il -op <output pattern> -i <input date>");
 			System.err.println("Default input and output pattern:"+DEFAULT_SIMPLE_DATE_FORMAT);
 			System.err.println("-il sets the input date formatter lenient.");
+			System.err.println("If you don't specify '-ip' the RTMLDateFormat parser is used.");
 			System.exit(2);
 		}
 		for(int i = 0; i < args.length; i++)
@@ -146,13 +153,18 @@ public class TestSimpleDateFormat
 		TimeZone timeZone = null;
 
 		// sort out simple date formats
-		inputSimpleDateFormat = new SimpleDateFormat(inputPatternString);
-		if(inputLenient)
+		if(inputPatternString != null)
 		{
-			System.out.println("Setting Input date format lenient.");
-			inputSimpleDateFormat.setLenient(true);
+			inputSimpleDateFormat = new SimpleDateFormat(inputPatternString);
+			if(inputLenient)
+			{
+				System.out.println("Setting Input date format lenient.");
+				inputSimpleDateFormat.setLenient(true);
+			}
 		}
 		outputSimpleDateFormat = new SimpleDateFormat(outputPatternString);
+		// rtml date formatter
+		rtmlDateFormat = new RTMLDateFormat();
 
 		// sort out GMT formatter
 		timeZone = TimeZone.getTimeZone("UTC");
@@ -162,11 +174,20 @@ public class TestSimpleDateFormat
 		System.out.println("Input date format:\t\t"+inputPatternString);
 		System.out.println("Output date format:\t\t"+outputPatternString);
 		System.out.println("Input date:\t\t\t"+inputString);
-		System.out.println("Parsing input date using Input date format...");
-		date = inputSimpleDateFormat.parse(inputString);
+		if(inputSimpleDateFormat != null)
+		{
+			System.out.println("Parsing input date using Input date format...");
+			date = inputSimpleDateFormat.parse(inputString);
+		}
+		else
+		{
+			System.out.println("Parsing input date using RTML date format...");
+			date = rtmlDateFormat.parse(inputString);
+		}
 		System.out.println("Date (internal formatter):\t"+date);
 		System.out.println("Date (milliseconds since 1970):\t"+date.getTime());
 		System.out.println("Date using Output date format:\t"+outputSimpleDateFormat.format(date));
+		System.out.println("Date using RTML date format:\t"+rtmlDateFormat.format(date));
 		System.out.println("Date using GMT date format:\t"+gmtSimpleDateFormat.format(date));
 	}
 
@@ -194,4 +215,7 @@ public class TestSimpleDateFormat
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2006/02/28 17:47:20  cjm
+** Initial revision
+**
 */
