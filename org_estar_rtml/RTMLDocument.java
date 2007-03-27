@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.13 2007-01-30 18:31:13 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.14 2007-03-27 19:16:58 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -28,14 +28,14 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class RTMLDocument implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.13 2007-01-30 18:31:13 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.14 2007-03-27 19:16:58 cjm Exp $";
 	/**
 	 * The type of the document, as specified in the RTML node's "type" attribute.
 	 */
@@ -65,6 +65,10 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	 */
 	public Double score = null;
 	/**
+	 * A list of Score tags in a Scores tag, with probability/cumulative probability and delays. 
+	 */
+	public List scoresList = null;
+	/**
 	 * The completion time. Note this should be a per observation score, according to the DTD.
 	 */
 	public Date completionTime = null;
@@ -74,13 +78,15 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	public String errorString = null;
 
 	/**
-	 * Default constructor.
+	 * Default constructor. Initialise scoresList and observationList.
 	 * @see #observationList
+	 * @see #scoresList
 	 */
 	public RTMLDocument()
 	{
 		super();
 		observationList = new Vector();
+		scoresList = new Vector();
 	}
 
 	public void setType(String s)
@@ -182,7 +188,7 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	}
 
 	/**
-	 * Set the documents score.
+	 * Set the documents "simple" score.
 	 * @param s The score.
 	 * @see #score
 	 */
@@ -192,7 +198,7 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	}
 
 	/**
-	 * Set the documents score.
+	 * Set the documents "simple" score.
 	 * @param s The score, as a string representing a double.
 	 * @exception RTMLException Thrown if the string is not a valid double.
 	 * @see #score
@@ -217,13 +223,113 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	}
 
 	/**
-	 * Get the documents score.
-	 * @return The score.
+	 * Get the documents "simple" score.
+	 * @return The score. This can be null.
 	 * @see #score
 	 */
 	public Double getScore()
 	{
 		return score;
+	}
+
+	/**
+	 * Add an score to the Scores list.
+	 * @param sc The score to add.
+	 * @see #scoresList
+	 * @see RTMLScore
+	 */
+	public void addScore(RTMLScore sc)
+	{
+		scoresList.add(sc);
+	}
+
+	/**
+	 * Add an score to the Scores list.
+	 * @param s The score, as a string representing a double.
+	 * @exception RTMLException Thrown if the string is not a valid double.
+	 * @see #score
+	 */
+	public void addScore(String delayString,String probabilityString,String cumulativeString) throws RTMLException
+	{
+		RTMLScore newScore = null;
+		RTMLPeriodFormat delay = null;
+		double d;
+
+		newScore = new RTMLScore();
+		// delay
+		delay = new RTMLPeriodFormat();
+		delay.parse(delayString); // throws RTMLException/NumberFormatException
+		newScore.setDelay(delay);
+		// probability
+		try
+		{
+			if(probabilityString.equals("NaN"))
+				d = Double.NaN;
+			else
+				d = Double.parseDouble(probabilityString);
+			newScore.setProbability(d);
+		}
+		catch(NumberFormatException e)
+		{
+			throw new RTMLException(this.getClass().getName()+":addScore:Illegal probabilityString:"+
+						probabilityString+":",e);
+		}
+		catch(Exception e)
+		{
+			throw new RTMLException(this.getClass().getName()+":addScore:Illegal probabilityString:"+
+						probabilityString+":",e);
+		}
+		// cumulative
+		try
+		{
+			if(cumulativeString.equals("NaN"))
+				d = Double.NaN;
+			else
+				d = Double.parseDouble(cumulativeString);
+			newScore.setCumulative(d);
+		}
+		catch(NumberFormatException e)
+		{
+			throw new RTMLException(this.getClass().getName()+":addScore:Illegal cumulativeString:"+
+						cumulativeString+":",e);
+		}
+		catch(Exception e)
+		{
+			throw new RTMLException(this.getClass().getName()+":addScore:Illegal cumulativeString:"+
+						cumulativeString+":",e);
+		}
+		scoresList.add(newScore);
+	}
+
+	/**
+	 * Clear the Scores list from the document.
+	 * @see #scoresList
+	 */
+	public void clearScoresList()
+	{
+		scoresList = null;
+		scoresList = new Vector();
+	}
+
+	/**
+	 * Get a Score from the Scores list.
+	 * @param index The index in the scores list.
+	 * @return The score in the specicifed index is returned.
+	 * @see #scoresList
+	 */
+	public RTMLScore getScore(int index)
+	{
+		return (RTMLScore)(scoresList.get(index));
+	}
+
+	/**
+	 * Get the number of Score's in the Scores list.
+	 * @return The number of scores in the list.
+	 * @see #scoresList
+	 */
+	public int getScoresListCount()
+	{
+		return scoresList.size();
 	}
 
 	/**
@@ -332,6 +438,7 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	public String toString(String prefix)
 	{
 		RTMLObservation ob = null;
+		RTMLScore sc = null;
 		StringBuffer sb = null;
 		
 		sb = new StringBuffer();
@@ -352,6 +459,12 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 		}
 		if(getScore() != null)
 			sb.append(prefix+"\tScore:"+getScore()+"\n");
+		for(int i = 0; i < getScoresListCount();i++)
+		{
+			sc = getScore(i);
+			if(sc != null)
+				sb.append(prefix+sc.toString("\t")+"\n");
+		}
 		if(getCompletionTime() != null)
 			sb.append(prefix+"\tCompletion Time:"+getCompletionTime()+"\n");
 		if(type.equals("reject") && (errorString != null))
@@ -361,6 +474,9 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.13  2007/01/30 18:31:13  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.12  2006/03/20 16:22:33  cjm
 ** Now uses RTMLDateFormat for date/time parsing/formatting.
 **
