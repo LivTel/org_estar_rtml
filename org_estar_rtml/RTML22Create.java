@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.34 2007-01-30 18:31:09 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.35 2007-03-27 19:14:11 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -59,14 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.34 $
+ * @version $Revision: 1.35 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.34 2007-01-30 18:31:09 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.35 2007-03-27 19:14:11 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -297,6 +297,8 @@ public class RTMLCreate
 		}
 		if(d.getScore() != null)
 			createScore(rtmlElement,d.getScore());
+		if(d.getScoresListCount() > 0)
+			createScores(rtmlElement,d);
 		if(d.getCompletionTime() != null)
 		{
 			createCompletionTime(rtmlElement,d.getCompletionTime());
@@ -794,6 +796,50 @@ public class RTMLCreate
 	}
 
 	/**
+	 * Create a Scores element, and Score sub-elements.
+	 * @param rtmlElement The RTML document element to put the score element in.
+	 * @param rtmlDocument The RTML document
+	 * @see RTMLDocument#getScoresListCount
+	 * @see RTMLDocument#getScore
+	 * @see RTMLScore#getDelay
+	 * @see RTMLScore#getProbability
+	 * @see RTMLScore#getCumulative
+	 */
+	private void createScores(Element rtmlElement,RTMLDocument rtmlDocument)
+	{
+		RTMLScore score = null;
+		Element scoresElement = null;
+		Element scoreElement = null;
+		DecimalFormat df = null;
+
+		df = new DecimalFormat("#####0.0#");
+		// Create Scores element
+		scoresElement = (Element)document.createElement("Scores");
+		// loop on Score list
+		for(int i = 0; i < rtmlDocument.getScoresListCount(); i++)
+		{
+			// get score
+			score = rtmlDocument.getScore(i);
+			// create Score element
+			scoreElement = (Element)document.createElement("Score");
+			scoreElement.setAttribute("delay",score.getDelay().toString());
+			if(Double.isNaN(score.getProbability()))
+				scoreElement.setAttribute("probability","NaN");
+			else
+				scoreElement.setAttribute("probability",df.format(score.getProbability()));
+			if(Double.isNaN(score.getCumulative()))
+				scoreElement.setAttribute("cumulative","NaN");
+			else
+				scoreElement.setAttribute("cumulative",df.format(score.getCumulative()));
+			// Add score to Scores list
+			scoresElement.appendChild(scoreElement);
+
+		}
+		// Add Scores to RTML
+		rtmlElement.appendChild(scoresElement);
+	}
+
+	/**
 	 * Create the completion time node.
 	 * @param rtmlElement The RTML document element to put the completion time element in.
 	 * @param completionTime The date to use.
@@ -815,6 +861,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.34  2007/01/30 18:31:09  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.33  2006/03/20 16:21:52  cjm
 ** Updated creation od date-time nodes to use the RTMLDateFormat formatter.
 **
