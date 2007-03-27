@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.16 2007-01-30 18:31:39 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.17 2007-03-27 19:17:38 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -37,14 +37,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.17 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.16 2007-01-30 18:31:39 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.17 2007-03-27 19:17:38 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
@@ -450,6 +450,20 @@ public class TestCreate
 				{
 					System.err.println(this.getClass().getName()+
 							   ":parseArguments:document_score needs a double.");
+					System.exit(2);
+				}
+			}
+			else if(args[i].equals("-document_score_list"))
+			{
+				if((i+3) < args.length)
+				{
+					document.addScore(args[i+1],args[i+2],args[i+3]);
+					i+= 3;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+			     ":parseArguments:document_score_list needs a delay/probability.cumulative probability.");
 					System.exit(2);
 				}
 			}
@@ -1020,6 +1034,7 @@ public class TestCreate
 		System.err.println("\t\t[-image_data_url <url> [-image_data_fits_header <string>]");
 		System.err.println("\t\t\t[-image_data_object_list <cluster|votable-url> <filename/url>]]");
 		System.err.println("\t[-document_score <double>]");
+		System.err.println("\t[-document_score_list <P{(y)Y{(m)M}{(d)D}{T{(h)H}{(m}M}{(s.s..)S}> <double> <double>]");
 		System.err.println("\t[-completion_time <yyyy-MM-dd'T'HH:mm:ss>]");
 	}
 
@@ -1047,6 +1062,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.16  2007/01/30 18:31:39  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.15  2005/08/19 17:01:07  cjm
 ** Added VOTable URL support to ImageData.
 **
