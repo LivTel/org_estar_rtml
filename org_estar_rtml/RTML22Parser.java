@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.23 2007-01-30 18:31:18 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.24 2007-03-27 19:15:39 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -50,14 +50,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.23 $
+ * @version $Revision: 1.24 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.23 2007-01-30 18:31:18 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.24 2007-03-27 19:15:39 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -294,6 +294,8 @@ public class RTMLParser
 					parseObservationNode(rtmlDocument,childNode);
 				else if(childNode.getNodeName() == "Score")
 					parseScoreNode(rtmlDocument,childNode);
+				else if(childNode.getNodeName() == "Scores")
+					parseScoresNode(rtmlDocument,childNode);
 				else if(childNode.getNodeName() == "CompletionTime")
 					parseCompletionTimeNode(rtmlDocument,childNode);
 			}
@@ -1986,6 +1988,102 @@ public class RTMLParser
 	}
 
 	/**
+	 * Internal method to parse an Scores node.
+	 * @param rtmlDocument The document to add the scores to.
+	 * @param scoresNode The XML DOM node for the Scores tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node.
+	 * @see #parseScoresScoreNode
+	 */
+	private void parseScoresNode(RTMLDocument rtmlDocument,Node scoresNode) throws RTMLException
+	{
+		Node childNode;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(scoresNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseScoresNode:Illegal Node:"+
+						scoresNode);
+		}
+		if(scoresNode.getNodeName() != "Scores")
+		{
+			throw new RTMLException(this.getClass().getName()+":parseScoresNode:Illegal Node Name:"+
+						scoresNode.getNodeName());
+		}
+		// clear scores list
+		rtmlDocument.clearScoresList();
+		// go through child nodes
+		childList = scoresNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+			
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "Score")
+					parseScoresScoreNode(rtmlDocument,childNode);
+				else
+					System.err.println("parseScoresNode:ELEMENT:"+childNode);
+			}
+		}
+	}
+
+	/**
+	 * Internal method to parse an Score node inside a Scores tag.
+	 * @param rtmlDocument The document with the list to add the score to.
+	 * @param scoreNode The XML DOM node for the Score tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @see RTMLDocument#addScore(java.lang.String,java.lang.String,java.lang.String)
+	 */
+	private void parseScoresScoreNode(RTMLDocument rtmlDocument,Node scoreNode) throws RTMLException
+	{
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+		String delayString,probabilityString,cumulativeString;
+
+		// check current XML node is correct
+		if(scoreNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseScoresScoreNode:Illegal Node:"+
+						scoreNode);
+		}
+		if(scoreNode.getNodeName() != "Score")
+		{
+			throw new RTMLException(this.getClass().getName()+":parseScoresScoreNode:Illegal Node Name:"+
+						scoreNode.getNodeName());
+		}
+		// go through attribute list
+		attributeList = scoreNode.getAttributes();
+		// delay
+		attributeNode = attributeList.getNamedItem("delay");
+		if(attributeNode == null)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseScoresScoreNode:delay attribute does not exist.");
+		}
+		delayString = attributeNode.getNodeValue();
+		// probability
+		attributeNode = attributeList.getNamedItem("probability");
+		if(attributeNode == null)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseScoresScoreNode:probability attribute does not exist.");
+		}
+		probabilityString = attributeNode.getNodeValue();
+		// cumulative
+		attributeNode = attributeList.getNamedItem("cumulative");
+		if(attributeNode == null)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseScoresScoreNode:cumulative attribute does not exist.");
+		}
+		cumulativeString = attributeNode.getNodeValue();
+		// parse and add score data to list
+		rtmlDocument.addScore(delayString,probabilityString,cumulativeString);
+	}
+
+	/**
 	 * Internal method to parse an Completion Time node.
 	 * @param rtmlDocument The document to set the completion time in.
 	 * @param completionTimeNode The XML DOM node for the CompletionTime tag node.
@@ -2109,6 +2207,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.23  2007/01/30 18:31:18  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.22  2006/03/20 16:21:28  cjm
 ** Updated date time parsing to use RTMLDateFormat.
 **
