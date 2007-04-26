@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLDevice.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDevice.java,v 1.3 2007-01-30 18:31:13 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDevice.java,v 1.4 2007-04-26 16:27:38 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -26,14 +26,14 @@ import java.io.*;
 /**
  * This class is a data container for information contained in the device nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RTMLDevice implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDevice.java,v 1.3 2007-01-30 18:31:13 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDevice.java,v 1.4 2007-04-26 16:27:38 cjm Exp $";
 	/**
 	 * The type of device this is. See the dtd: %deviceTypes;.
 	 */
@@ -67,6 +67,7 @@ public class RTMLDevice implements Serializable
 	/**
 	 * Set the type of instrument. This should be one of the types defined in the RTML DTD,
 	 * entity %deviceTypes;.
+	 * This corresponds to the <b>type</b> attribute in the RTML &lt;Device&gt; tag.
 	 * @param s A valid type.
 	 * @exception IllegalArgumentException Thrown if s is not valid.
 	 * @see #type
@@ -82,6 +83,12 @@ public class RTMLDevice implements Serializable
 		type = s;
 	}
 
+	/**
+	 * Get the type of device.
+	 * This corresponds to the <b>type</b> attribute in the RTML &lt;Device&gt; tag.
+	 * @return A String from the list of valid device types (RTML DTD entity %deviceTypes;).
+	 * @see #type
+	 */
 	public String getType()
 	{
 		return type;
@@ -90,6 +97,7 @@ public class RTMLDevice implements Serializable
 	/**
 	 * Set the spectral region of the instrument. This should be one of the types defined in the RTML DTD,
 	 * entity %spectralRegions;.
+	 * This corresponds to the <b>region</b> attribute in the RTML &lt;Device&gt; tag.
 	 * @param s A valid spectral region.
 	 * @exception IllegalArgumentException Thrown if s is not valid.
 	 * @see #spectralRegion
@@ -105,6 +113,12 @@ public class RTMLDevice implements Serializable
 		spectralRegion = s;
 	}
 
+	/**
+	 * Get the spectral region of the device.
+	 * This corresponds to the <b>region</b> attribute in the RTML &lt;Device&gt; tag.
+	 * @return A String from the list of valid spectral regions (RTML DTD, entity %spectralRegions;).
+	 * @see #spectralRegion
+	 */
 	public String getSpectralRegion()
 	{
 		return spectralRegion;
@@ -179,6 +193,9 @@ public class RTMLDevice implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2007/01/30 18:31:13  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.2  2005/01/19 11:54:09  cjm
 ** Added detector to device.
 **
