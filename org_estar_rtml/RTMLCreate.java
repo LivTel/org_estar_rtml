@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.35 2007-03-27 19:14:11 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.36 2007-05-02 09:17:20 snf Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -59,14 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.35 $
+ * @version $Revision: 1.36 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.35 2007-03-27 19:14:11 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.36 2007-05-02 09:17:20 snf Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -789,9 +789,11 @@ public class RTMLCreate
 	private void createScore(Element rtmlElement,Double score)
 	{
 		Element e = null;
+		DecimalFormat df = null;
 
+		df = new DecimalFormat("#0.0#####");
 		e = (Element)document.createElement("Score");
-		e.appendChild(document.createTextNode(score.toString()));
+		e.appendChild(document.createTextNode(df.format(score.doubleValue())));
 		rtmlElement.appendChild(e);
 	}
 
@@ -861,6 +863,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.35  2007/03/27 19:14:11  cjm
+** Added createScores.
+**
 ** Revision 1.34  2007/01/30 18:31:09  cjm
 ** gnuify: Added GNU General Public License.
 **
