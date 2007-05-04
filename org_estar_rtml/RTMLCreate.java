@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.36 2007-05-02 09:17:20 snf Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.37 2007-05-04 09:30:17 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -59,14 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.36 $
+ * @version $Revision: 1.37 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.36 2007-05-02 09:17:20 snf Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.37 2007-05-04 09:30:17 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -176,6 +176,7 @@ public class RTMLCreate
 			DOMSource source = new DOMSource(document);
 			StreamResult result = new StreamResult(os);
 			transformer.transform(source, result);
+			os.flush();
 		}
 		catch (Exception e)
 		{
@@ -863,6 +864,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.36  2007/05/02 09:17:20  snf
+** added decimal format for createScore
+**
 ** Revision 1.35  2007/03/27 19:14:11  cjm
 ** Added createScores.
 **
