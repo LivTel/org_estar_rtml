@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.37 2007-05-04 09:30:17 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.38 2007-07-06 15:18:09 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -59,14 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.37 $
+ * @version $Revision: 1.38 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.37 2007-05-04 09:30:17 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.38 2007-07-06 15:18:09 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -396,6 +396,9 @@ public class RTMLCreate
 		rtmlElement.appendChild(e);
 	}
 
+	/**
+	 * Create the Intelligent Agent node.
+	 */
 	private void createIntelligentAgent(Element rtmlElement,RTMLIntelligentAgent rtmlIA)
 	{
 		Element iaElement = null;
@@ -403,7 +406,8 @@ public class RTMLCreate
 		iaElement = (Element)document.createElement("IntelligentAgent");
 		if(rtmlIA.getHostname() != null)
 			iaElement.setAttribute("host",rtmlIA.getHostname());
-		iaElement.setAttribute("port",""+rtmlIA.getPort());
+		if(rtmlIA.getPort() != 0)
+			iaElement.setAttribute("port",""+rtmlIA.getPort());
 		if(rtmlIA.getId() != null)
 			iaElement.appendChild(document.createTextNode(rtmlIA.getId()));
 		rtmlElement.appendChild(iaElement);
@@ -864,6 +868,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.37  2007/05/04 09:30:17  cjm
+** Added stream flush to OutputStream. (toStream method).
+**
 ** Revision 1.36  2007/05/02 09:17:20  snf
 ** added decimal format for createScore
 **
