@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.12 2007-01-30 18:31:21 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.13 2007-07-09 11:45:52 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -30,14 +30,14 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class RTMLSchedule implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.12 2007-01-30 18:31:21 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.13 2007-07-09 11:45:52 cjm Exp $";
 	/**
 	 * Schedule priority attribute. Accordin to the DTD, The required
 	 * priority attribute is an integer: 0=Target-of-Opportunity
@@ -84,6 +84,16 @@ public class RTMLSchedule implements Serializable
 	 * This reference can be null, if no seeing constraint was specified.
 	 */
 	private RTMLSeeingConstraint seeingConstraint = null;
+	/**
+	 * Object containing details of any specified moon constraint.
+	 * This reference can be null, if no moon constraint was specified.
+	 */
+	private RTMLMoonConstraint moonConstraint = null;
+	/**
+	 * Object containing details of any specified sky constraint.
+	 * This reference can be null, if no sky constraint was specified.
+	 */
+	private RTMLSkyConstraint skyConstraint = null;
 	/**
 	 * The calibration data that may be contained a a sub-tag.
 	 */
@@ -415,7 +425,7 @@ public class RTMLSchedule implements Serializable
 	 * Set the series constraint data. This data contains information on how to repeat
 	 * the observation over time (e.g. a MonitorGroup, repeat the observation <b>count</b> time 
 	 * with an elapsed time between repeats of <b>interval</b> +/- <b>tolerance</b>.
-	 * @param sc A series constrint. This can be null.
+	 * @param sc A series constraint. This can be null.
 	 * @see #seriesConstraint
 	 */
 	public void setSeriesConstraint(RTMLSeriesConstraint sc)
@@ -425,7 +435,7 @@ public class RTMLSchedule implements Serializable
 
 	/**
 	 * Get the series constraint data.
-	 * @return A series constrint. This can be null.
+	 * @return A series constraint. This can be null.
 	 * @see #seriesConstraint
 	 */
 	public RTMLSeriesConstraint getSeriesConstraint()
@@ -436,7 +446,7 @@ public class RTMLSchedule implements Serializable
 	/**
 	 * Set the seeing constraint data. This constrains the observation to be done when the seeing
 	 * conditions match the specified criteria.
-	 * @param sc A seeing constrint. This can be null.
+	 * @param sc A seeing constraint. This can be null.
 	 * @see #seeingConstraint
 	 */
 	public void setSeeingConstraint(RTMLSeeingConstraint sc)
@@ -446,12 +456,54 @@ public class RTMLSchedule implements Serializable
 
 	/**
 	 * Get the seeing constraint data.
-	 * @return A seeing constrint. This can be null.
+	 * @return A seeing constraint. This can be null.
 	 * @see #seeingConstraint
 	 */
 	public RTMLSeeingConstraint getSeeingConstraint()
 	{
 		return seeingConstraint;
+	}
+
+	/**
+	 * Set the moon constraint data. This constrains the observation to be done when the seeing
+	 * conditions match the specified criteria.
+	 * @param c A moon constraint. This can be null.
+	 * @see #moonConstraint
+	 */
+	public void setMoonConstraint(RTMLMoonConstraint c)
+	{
+		moonConstraint = c;
+	}
+
+	/**
+	 * Get the moon constraint data.
+	 * @return A moon constraint. This can be null.
+	 * @see #moonConstraint
+	 */
+	public RTMLMoonConstraint getMoonConstraint()
+	{
+		return moonConstraint;
+	}
+
+	/**
+	 * Set the sky constraint data. This constrains the observation to be done when the sky
+	 * conditions match the specified criteria.
+	 * @param c A sky constraint. This can be null.
+	 * @see #skyConstraint
+	 */
+	public void setSkyConstraint(RTMLSkyConstraint c)
+	{
+		skyConstraint = c;
+	}
+
+	/**
+	 * Get the sky constraint data.
+	 * @return A sky constraint. This can be null.
+	 * @see #skyConstraint
+	 */
+	public RTMLSkyConstraint getSkyConstraint()
+	{
+		return skyConstraint;
 	}
 
 	/**
@@ -491,6 +543,8 @@ public class RTMLSchedule implements Serializable
 	 * @see #endDate
 	 * @see #seriesConstraint
 	 * @see #seeingConstraint
+	 * @see #moonConstraint
+	 * @see #skyConstraint
 	 * @see #isMonitorGroup
 	 */
 	public String toString(String prefix)
@@ -507,12 +561,19 @@ public class RTMLSchedule implements Serializable
 			sb.append(getSeriesConstraint().toString(prefix+"\t"));
 		if(getSeeingConstraint() != null)
 			sb.append(getSeeingConstraint().toString(prefix+"\t"));
+		if(getMoonConstraint() != null)
+			sb.append(getMoonConstraint().toString(prefix+"\t"));
+		if(getSkyConstraint() != null)
+			sb.append(getSkyConstraint().toString(prefix+"\t"));
 		sb.append(prefix+"\tBetween:"+startDate+" and "+endDate+"\n");
 		return sb.toString();
 	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.12  2007/01/30 18:31:21  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.11  2006/03/20 16:22:13  cjm
 ** Now uses RTMLDateFormat for date time parsing.
 **
