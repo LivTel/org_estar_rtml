@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.17 2007-03-27 19:17:38 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.18 2007-07-09 12:53:14 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -37,14 +37,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.17 2007-03-27 19:17:38 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.18 2007-07-09 12:53:14 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
@@ -93,6 +93,14 @@ public class TestCreate
 	 * RTML schedule seeing constraint data.
 	 */
 	protected RTMLSeeingConstraint seeingConstraint = null;
+	/**
+	 * RTML schedule moon constraint data.
+	 */
+	protected RTMLMoonConstraint moonConstraint = null;
+	/**
+	 * RTML schedule sky constraint data.
+	 */
+	protected RTMLSkyConstraint skyConstraint = null;
 	/**
 	 * RTML observation image data.
 	 */
@@ -660,6 +668,32 @@ public class TestCreate
 			{
 				document.setType("incomplete");
 			}
+			else if(args[i].equals("-moon_constraint"))
+			{
+				if((i+2) < args.length)
+				{
+					if(schedule != null)
+					{
+						moonConstraint = new RTMLMoonConstraint();
+						schedule.setMoonConstraint(moonConstraint);
+						moonConstraint.setDistance(args[i+1]);
+						moonConstraint.setUnits(args[i+2]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+						     ":parseArguments:moon_constraint:schedule was null.");
+						System.exit(2);
+					}
+					i+= 2;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+						 ":parseArguments:moon_constraint needs a <distance> and <units>.");
+					System.exit(2);
+				}
+			}
 			else if(args[i].equals("-name"))
 			{
 				if((i+1) < args.length)
@@ -907,6 +941,31 @@ public class TestCreate
 					System.exit(2);
 				}
 			}
+			else if(args[i].equals("-sky_constraint"))
+			{
+				if((i+1) < args.length)
+				{
+					if(schedule != null)
+					{
+						skyConstraint = new RTMLSkyConstraint();
+						schedule.setSkyConstraint(skyConstraint);
+						skyConstraint.setSky(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+						     ":parseArguments:sky_constraint:sky was null.");
+						System.exit(2);
+					}
+					i+= 1;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+						 ":parseArguments:sky_constraint needs a <dark|bright>.");
+					System.exit(2);
+				}
+			}
 			else if(args[i].equals("-start_date"))
 			{
 				if((i+1) < args.length)
@@ -1030,7 +1089,9 @@ public class TestCreate
 		System.err.println("\t\t[-series_constraint_tolerance <P{(y)Y{(m)M}{(d)D}{T{(h)H}{(m}M}{(s.s..)S}>]");
 		System.err.println("\t\t[-start_date <yyyy-MM-ddTHH:mm:ss>]");
 		System.err.println("\t\t[-end_date <yyyy-MM-ddTHH:mm:ss>]");
+		System.err.println("\t\t[-moon_constraint <distance> <units(degs|rads)>]");
 		System.err.println("\t\t[-seeing_constraint <min arcsec> <max arcsec>]");
+		System.err.println("\t\t[-sky_constraint <dark|bright>]");
 		System.err.println("\t\t[-image_data_url <url> [-image_data_fits_header <string>]");
 		System.err.println("\t\t\t[-image_data_object_list <cluster|votable-url> <filename/url>]]");
 		System.err.println("\t[-document_score <double>]");
@@ -1062,6 +1123,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.17  2007/03/27 19:17:38  cjm
+** Added -document_score_list option to addScore to a document.
+**
 ** Revision 1.16  2007/01/30 18:31:39  cjm
 ** gnuify: Added GNU General Public License.
 **
