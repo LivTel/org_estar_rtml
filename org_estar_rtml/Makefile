@@ -11,8 +11,9 @@ JAVACFLAGS 	= -d $(LIBDIR) -sourcepath ../../../ -classpath $(LIBDIR):$(CLASSPAT
 DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 
 SRCS = RTMLException.java RTMLErrorHandler.java RTMLDateFormat.java RTMLPeriodFormat.java RTMLIntelligentAgent.java \
-	RTMLTarget.java RTMLSeeingConstraint.java RTMLSeriesConstraint.java RTMLSchedule.java \
-	RTMLDevice.java RTMLDetector.java RTMLObservation.java \
+	RTMLTarget.java \
+	RTMLSeeingConstraint.java RTMLSeriesConstraint.java RTMLMoonConstraint.java RTMLSkyConstraint.java \
+	RTMLSchedule.java RTMLDevice.java RTMLDetector.java RTMLObservation.java \
 	RTMLDocument.java RTMLParser.java RTMLCreate.java RTMLContact.java RTMLProject.java RTMLScore.java
 OBJS = $(SRCS:%.java=$(LIBDIR)/$(PACKAGEDIR)/%.class)
 DOCS = $(SRCS:%.java=$(DOCSDIR)/$(PACKAGEDIR)/%.html)
