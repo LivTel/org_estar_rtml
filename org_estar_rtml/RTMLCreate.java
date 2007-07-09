@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.38 2007-07-06 15:18:09 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.39 2007-07-09 11:47:48 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -59,14 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.38 $
+ * @version $Revision: 1.39 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.38 2007-07-06 15:18:09 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.39 2007-07-09 11:47:48 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -577,6 +577,8 @@ public class RTMLCreate
 	 * @see #createTimeConstraint
 	 * @see #createSeriesConstraint
 	 * @see #createSeeingConstraint
+	 * @see #createMoonConstraint
+	 * @see #createSkyConstraint
 	 * @see RTMLSchedule
 	 */
 	private void createSchedule(Element observationElement,RTMLSchedule schedule)
@@ -613,6 +615,12 @@ public class RTMLCreate
 		// SeeingConstraint
 		if(schedule.getSeeingConstraint() != null)
 			createSeeingConstraint(scheduleElement,schedule.getSeeingConstraint());
+		// MoonConstraint
+		if(schedule.getMoonConstraint() != null)
+			createMoonConstraint(scheduleElement,schedule.getMoonConstraint());
+		// SkyConstraint
+		if(schedule.getSkyConstraint() != null)
+			createSkyConstraint(scheduleElement,schedule.getSkyConstraint());
 		// add schedule to a observation
 		observationElement.appendChild(scheduleElement);		
 	}
@@ -718,6 +726,47 @@ public class RTMLCreate
 		seeingConstraintElement.setAttribute("maximum",nf.format(seeingConstraint.getMaximum()));
 		// add seeingConstraintElement to a scheduleElement
 		scheduleElement.appendChild(seeingConstraintElement);		
+	}
+
+	/**
+	 * Create a MoonConstraint tag.
+	 * @param scheduleElement The schedule XML node to add the moon constraint to.
+	 * @param moonConstraint The RTML moon constraint data.
+	 * @see RTMLMoonConstraint
+	 */
+	private void createMoonConstraint(Element scheduleElement,RTMLMoonConstraint moonConstraint)
+	{
+		Element moonConstraintElement = null;
+		DecimalFormat nf = null;
+
+		nf = new DecimalFormat("#####0.0#");
+		// moon constraint element
+		moonConstraintElement = (Element)document.createElement("MoonConstraint");
+		moonConstraintElement.setAttribute("distance",nf.format(moonConstraint.getDistance()));
+		moonConstraintElement.setAttribute("units",moonConstraint.getUnits());
+		// maxPhase
+		// width
+		// add moonConstraintElement to a scheduleElement
+		scheduleElement.appendChild(moonConstraintElement);		
+	}
+
+	/**
+	 * Create a SkyConstraint tag.
+	 * @param scheduleElement The schedule XML node to add the sky constraint to.
+	 * @param skyConstraint The RTML sky constraint data.
+	 * @see RTMLSkyConstraint
+	 */
+	private void createSkyConstraint(Element scheduleElement,RTMLSkyConstraint skyConstraint)
+	{
+		Element skyConstraintElement = null;
+
+		// sky constraint element
+		skyConstraintElement = (Element)document.createElement("SkyConstraint");
+		skyConstraintElement.setAttribute("sky",skyConstraint.getSky());
+		// value
+		// units
+		// add skyConstraintElement to a scheduleElement
+		scheduleElement.appendChild(skyConstraintElement);		
 	}
 
 	/**
@@ -868,6 +917,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.38  2007/07/06 15:18:09  cjm
+** IntelligentAgent port only added to IntelligentAgent if non-zero.
+**
 ** Revision 1.37  2007/05/04 09:30:17  cjm
 ** Added stream flush to OutputStream. (toStream method).
 **
