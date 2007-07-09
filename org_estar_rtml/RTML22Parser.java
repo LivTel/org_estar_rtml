@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.25 2007-07-06 15:17:19 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.26 2007-07-09 12:04:23 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -50,14 +50,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.25 $
+ * @version $Revision: 1.26 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.25 2007-07-06 15:17:19 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.26 2007-07-09 12:04:23 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -1446,6 +1446,8 @@ public class RTMLParser
 	 * @see #parseTimeConstraintNode
 	 * @see #parseSeriesConstraintNode
 	 * @see #parseSeeingConstraintNode
+	 * @see #parseMoonConstraintNode
+	 * @see #parseSkyConstraintNode
 	 */
 	private void parseScheduleNode(RTMLObservation observation,Node scheduleNode) throws RTMLException, 
 											     NumberFormatException
@@ -1498,6 +1500,10 @@ public class RTMLParser
 					parseSeriesConstraintNode(schedule,childNode);
 				else if(childNode.getNodeName() == "SeeingConstraint")
 					parseSeeingConstraintNode(schedule,childNode);
+				else if(childNode.getNodeName() == "MoonConstraint")
+					parseMoonConstraintNode(schedule,childNode);
+				else if(childNode.getNodeName() == "SkyConstraint")
+					parseSkyConstraintNode(schedule,childNode);
 			}
 		}
 		// add scheule to observation
@@ -1788,6 +1794,106 @@ public class RTMLParser
 		}
 		// add seeing constraint to schedule
 		schedule.setSeeingConstraint(seeingConstraint);
+	}
+
+	/**
+	 * Internal method to parse a MoonConstraint node.
+	 * @param schedule The instance of RTMLSchedule to set the moon constrints for.
+	 * @param moonConstraintNode The XML DOM node for the MoonConstrint tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @exception NumberFormatException Thrown if a parse error occurs when parsing the numeric attributes.
+	 * @see RTMLSchedule
+	 * @see RTMLMoonConstraint
+	 */
+	private void parseMoonConstraintNode(RTMLSchedule schedule,Node moonConstraintNode) throws RTMLException, 
+											   NumberFormatException
+	{
+		RTMLMoonConstraint moonConstraint = null;
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+		String s = null;
+
+		// check current XML node is correct
+		if(moonConstraintNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseMoonConstraintNode:Illegal Node:"+
+						moonConstraintNode);
+		}
+		if(moonConstraintNode.getNodeName() != "MoonConstraint")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseMoonConstraintNode:Illegal Node Name:"+
+						moonConstraintNode.getNodeName());
+		}
+		// add moon constraint object
+		moonConstraint = new RTMLMoonConstraint();
+		// go through attribute list
+		attributeList = moonConstraintNode.getAttributes();
+		// distance
+		attributeNode = attributeList.getNamedItem("distance");
+		if(attributeNode != null)
+		{
+			s = attributeNode.getNodeValue();
+			if(s != null)
+				moonConstraint.setDistance(s);
+		}
+		// units
+		attributeNode = attributeList.getNamedItem("units");
+		if(attributeNode != null)
+		{
+			s = attributeNode.getNodeValue();
+			if(s != null)
+				moonConstraint.setUnits(s);
+		}
+		// add moon constraint to schedule
+		schedule.setMoonConstraint(moonConstraint);
+	}
+
+	/**
+	 * Internal method to parse a SkyConstraint node.
+	 * @param schedule The instance of RTMLSchedule to set the sky constrints for.
+	 * @param skyConstraintNode The XML DOM node for the SkyConstrint tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @exception NumberFormatException Thrown if a parse error occurs when parsing the numeric attributes.
+	 * @see RTMLSchedule
+	 * @see RTMLSkyConstraint
+	 */
+	private void parseSkyConstraintNode(RTMLSchedule schedule,Node skyConstraintNode) throws RTMLException, 
+											   NumberFormatException
+	{
+		RTMLSkyConstraint skyConstraint = null;
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+		String s = null;
+
+		// check current XML node is correct
+		if(skyConstraintNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseSkyConstraintNode:Illegal Node:"+
+						skyConstraintNode);
+		}
+		if(skyConstraintNode.getNodeName() != "SkyConstraint")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseSkyConstraintNode:Illegal Node Name:"+
+						skyConstraintNode.getNodeName());
+		}
+		// add sky constraint object
+		skyConstraint = new RTMLSkyConstraint();
+		// go through attribute list
+		attributeList = skyConstraintNode.getAttributes();
+		// distance
+		attributeNode = attributeList.getNamedItem("sky");
+		if(attributeNode != null)
+		{
+			s = attributeNode.getNodeValue();
+			if(s != null)
+				skyConstraint.setSky(s);
+		}
+		// add sky constraint to schedule
+		schedule.setSkyConstraint(skyConstraint);
 	}
 
 	/**
@@ -2213,6 +2319,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.25  2007/07/06 15:17:19  cjm
+** IntelligentAgent parsing checks for null attributes.
+**
 ** Revision 1.24  2007/03/27 19:15:39  cjm
 ** Added Scores handling, added parseScoresNode/parseScoresScoreNode.
 **
