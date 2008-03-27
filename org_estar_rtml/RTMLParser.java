@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.26 2007-07-09 12:04:23 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.27 2008-03-27 17:13:54 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -50,14 +50,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.26 $
+ * @version $Revision: 1.27 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLParser.java,v 1.26 2007-07-09 12:04:23 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLParser.java,v 1.27 2008-03-27 17:13:54 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -870,6 +870,9 @@ public class RTMLParser
 	 *                         RTMLObservation.
 	 * @param deviceNode The XML DOM node for the IntelligentAgent tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node.
+	 * @see #parseFilterNode
+	 * @see #parseDetectorNode
+	 * @see #parseGratingNode
 	 */
 	private void parseDeviceNode(RTMLDeviceHolder rtmlDeviceHolder,Node deviceNode) 
 		throws RTMLException
@@ -915,6 +918,8 @@ public class RTMLParser
 					parseFilterNode(device,childNode);
 				if(childNode.getNodeName() == "Detector")
 					parseDetectorNode(device,childNode);
+				if(childNode.getNodeName() == "Grating")
+					parseGratingNode(device,childNode);
 			}
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
@@ -1067,6 +1072,65 @@ public class RTMLParser
 		}
 		// set detector in device.
 		device.setDetector(detector);
+	}
+
+	/**
+	 * Internal method to parse a Grating node.
+	 * @param device The device to add the grating to.
+	 * @param gratingNode The XML DOM node for the Grating tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node.
+	 * @see org.estar.rtml.RTMLGrating
+	 * @see org.estar.rtml.RTMLGrating#setName
+	 * @see org.estar.rtml.RTMLGrating#setWavelength
+	 * @see org.estar.rtml.RTMLGrating#setWavelengthUnits
+	 * @see org.estar.rtml.RTMLGrating#setResolution
+	 * @see org.estar.rtml.RTMLGrating#setAngle
+	 */
+	private void parseGratingNode(RTMLDevice device,Node gratingNode) 
+		throws RTMLException
+	{
+		RTMLGrating grating = null;
+		NamedNodeMap attributeList = null;
+		Node attributeNode;
+
+		// check current XML node is correct
+		if(gratingNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseGratingNode:Illegal Node:"+
+						gratingNode);
+		}
+		if(gratingNode.getNodeName() != "Grating")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseGratingNode:Illegal Node Name:"+
+						gratingNode.getNodeName());
+		}
+		// add Grating node
+		grating = new RTMLGrating();
+		// go through attribute list
+		attributeList = gratingNode.getAttributes();
+		// name
+		attributeNode = attributeList.getNamedItem("name");
+		if(attributeNode != null)
+			grating.setName(attributeNode.getNodeValue());
+		// wavelength
+		attributeNode = attributeList.getNamedItem("wavelength");
+		if(attributeNode != null)
+			grating.setWavelength(attributeNode.getNodeValue());
+		// wavelengthUnits
+		attributeNode = attributeList.getNamedItem("units");
+		if(attributeNode != null)
+			grating.setWavelengthUnits(attributeNode.getNodeValue());
+		// resolution
+		attributeNode = attributeList.getNamedItem("resolution");
+		if(attributeNode != null)
+			grating.setResolution(attributeNode.getNodeValue());
+		// angle
+		attributeNode = attributeList.getNamedItem("angle");
+		if(attributeNode != null)
+			grating.setAngle(attributeNode.getNodeValue());
+		// set grating in device.
+		device.setGrating(grating);
 	}
 
 	/**
@@ -2319,6 +2383,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.26  2007/07/09 12:04:23  cjm
+** Added parseMoonConstraintNode , parseSkyConstraintNode.
+**
 ** Revision 1.25  2007/07/06 15:17:19  cjm
 ** IntelligentAgent parsing checks for null attributes.
 **
