@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.39 2007-07-09 11:47:48 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.40 2008-03-27 17:14:31 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -59,14 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.39 $
+ * @version $Revision: 1.40 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.39 2007-07-09 11:47:48 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.40 2008-03-27 17:14:31 cjm Exp $";
 	/**
 	 * RTML version attribute constant string (2.2) for eSTAR documents.
 	 */
@@ -420,6 +420,7 @@ public class RTMLCreate
 	 * @param device The Java object containing the device (instrument) data to add.
 	 * @see org.estar.rtml.RTMLDevice
 	 * @see #createDetector
+	 * @see #createGrating
 	 */
 	private void createDevice(Element rtmlElement,RTMLDevice device)
 	{
@@ -447,6 +448,8 @@ public class RTMLCreate
 		}
 		if(device.getDetector() != null)
 			createDetector(deviceElement,device.getDetector());
+		if(device.getGrating() != null)
+			createGrating(deviceElement,device.getGrating());
 		if(device.getName() != null)
 			deviceElement.appendChild(document.createTextNode(device.getName()));
 		rtmlElement.appendChild(deviceElement);
@@ -458,7 +461,7 @@ public class RTMLCreate
 	 * @param rtmlElement The RTML DOM element to add the Detector tag to.
 	 * @param detector The Java object containing the detector (instrument) data to add.
 	 * @see org.estar.rtml.RTMLDetector
-	 * @see #createDetector
+	 * @see #createDevice
 	 */
 	private void createDetector(Element rtmlElement,RTMLDetector detector)
 	{
@@ -474,6 +477,36 @@ public class RTMLCreate
 		rtmlElement.appendChild(detectorElement);
 	}
 
+	/**
+	 * Method to create the Grating tags.
+	 * Create a grating node and associated attributes.
+	 * @param rtmlElement The RTML DOM element to add the Grating tag to.
+	 * @param detector The Java object containing the grating (instrument) data to add.
+	 * @see #createDevice
+	 * @see org.estar.rtml.RTMLGrating
+	 * @see org.estar.rtml.RTMLGrating#getName
+	 * @see org.estar.rtml.RTMLGrating#getWavelengthString
+	 * @see org.estar.rtml.RTMLGrating#getWavelengthUnits
+	 * @see org.estar.rtml.RTMLGrating#getResolutionString
+	 * @see org.estar.rtml.RTMLGrating#getAngleString
+	 */
+	private void createGrating(Element rtmlElement,RTMLGrating grating)
+	{
+		Element gratingElement = null;
+
+		gratingElement = (Element)document.createElement("Grating");
+		if(grating.getName() != null)
+			gratingElement.setAttribute("name",grating.getName());
+		if(grating.getWavelength() != 0.0)
+			gratingElement.setAttribute("wavelength",grating.getWavelengthString());
+		if(grating.getWavelengthUnits() != null)
+			gratingElement.setAttribute("units",grating.getWavelengthUnits());
+		if(grating.getResolution() != 0.0)
+			gratingElement.setAttribute("resolution",grating.getResolutionString());
+		if(grating.getAngle() != 0.0)
+			gratingElement.setAttribute("angle",grating.getAngleString());
+		rtmlElement.appendChild(gratingElement);
+	}
 
 	/**
 	 * Method to create XML in the Observation tag.
@@ -917,6 +950,9 @@ public class RTMLCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.39  2007/07/09 11:47:48  cjm
+** Added creation of MoonConstraint and SkyConstraint nodes.
+**
 ** Revision 1.38  2007/07/06 15:18:09  cjm
 ** IntelligentAgent port only added to IntelligentAgent if non-zero.
 **
