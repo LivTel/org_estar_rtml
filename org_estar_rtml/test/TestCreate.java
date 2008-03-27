@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.18 2007-07-09 12:53:14 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.19 2008-03-27 17:16:28 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -37,14 +37,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.19 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.18 2007-07-09 12:53:14 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.19 2008-03-27 17:16:28 cjm Exp $";
 	/**
 	 * Create to use for parsing.
 	 */
@@ -73,6 +73,10 @@ public class TestCreate
 	 * RTML detector data.
 	 */
 	protected RTMLDetector detector = null;
+	/**
+	 * RTML grating data.
+	 */
+	protected RTMLGrating grating = null;
 	/**
 	 * RTML observation data.
 	 */
@@ -411,26 +415,39 @@ public class TestCreate
 			}
 			else if(args[i].equals("-device"))
 			{
-				if((i+4) < args.length)
+				if((i+3) < args.length)
 				{
 					device = new RTMLDevice();
 					device.setName(args[i+1]);
 					device.setType(args[i+2]);
 					device.setSpectralRegion(args[i+3]);
-					device.setFilterType(args[i+4]);
 					// add device to observation if it exists,
 					// otherwise make it the generic document device
 					if(observation != null)
 						observation.setDevice(device);
 					else
 						document.setDevice(device);
-					i+= 4;
+					i+= 3;
 				}
 				else
 				{
 					System.err.println(this.getClass().getName()+
-					":parseArguments:device needs name,type,spectral region and filter type.");
+					":parseArguments:device needs name,type and spectral region.");
 					System.exit(5);
+				}
+			}
+			else if(args[i].equals("-device_filter"))
+			{
+				if((i+1) < args.length)
+				{
+					device.setFilterType(args[i+1]);
+					i+= 1;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+		       				   ":parseArguments:device_filter needs a filter type string.");
+					System.exit(2);
 				}
 			}
 			else if(args[i].equals("-doctype_system_id"))
@@ -527,6 +544,32 @@ public class TestCreate
 			else if(args[i].equals("-fail"))
 			{
 				document.setType("fail");
+			}
+			else if(args[i].equals("-grating_wavelength"))
+			{
+				if (device != null)
+				{
+					if((i+2) < args.length)
+					{
+						grating = new RTMLGrating();
+						device.setGrating(grating);
+						grating.setWavelength(args[i+1]);
+						grating.setWavelengthUnits(args[i+2]);
+						i+= 2;
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:Grating needs wavelength and wavelength_units values.");
+						System.exit(3);
+					}
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Binning:Device was null.");
+					System.exit(4);
+				}
 			}
 			else if(args[i].equals("-help"))
 			{
@@ -1079,8 +1122,10 @@ public class TestCreate
 		System.err.println("\t[-contact [-contact_address <address>][-contact_email <email>]");
 		System.err.println("\t\t[-contact_fax <fax>][-contact_institution <institute>][-contact_name <name>]");
 		System.err.println("\t\t[-contact_telephone <telno>][-contact_url <URL>][-contact_user <user>]]");
-		System.err.println("\t[-device <name> <device type> <spectral region> <filter type>");
-		System.err.println("\t\t[-binning <x> <y>]]");
+		System.err.println("\t[-device <name> <device type> <spectral region>]");
+		System.err.println("\t\t[-device_filter <filter type>]");
+		System.err.println("\t\t[-binning <x> <y>]");
+		System.err.println("\t\t[-grating_wavelength <wavelength> <m|cm|mm|micron|nm|nanometer|nanometers|Angstrom|Angstroms>]");
 		System.err.println("\t<-observation <-name <string>> [-target_ident <string>] ");
 		System.err.println("\t\t<-ra <HH:MM:SS>> <-dec <[+|-]DD:MM:SS>> [-toop]");
 		System.err.println("\t\t<-exposure <length> <units> <count>>");
@@ -1123,6 +1168,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.18  2007/07/09 12:53:14  cjm
+** Added sky and moon constraint.
+**
 ** Revision 1.17  2007/03/27 19:17:38  cjm
 ** Added -document_score_list option to addScore to a document.
 **
