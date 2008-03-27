@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLDevice.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDevice.java,v 1.4 2007-04-26 16:27:38 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDevice.java,v 1.5 2008-03-27 17:15:02 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -26,14 +26,14 @@ import java.io.*;
 /**
  * This class is a data container for information contained in the device nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class RTMLDevice implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDevice.java,v 1.4 2007-04-26 16:27:38 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDevice.java,v 1.5 2008-03-27 17:15:02 cjm Exp $";
 	/**
 	 * The type of device this is. See the dtd: %deviceTypes;.
 	 */
@@ -55,6 +55,11 @@ public class RTMLDevice implements Serializable
 	 * Detector information associated with this device.
 	 */
 	private RTMLDetector detector = null;
+	/**
+	 * Grating information associated with this device.
+	 * Only normally used for spectrographs.
+	 */
+	private RTMLGrating grating = null;
 
 	/**
 	 * Default constructor.
@@ -154,6 +159,16 @@ public class RTMLDevice implements Serializable
 		return detector;
 	}
 
+	public void setGrating(RTMLGrating g)
+	{
+		grating = g;
+	}
+
+	public RTMLGrating getGrating()
+	{
+		return grating;
+	}
+
 	/**
 	 * Method to print out a string representation of this node.
 	 * @see #toString(java.lang.String)
@@ -170,6 +185,8 @@ public class RTMLDevice implements Serializable
 	 * @see #spectralRegion
 	 * @see #name
 	 * @see #filterType
+	 * @see #detector
+	 * @see #grating
 	 */
 	public String toString(String prefix)
 	{
@@ -187,12 +204,17 @@ public class RTMLDevice implements Serializable
 			sb.append(prefix+"\tFilter: type = "+filterType+"\n");
 		if(detector != null)
 			sb.append(prefix+detector.toString("\t")+"\n");
+		if(grating != null)
+			sb.append(prefix+grating.toString("\t")+"\n");
 		return sb.toString();
 	}
 
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2007/04/26 16:27:38  cjm
+** Added more comments.
+**
 ** Revision 1.3  2007/01/30 18:31:13  cjm
 ** gnuify: Added GNU General Public License.
 **
