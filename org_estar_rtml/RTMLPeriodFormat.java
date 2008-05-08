@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLPeriodFormat.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLPeriodFormat.java,v 1.4 2007-01-30 18:31:19 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLPeriodFormat.java,v 1.5 2008-05-08 14:03:29 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -32,14 +32,14 @@ import java.util.*;
  * </code>
  * For the purposes of this implementation, we have assumed 30 days in 1 month, and 365 days in 1 year.
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class RTMLPeriodFormat implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLPeriodFormat.java,v 1.4 2007-01-30 18:31:19 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLPeriodFormat.java,v 1.5 2008-05-08 14:03:29 cjm Exp $";
 	/**
 	 * Number of milliseconds in a second. 
 	 */
@@ -460,6 +460,9 @@ public class RTMLPeriodFormat implements Serializable
 			sb.append(minutes+"M");
 		if(seconds != 0)
 			sb.append(seconds+"S");
+		// special case for 0 period
+		if((years == 0)&&(months == 0)&&(days == 0)&&(hours == 0)&&(minutes == 0)&&(seconds == 0))
+			sb.append("T"+seconds+"S");
 		return sb.toString();
 	}
 
@@ -502,6 +505,9 @@ public class RTMLPeriodFormat implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2007/01/30 18:31:19  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.3  2005/06/08 11:39:01  cjm
 ** Fixed comments.
 **
