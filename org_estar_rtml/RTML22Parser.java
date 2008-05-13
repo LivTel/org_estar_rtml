@@ -17,8 +17,8 @@
     along with org.estar.rtml; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-// RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.27 2008-03-27 17:13:54 cjm Exp $
+// RTML22Parser.java
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.28 2008-05-13 10:30:48 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -50,14 +50,14 @@ import org.estar.astrometry.*;
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
  * @author Chris Mottram
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.28 $
  */
-public class RTMLParser
+public class RTML22Parser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.27 2008-03-27 17:13:54 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.28 2008-05-13 10:30:48 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -76,7 +76,7 @@ public class RTMLParser
 	 * @exception Exception Thrown if init fails.
 	 * @see #init
 	 */
-	public RTMLParser() throws Exception
+	public RTML22Parser() throws Exception
 	{
 		super();
 		try
@@ -196,7 +196,7 @@ public class RTMLParser
 		factory.setValidating(true);   
 		factory.setNamespaceAware(true);
 		builder = factory.newDocumentBuilder();
-		errorHandler = new RTMLErrorHandler(this);
+		errorHandler = new RTMLErrorHandler();
 		builder.setErrorHandler(errorHandler);
 	}
 
@@ -258,6 +258,7 @@ public class RTMLParser
 		Node childNode,attributeNode;
 		NodeList childList;
 		String type = null;
+		String version = null;
 
 		// create document to return
 		rtmlDocument = new RTMLDocument();
@@ -271,6 +272,11 @@ public class RTMLParser
 		}
 		// go through attribute list
 		attributeList = rtmlNode.getAttributes();
+		// version
+		attributeNode = attributeList.getNamedItem("version");
+		version = attributeNode.getNodeValue();
+		rtmlDocument.setVersion(version);
+		// type (mode in RTML 3.1)
 		attributeNode = attributeList.getNamedItem("type");
 		type = attributeNode.getNodeValue();
 		rtmlDocument.setType(type);
@@ -2383,6 +2389,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.27  2008/03/27 17:13:54  cjm
+** Added parseGratingNode and call in parseDeviceNode to handle spectrographs.
+**
 ** Revision 1.26  2007/07/09 12:04:23  cjm
 ** Added parseMoonConstraintNode , parseSkyConstraintNode.
 **
