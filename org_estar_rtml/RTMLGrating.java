@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLGrating.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLGrating.java,v 1.1 2008-03-27 17:13:18 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLGrating.java,v 1.2 2008-05-23 14:24:41 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -27,14 +27,14 @@ import java.text.*;
 /**
  * This class is a data container for information contained in the Grating nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RTMLGrating implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLGrating.java,v 1.1 2008-03-27 17:13:18 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLGrating.java,v 1.2 2008-05-23 14:24:41 cjm Exp $";
 	/**
 	 * The name of the grating.
 	 */
@@ -86,7 +86,7 @@ public class RTMLGrating implements Serializable
 
 	/**
 	 * Set the wavelength of the grating.
-	 * @param s The wavelength.
+	 * @param d The wavelength.
 	 * @see #wavelength
 	 */
 	public void setWavelength(double d)
@@ -236,7 +236,7 @@ public class RTMLGrating implements Serializable
 
 	/**
 	 * Set the resolution of the grating.
-	 * @param s The resolution.
+	 * @param d The resolution.
 	 * @see #resolution
 	 */
 	public void setResolution(double d)
@@ -360,4 +360,7 @@ public class RTMLGrating implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2008/03/27 17:13:18  cjm
+** Initial revision
+**
 */
