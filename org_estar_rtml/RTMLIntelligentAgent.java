@@ -18,22 +18,23 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLIntelligentAgent.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLIntelligentAgent.java,v 1.3 2007-01-30 18:31:16 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLIntelligentAgent.java,v 1.4 2008-05-23 14:30:56 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
 
 /**
  * This class is a data container for information contained in the intelligent agent nodes/tags of an RTML document.
+ * These are IntelligentAgent nodes in RTML2.2, and Agent nodes in RTML3.1.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RTMLIntelligentAgent implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLIntelligentAgent.java,v 1.3 2007-01-30 18:31:16 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLIntelligentAgent.java,v 1.4 2008-05-23 14:30:56 cjm Exp $";
 	/**
 	 * The unique identifier for the RTML request, the #PCDATA in the IntelligentAgent tag.
 	 */
@@ -46,6 +47,10 @@ public class RTMLIntelligentAgent implements Serializable
 	 * The port number of the intelligent agent reply port, the "port" attribute of the IntelligentAgent tag.
 	 */
 	private int port = 0;
+	/**
+	 * The URI of an RTML3.1 Agent tag.
+	 */
+	private String uri = null;
 
 	/**
 	 * Default constructor.
@@ -104,6 +109,26 @@ public class RTMLIntelligentAgent implements Serializable
 	}
 
 	/**
+	 * Set the Uniform Resource Identifier (RTML 3.1 only).
+	 * @param s The Uri.
+	 * @see #uri
+	 */
+	public void setUri(String s)
+	{
+		uri = s;
+	}
+
+	/**
+	 * Get the Uniform Resource Identifier (RTML 3.1 only).
+	 * @return The Uri.
+	 * @see #uri
+	 */
+	public String getUri()
+	{
+		return uri;
+	}
+
+	/**
 	 * Method to print out a string representation of this node.
 	 */
 	public String toString()
@@ -117,6 +142,7 @@ public class RTMLIntelligentAgent implements Serializable
 	 * @see #hostname
 	 * @see #port
 	 * @see #id
+	 * @see #uri
 	 */
 	public String toString(String prefix)
 	{
@@ -125,11 +151,15 @@ public class RTMLIntelligentAgent implements Serializable
 		sb = new StringBuffer();
 		sb.append(prefix+"Intelligent Agent: host = "+hostname+": port = "+port+"\n");
 		sb.append(prefix+"\tID:"+id);
+		sb.append(prefix+"\tURI:"+uri);
 		return sb.toString();
 	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2007/01/30 18:31:16  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.2  2005/01/19 15:30:38  cjm
 ** Added Serializable.
 **
