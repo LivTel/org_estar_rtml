@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.40 2008-03-27 17:14:31 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLCreate.java,v 1.41 2008-05-23 14:14:33 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -59,18 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.40 $
+ * @version $Revision: 1.41 $
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.40 2008-03-27 17:14:31 cjm Exp $";
-	/**
-	 * RTML version attribute constant string (2.2) for eSTAR documents.
-	 */
-	public final static String DEFAULT_RTML_VERSION_STRING = "2.2";
+	public final static String RCSID = "$Id: RTMLCreate.java,v 1.41 2008-05-23 14:14:33 cjm Exp $";
 	/**
 	 * System ID put into DOCTYPE statement. This is the URL of the RTML DTD.
 	 */
@@ -78,11 +74,6 @@ public class RTMLCreate
         //public final static String DEFAULT_DOCTYPE_SYSTEM_ID = "http://www.astro.livjm.ac.uk/~je/rtml2.1.dtd";
         //public final static String DEFAULT_DOCTYPE_SYSTEM_ID = "http://www.estar.org.uk/documents/rtml2.1.dtd";
         public final static String DEFAULT_DOCTYPE_SYSTEM_ID = "http://www.estar.org.uk/documents/rtml2.2.dtd";
-	/**
-	 * RTML version string. Defaults to DEFAULT_RTML_VERSION_STRING.
-	 * @see #DEFAULT_RTML_VERSION_STRING
-	 */
-	private String rtmlVersionString = new String(DEFAULT_RTML_VERSION_STRING);
 	/**
 	 * RTML doctype system ID. Put into DOCTYPE statement. This is the URL of the RTML DTD.
 	 * Defaults to DEFAULT_DOCTYPE_SYSTEM_ID.
@@ -101,6 +92,11 @@ public class RTMLCreate
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
 	private Document document = null;
+	/**
+	 * A copy of the RTMLDocuments version. Used for setting various output transformer properties
+	 * (DTD declaration for RTML v2.2).
+	 */
+	private String rtmlVersion = null;
 
 	/**
 	 * Default constructor.
@@ -122,18 +118,6 @@ public class RTMLCreate
 	}
 
 	/**
-	 * Method to set the RTML version string. This is the value of the RTML elements's 
-	 * "version" attribute e.g.: "2.2".
-	 * @param s The string to use.
-	 * @see #DEFAULT_RTML_VERSION_STRING
-	 * @see #rtmlVersionString
-	 */
-	public void setRTMLVersionString(String s)
-	{
-		rtmlVersionString = s;
-	}
-
-	/**
 	 * Method to set the Doctype system ID. This is the URL of the RTML DTD. e.g.:
 	 * http://www.estar.org.uk/documents/rtml2.2.dtd
 	 * @param s The string to use. This is the URL of the RTML DTD.
@@ -147,34 +131,75 @@ public class RTMLCreate
 
 	/**
 	 * Create an XML representation (DOM tree) from the RTMLDocument (Java object tree).
-	 * @param d The Java representation of an RTML document.
-	 * @see #createRTML
+	 * @param rtmlDocument The Java representation of an RTML document.
+	 * @see #builder
+	 * @see #document
+	 * @see #rtmlVersion
 	 */
-	public void create(RTMLDocument d) throws RTMLException
+	public void create(RTMLDocument rtmlDocument) throws RTMLException
 	{
+		RTML22Create create22 = null;
+		RTML31Create create31 = null;
+
 		document = builder.newDocument();
-		createRTML(d);
+		if(rtmlDocument.getVersion() == null)
+		{
+			throw new RTMLException(this.getClass().getName()+":create:"+"document version was null.");
+		}
+		else if(rtmlDocument.getVersion().equals(RTMLDocument.RTML_VERSION_22))
+		{
+			create22 = new RTML22Create();
+			create22.create(rtmlDocument,document);
+			rtmlVersion = rtmlDocument.getVersion();
+		}
+		else if(rtmlDocument.getVersion().equals(RTMLDocument.RTML_VERSION_31))
+		{
+			create31 = new RTML31Create();
+			create31.create(rtmlDocument,document);
+			rtmlVersion = rtmlDocument.getVersion();
+		}
+		else
+		{
+			throw new RTMLException(this.getClass().getName()+":create:"+"Unsupported document version:"+
+						rtmlDocument.getVersion());
+		}
 	}
 
 	/**
 	 * Method to send the created XML to a stream.
 	 * @see #doctypeSystemID
+	 * @see #rtmlVersion
+	 * @see org.estar.rtml.RTMLDocument#RTML_VERSION_22
 	 */
 	public void toStream(OutputStream os) throws RTMLException
 	{
 		try
 		{
 			// Use a Transformer for output
-			TransformerFactory tFactory = TransformerFactory.newInstance();
-			Transformer transformer = tFactory.newTransformer();
+			TransformerFactory factory = TransformerFactory.newInstance();
+			// Java 1.5
+			try
+			{
+				factory.setAttribute("indent-number",new Integer(2));
+			}
+			catch(Exception e)
+			{
+				//Throw Java 1.4 errors away
+			}
+			Transformer transformer = factory.newTransformer();
 			
-			// setup DOCTYPE
-			transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,doctypeSystemID);
+			// setup DOCTYPE if RTML v2.2.
+			if(rtmlVersion.equals(RTMLDocument.RTML_VERSION_22))
+				transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,doctypeSystemID);
 			transformer.setOutputProperty(OutputKeys.ENCODING,"ISO-8859-1");
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty(OutputKeys.INDENT,"yes");
+			// This is the Java 1.4 equivalent of the factory setting above
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 			DOMSource source = new DOMSource(document);
-			StreamResult result = new StreamResult(os);
+			//StreamResult result = new StreamResult(os);
+			// Java 1.5 requires OutputStreamWriter wrapping for indentation to work!
+			StreamResult result = new StreamResult(new OutputStreamWriter(os));
 			transformer.transform(source, result);
 			os.flush();
 		}
@@ -188,6 +213,8 @@ public class RTMLCreate
 	 * Method to send the created XML to a string.
 	 * @return A string.
 	 * @see #doctypeSystemID
+	 * @see #rtmlVersion
+	 * @see org.estar.rtml.RTMLDocument#RTML_VERSION_22
 	 */
 	public String toXMLString() throws RTMLException
 	{
@@ -200,7 +227,8 @@ public class RTMLCreate
 			Transformer transformer = tFactory.newTransformer();
 			
 			// setup DOCTYPE
-			transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,doctypeSystemID);
+			if(rtmlVersion.equals(RTMLDocument.RTML_VERSION_22))
+				transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,doctypeSystemID);
 			transformer.setOutputProperty(OutputKeys.ENCODING,"ISO-8859-1");
 			transformer.setOutputProperty(OutputKeys.INDENT,"yes");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
@@ -258,698 +286,12 @@ public class RTMLCreate
 		errorHandler = new RTMLErrorHandler(this);
 		builder.setErrorHandler(errorHandler);
 	}
-
-	/**
-	 * Create RTML element, and add to document.
-	 * @param d The Java representation of an RTML document.
-	 * @see #rtmlVersionString
-	 * @see #document
-	 * @see #createContact
-	 * @see #createProject
-	 * @see #createTelescope
-	 * @see #createIntelligentAgent
-	 * @see #createDevice
-	 * @see #createObservation
-	 * @see #createScore
-	 * @see #createCompletionTime
-	 */
-	private void createRTML(RTMLDocument d)
-	{
-		RTMLObservation obs = null;
-		Element rtmlElement = null;
-
-		rtmlElement = (Element)document.createElement("RTML"); 
-		document.appendChild(rtmlElement);
-		rtmlElement.setAttribute("version",rtmlVersionString);
-		rtmlElement.setAttribute("type",d.getType());
-		if(d.getContact() != null)
-			createContact(rtmlElement,d.getContact());
-		if(d.getProject() != null)
-			createProject(rtmlElement,d.getProject());
-		createTelescope(rtmlElement);
-		if(d.getIntelligentAgent() != null)
-			createIntelligentAgent(rtmlElement,d.getIntelligentAgent());
-		if(d.getDevice() != null)
-			createDevice(rtmlElement,d.getDevice());
-		for(int i = 0; i < d.getObservationListCount(); i++)
-		{
-			obs = d.getObservation(i);
-			createObservation(rtmlElement,obs);
-		}
-		if(d.getScore() != null)
-			createScore(rtmlElement,d.getScore());
-		if(d.getScoresListCount() > 0)
-			createScores(rtmlElement,d);
-		if(d.getCompletionTime() != null)
-		{
-			createCompletionTime(rtmlElement,d.getCompletionTime());
-		}
-		if((d.getType().equals("reject") || d.getType().equals("fail") || d.getType().equals("abort")) && 
-		   (d.getErrorString() != null))
-			rtmlElement.appendChild(document.createTextNode(d.getErrorString()));
-	}
-
-	/**
-	 * Create a contact node and associated sub-elements.
-	 * @param rtmlElement The RTML DOM element to add the Contact tag to.
-	 * @param contact The Java object containing the contact data to add.
-	 * @see org.estar.rtml.RTMLContact
-	 */
-	private void createContact(Element rtmlElement, RTMLContact contact)
-	{
-		Element contactElement = null;
-		Element subElement = null;
-
-		contactElement = (Element)document.createElement("Contact");
-		if(contact.getName() != null)
-		{
-			subElement = (Element)document.createElement("Name");
-			subElement.appendChild(document.createTextNode(contact.getName()));
-			contactElement.appendChild(subElement);
-		}
-		if(contact.getUser() != null)
-		{
-			subElement = (Element)document.createElement("User");
-			subElement.appendChild(document.createTextNode(contact.getUser()));
-			contactElement.appendChild(subElement);
-		}
-		if(contact.getInstitution() != null)
-		{
-			subElement = (Element)document.createElement("Institution");
-			subElement.appendChild(document.createTextNode(contact.getInstitution()));
-			contactElement.appendChild(subElement);
-		}
-		if(contact.getAddress() != null)
-		{
-			subElement = (Element)document.createElement("Address");
-			subElement.appendChild(document.createTextNode(contact.getAddress()));
-			contactElement.appendChild(subElement);
-		}
-		if(contact.getTelephone() != null)
-		{
-			subElement = (Element)document.createElement("Telephone");
-			subElement.appendChild(document.createTextNode(contact.getTelephone()));
-			contactElement.appendChild(subElement);
-		}
-		if(contact.getFax() != null)
-		{
-			subElement = (Element)document.createElement("Fax");
-			subElement.appendChild(document.createTextNode(contact.getFax()));
-			contactElement.appendChild(subElement);
-		}
-		if(contact.getEmail() != null)
-		{
-			subElement = (Element)document.createElement("Email");
-			subElement.appendChild(document.createTextNode(contact.getEmail()));
-			contactElement.appendChild(subElement);
-		}
-		if(contact.getUrl() != null)
-		{
-			subElement = (Element)document.createElement("Url");
-			subElement.appendChild(document.createTextNode(contact.getUrl().toString()));
-			contactElement.appendChild(subElement);
-		}
-		rtmlElement.appendChild(contactElement);
-	}
-
-	/**
-	 * Create RTML Project node.
-	 * @param rtmlElement The RTML DOM element to add the Project tag to.
-	 * @param project The Java object containing the project data to add.
-	 * @see org.estar.rtml.RTMLProject
-	 */
-	private void createProject(Element rtmlElement,RTMLProject project)
-	{
-		Element projectElement = null;
-
-		projectElement = (Element)document.createElement("Project");
-		if(project.getProject() != null)
-			projectElement.appendChild(document.createTextNode(project.getProject()));
-		rtmlElement.appendChild(projectElement);
-	}
-
-	private void createTelescope(Element rtmlElement)
-	{
-		Element e = null;
-
-		e = (Element)document.createElement("Telescope");
-		rtmlElement.appendChild(e);
-	}
-
-	/**
-	 * Create the Intelligent Agent node.
-	 */
-	private void createIntelligentAgent(Element rtmlElement,RTMLIntelligentAgent rtmlIA)
-	{
-		Element iaElement = null;
-
-		iaElement = (Element)document.createElement("IntelligentAgent");
-		if(rtmlIA.getHostname() != null)
-			iaElement.setAttribute("host",rtmlIA.getHostname());
-		if(rtmlIA.getPort() != 0)
-			iaElement.setAttribute("port",""+rtmlIA.getPort());
-		if(rtmlIA.getId() != null)
-			iaElement.appendChild(document.createTextNode(rtmlIA.getId()));
-		rtmlElement.appendChild(iaElement);
-	}
-
-	/**
-	 * Method to create the Device tags.
-	 * Create a contact node and associated sub-elements.
-	 * @param rtmlElement The RTML DOM element to add the Contact tag to.
-	 * @param device The Java object containing the device (instrument) data to add.
-	 * @see org.estar.rtml.RTMLDevice
-	 * @see #createDetector
-	 * @see #createGrating
-	 */
-	private void createDevice(Element rtmlElement,RTMLDevice device)
-	{
-		Element deviceElement = null;
-		Element filterElement = null;
-		Element filterTypeElement = null;
-
-		deviceElement = (Element)document.createElement("Device");
-		if(device.getType() != null)
-			deviceElement.setAttribute("type",device.getType());
-		if(device.getSpectralRegion() != null)
-			deviceElement.setAttribute("region",""+device.getSpectralRegion());
-		// filter type sub-element(s)
-		if(device.getFilterType() != null)
-		{
-			// filter node/tag
-			filterElement = (Element)document.createElement("Filter");
-			deviceElement.appendChild(filterElement);
-			// filter type node/tag
-			filterTypeElement = (Element)document.createElement("FilterType");
-			filterElement.appendChild(filterTypeElement);
-			// filter type node/tag
-			if(device.getFilterType() != null)
-				filterTypeElement.appendChild(document.createTextNode(device.getFilterType()));
-		}
-		if(device.getDetector() != null)
-			createDetector(deviceElement,device.getDetector());
-		if(device.getGrating() != null)
-			createGrating(deviceElement,device.getGrating());
-		if(device.getName() != null)
-			deviceElement.appendChild(document.createTextNode(device.getName()));
-		rtmlElement.appendChild(deviceElement);
-	}
-
-	/**
-	 * Method to create the Detector tags.
-	 * Create a detector node and associated sub-elements.
-	 * @param rtmlElement The RTML DOM element to add the Detector tag to.
-	 * @param detector The Java object containing the detector (instrument) data to add.
-	 * @see org.estar.rtml.RTMLDetector
-	 * @see #createDevice
-	 */
-	private void createDetector(Element rtmlElement,RTMLDetector detector)
-	{
-		Element detectorElement = null;
-		Element binningElement = null;
-
-		detectorElement = (Element)document.createElement("Detector");
-		// binning node/tag
-		binningElement = (Element)document.createElement("Binning");
-		detectorElement.appendChild(binningElement);
-		binningElement.setAttribute("rows",""+detector.getRowBinning());
-		binningElement.setAttribute("columns",""+detector.getColumnBinning());
-		rtmlElement.appendChild(detectorElement);
-	}
-
-	/**
-	 * Method to create the Grating tags.
-	 * Create a grating node and associated attributes.
-	 * @param rtmlElement The RTML DOM element to add the Grating tag to.
-	 * @param detector The Java object containing the grating (instrument) data to add.
-	 * @see #createDevice
-	 * @see org.estar.rtml.RTMLGrating
-	 * @see org.estar.rtml.RTMLGrating#getName
-	 * @see org.estar.rtml.RTMLGrating#getWavelengthString
-	 * @see org.estar.rtml.RTMLGrating#getWavelengthUnits
-	 * @see org.estar.rtml.RTMLGrating#getResolutionString
-	 * @see org.estar.rtml.RTMLGrating#getAngleString
-	 */
-	private void createGrating(Element rtmlElement,RTMLGrating grating)
-	{
-		Element gratingElement = null;
-
-		gratingElement = (Element)document.createElement("Grating");
-		if(grating.getName() != null)
-			gratingElement.setAttribute("name",grating.getName());
-		if(grating.getWavelength() != 0.0)
-			gratingElement.setAttribute("wavelength",grating.getWavelengthString());
-		if(grating.getWavelengthUnits() != null)
-			gratingElement.setAttribute("units",grating.getWavelengthUnits());
-		if(grating.getResolution() != 0.0)
-			gratingElement.setAttribute("resolution",grating.getResolutionString());
-		if(grating.getAngle() != 0.0)
-			gratingElement.setAttribute("angle",grating.getAngleString());
-		rtmlElement.appendChild(gratingElement);
-	}
-
-	/**
-	 * Method to create XML in the Observation tag.
-	 * @param rtmlElement The RTML element to add the Observation tag to.
-	 * @param observation The Java object containing the observation data to add.
-	 * @see #document
-	 * @see #createTarget
-	 * @see #createDevice
-	 * @see #createSchedule
-	 * @see #createImageData
-	 */
-	private void createObservation(Element rtmlElement,RTMLObservation observation)
-	{
-		Element observationElement = null;
-		RTMLImageData imageData = null;
-
-		observationElement = (Element)document.createElement("Observation");
-		if(observation.getTarget() != null)
-			createTarget(observationElement,observation.getTarget());
-		if(observation.getDevice() != null)
-			createDevice(observationElement,observation.getDevice());
-		if(observation.getSchedule() != null)
-			createSchedule(observationElement,observation.getSchedule());
-		for(int i = 0; i < observation.getImageDataCount(); i++)
-		{
-			imageData = observation.getImageData(i);
-			createImageData(observationElement,imageData);
-		}
-		rtmlElement.appendChild(observationElement);
-	}
-
-	/**
-	 * Create a Target element and append it to the specified Observation element.
-	 * @param observationElement The observation to append the new Target element to.
-	 * @param target The RTMLTarget object containing target information.
-	 * @see RTMLTarget
-	 */
-	private void createTarget(Element observationElement,RTMLTarget target)
-	{
-		Element targetElement = null;
-		Element nameElement = null;
-		Element coordElement = null;
-		Element raElement = null;
-		Element decElement = null;
-		Element equinoxElement = null;
-
-		// target element
-		targetElement = (Element)document.createElement("Target");
-		// type attribute
-		targetElement.setAttribute("type",target.getType());
-		// ident attribute
-		if(target.getIdent() != null)
-			targetElement.setAttribute("ident",target.getIdent());
-		// target name sub-element
-		if(target.getName() != null)
-		{
-			nameElement = (Element)document.createElement("TargetName");
-			nameElement.appendChild(document.createTextNode(target.getName()));
-			targetElement.appendChild(nameElement);
-		}
-		// coordinate sub-element
-		coordElement = (Element)document.createElement("Coordinates");
-		// add coordinate sub-element to target element
-		targetElement.appendChild(coordElement);
-		// ra sub-sub element
-		if(target.getRA() != null)
-		{
-			raElement = (Element)document.createElement("RightAscension");
-			raElement.appendChild(document.createTextNode(target.getRA().toString(' ')));
-			raElement.setAttribute("units","hms");
-			raElement.setAttribute("format","hh mm ss.ss");
-			// add ra element to coordElement.
-			coordElement.appendChild(raElement);
-		}
-		// dec sub-sub element
-		if(target.getDec() != null)
-		{
-			decElement = (Element)document.createElement("Declination");
-			decElement.appendChild(document.createTextNode(target.getDec().toString(' ')));
-			decElement.setAttribute("units","dms");
-			decElement.setAttribute("format","sdd mm ss.ss");
-			// add dec element to coordElement.
-			coordElement.appendChild(decElement);
-		}
-		if(target.getEquinox() != null)
-		{
-			equinoxElement = (Element)document.createElement("Equinox");
-			equinoxElement.appendChild(document.createTextNode(target.getEquinox()));
-			// add equinox element to coordElement.
-			coordElement.appendChild(equinoxElement);
-		}
-		// add target to observation
-		observationElement.appendChild(targetElement);
-		
-	}
-
-	/**
-	 * Create a Schedule tag.
-	 * @param observationElement The observation XML node to add the schedule to.
-	 * @param schedule The RTML schedule data.
-	 * @see #createTimeConstraint
-	 * @see #createSeriesConstraint
-	 * @see #createSeeingConstraint
-	 * @see #createMoonConstraint
-	 * @see #createSkyConstraint
-	 * @see RTMLSchedule
-	 */
-	private void createSchedule(Element observationElement,RTMLSchedule schedule)
-	{
-		Element scheduleElement = null;
-		Element exposureElement = null;
-		Element exposureCountElement = null;
-
-		// schedule element
-		scheduleElement = (Element)document.createElement("Schedule");
-		scheduleElement.setAttribute("priority",""+schedule.getPriority());
-		// exposure element
-		exposureElement = (Element)document.createElement("Exposure");
-		if(schedule.getExposureType() != null)
-			exposureElement.setAttribute("type",schedule.getExposureType());
-		if(schedule.getExposureUnits() != null)
-			exposureElement.setAttribute("units",schedule.getExposureUnits());
-		// exposure count element
-		if(schedule.getExposureCount() != 1)
-		{
-			exposureCountElement = (Element)document.createElement("Count");
-			exposureCountElement.appendChild(document.createTextNode(""+schedule.getExposureCount()));
-			exposureElement.appendChild(exposureCountElement);
-		}
-		exposureElement.appendChild(document.createTextNode(""+schedule.getExposureLength()));
-		// add exposure to a schedule
-		scheduleElement.appendChild(exposureElement);
-		// TimeConstraint
-		if((schedule.getStartDate() != null) || (schedule.getEndDate() != null))
-			createTimeConstraint(scheduleElement,schedule);
-		// SeriesConstraint
-		if(schedule.getSeriesConstraint() != null)
-			createSeriesConstraint(scheduleElement,schedule.getSeriesConstraint());
-		// SeeingConstraint
-		if(schedule.getSeeingConstraint() != null)
-			createSeeingConstraint(scheduleElement,schedule.getSeeingConstraint());
-		// MoonConstraint
-		if(schedule.getMoonConstraint() != null)
-			createMoonConstraint(scheduleElement,schedule.getMoonConstraint());
-		// SkyConstraint
-		if(schedule.getSkyConstraint() != null)
-			createSkyConstraint(scheduleElement,schedule.getSkyConstraint());
-		// add schedule to a observation
-		observationElement.appendChild(scheduleElement);		
-	}
-
-	/**
-	 * Create a TimeConstraint tag.
-	 * @param scheduleElement The schedule XML node to add the schedule to.
-	 * @param schedule The RTML schedule data (which contains time constrint data).
-	 * @see RTMLSchedule
-	 * @see RTMLDateFormat
-	 */
-	private void createTimeConstraint(Element scheduleElement,RTMLSchedule schedule)
-	{
-		Element timeConstraintElement = null;
-		Element dateTimeElement = null;
-		RTMLDateFormat dateFormat = null;
-
-		dateFormat = new RTMLDateFormat();
-		// schedule element
-		timeConstraintElement = (Element)document.createElement("TimeConstraint");
-		// start date time element
-		if(schedule.getStartDate() != null)
-		{
-			dateTimeElement = (Element)document.createElement("StartDateTime");
-			dateTimeElement.appendChild(document.createTextNode(
-					     dateFormat.format(schedule.getStartDate())));
-			// add dateTimeElement to a timeConstraintElement
-			timeConstraintElement.appendChild(dateTimeElement);
-		}
-		// end date time element
-		if(schedule.getEndDate() != null)
-		{
-			dateTimeElement = (Element)document.createElement("EndDateTime");
-			dateTimeElement.appendChild(document.createTextNode(
-					     dateFormat.format(schedule.getEndDate())));
-			// add dateTimeElement to a timeConstraintElement
-			timeConstraintElement.appendChild(dateTimeElement);
-		}
-		// add timeConstraintElement to a scheduleElement
-		scheduleElement.appendChild(timeConstraintElement);		
-	}
-
-	/**
-	 * Create a SeriesConstraint tag.
-	 * @param scheduleElement The schedule XML node to add the series constraint to.
-	 * @param seriesConstraint The RTML series constraint data.
-	 * @see RTMLSeriesConstraint
-	 */
-	private void createSeriesConstraint(Element scheduleElement,RTMLSeriesConstraint seriesConstraint)
-	{
-		Element seriesConstraintElement = null;
-		Element countElement = null;
-		Element intervalElement = null;
-		Element toleranceElement = null;
-
-		// series constraint element
-		seriesConstraintElement = (Element)document.createElement("SeriesConstraint");
-		// count element
-		if(seriesConstraint.getCount() != 0)
-		{
-			countElement = (Element)document.createElement("Count");
-			countElement.appendChild(document.createTextNode(""+seriesConstraint.getCount()));
-			// add countElement to a seriesConstraintElement
-			seriesConstraintElement.appendChild(countElement);
-		}
-		// interval element
-		if(seriesConstraint.getInterval() != null)
-		{
-			intervalElement = (Element)document.createElement("Interval");
-			intervalElement.appendChild(document.createTextNode(seriesConstraint.getInterval().
-									    toString()));
-			// add intervalElement to a seriesConstraintElement
-			seriesConstraintElement.appendChild(intervalElement);
-		}
-		// tolerance element
-		if(seriesConstraint.getTolerance() != null)
-		{
-			toleranceElement = (Element)document.createElement("Tolerance");
-			toleranceElement.appendChild(document.createTextNode(seriesConstraint.getTolerance().
-									    toString()));
-			// add toleranceElement to a seriesConstraintElement
-			seriesConstraintElement.appendChild(toleranceElement);
-		}
-		// add seriesConstraintElement to a scheduleElement
-		scheduleElement.appendChild(seriesConstraintElement);		
-	}
-
-	/**
-	 * Create a SeeingConstraint tag.
-	 * @param scheduleElement The schedule XML node to add the seeing constraint to.
-	 * @param seeingConstraint The RTML seeing constraint data.
-	 * @see RTMLSeeingConstraint
-	 */
-	private void createSeeingConstraint(Element scheduleElement,RTMLSeeingConstraint seeingConstraint)
-	{
-		Element seeingConstraintElement = null;
-		DecimalFormat nf = null;
-
-		nf = new DecimalFormat("#####0.0#");
-		// seeing constraint element
-		seeingConstraintElement = (Element)document.createElement("SeeingConstraint");
-		seeingConstraintElement.setAttribute("minimum",nf.format(seeingConstraint.getMinimum()));
-		seeingConstraintElement.setAttribute("maximum",nf.format(seeingConstraint.getMaximum()));
-		// add seeingConstraintElement to a scheduleElement
-		scheduleElement.appendChild(seeingConstraintElement);		
-	}
-
-	/**
-	 * Create a MoonConstraint tag.
-	 * @param scheduleElement The schedule XML node to add the moon constraint to.
-	 * @param moonConstraint The RTML moon constraint data.
-	 * @see RTMLMoonConstraint
-	 */
-	private void createMoonConstraint(Element scheduleElement,RTMLMoonConstraint moonConstraint)
-	{
-		Element moonConstraintElement = null;
-		DecimalFormat nf = null;
-
-		nf = new DecimalFormat("#####0.0#");
-		// moon constraint element
-		moonConstraintElement = (Element)document.createElement("MoonConstraint");
-		moonConstraintElement.setAttribute("distance",nf.format(moonConstraint.getDistance()));
-		moonConstraintElement.setAttribute("units",moonConstraint.getUnits());
-		// maxPhase
-		// width
-		// add moonConstraintElement to a scheduleElement
-		scheduleElement.appendChild(moonConstraintElement);		
-	}
-
-	/**
-	 * Create a SkyConstraint tag.
-	 * @param scheduleElement The schedule XML node to add the sky constraint to.
-	 * @param skyConstraint The RTML sky constraint data.
-	 * @see RTMLSkyConstraint
-	 */
-	private void createSkyConstraint(Element scheduleElement,RTMLSkyConstraint skyConstraint)
-	{
-		Element skyConstraintElement = null;
-
-		// sky constraint element
-		skyConstraintElement = (Element)document.createElement("SkyConstraint");
-		skyConstraintElement.setAttribute("sky",skyConstraint.getSky());
-		// value
-		// units
-		// add skyConstraintElement to a scheduleElement
-		scheduleElement.appendChild(skyConstraintElement);		
-	}
-
-	/**
-	 * Mehtod to create image data sub-node.
-	 * @param rtmlElement The Element to add the <ImageData> node to.
-	 * @param imageData The object to construct the <ImageData> node from.
-	 * @see RTMLImageData
-	 */
-	private void createImageData(Element rtmlElement,RTMLImageData imageData)
-	{
-		Element imageDataElement = null;
-		Element fitsHeaderElement = null;
-		Element objectListElement = null;
-		String imageDataType = null;
-		String s = null;
-
-		imageDataElement = (Element)document.createElement("ImageData");
-		// FITS header
-		if(imageData.getFITSHeader() != null)
-		{
-			fitsHeaderElement = (Element)document.createElement("FITSHeader");
-			fitsHeaderElement.setAttribute("type","all");// all fits headers
-			fitsHeaderElement.appendChild(document.createTextNode(imageData.getFITSHeader()));
-			imageDataElement.appendChild(fitsHeaderElement);
-		}
-		// ObjectList types
-		// Cluster
-		if(imageData.isObjectListTypeCluster())
-		{
-			objectListElement = (Element)document.createElement("ObjectList");
-			objectListElement.appendChild(document.createTextNode(imageData.getObjectListCluster()));
-			objectListElement.setAttribute("type",imageData.getObjectListType());
-			objectListElement.setAttribute("format",
-					     " fn sn rah ram ras decd decm decs xpos ypos mag magerror magflag");
-			imageDataElement.appendChild(objectListElement);
-		}
-		// VOTableURL
-		if(imageData.isObjectListTypeVOTableURL())
-		{
-			objectListElement = (Element)document.createElement("ObjectList");
-			objectListElement.appendChild(document.createTextNode(imageData.getObjectListVOTableURL().
-									      toString()));
-			objectListElement.setAttribute("type",imageData.getObjectListType());
-			imageDataElement.appendChild(objectListElement);
-		}
-		// get image data type
-		imageDataType = imageData.getImageDataType();
-		// if URL is present, add as text node
-		if(imageData.getImageDataURL() != null)
-		{
-			s = imageData.getImageDataURL().toString();
-			imageDataElement.appendChild(document.createTextNode(s));
-			// if no imageDataType has been set, we can deduce this from the end of the URL
-			if(imageDataType == null)
-			{
-				if(s.endsWith(".fits"))
-					imageDataType = new String("FITS16");
-				else if(s.endsWith(".jpg"))
-					imageDataType = new String("jpg");
-			}
-		}
-		if(imageDataType != null)
-			imageDataElement.setAttribute("type",imageDataType);
-		imageDataElement.setAttribute("delivery","url");
-		imageDataElement.setAttribute("reduced","true");
-		rtmlElement.appendChild(imageDataElement);
-	}
-
-	/**
-	 * Create a score element.
-	 * @param rtmlElement The RTML document element to put the score element in.
-	 * @param score A Double object. This method assumes it is non-null.
-	 */
-	private void createScore(Element rtmlElement,Double score)
-	{
-		Element e = null;
-		DecimalFormat df = null;
-
-		df = new DecimalFormat("#0.0#####");
-		e = (Element)document.createElement("Score");
-		e.appendChild(document.createTextNode(df.format(score.doubleValue())));
-		rtmlElement.appendChild(e);
-	}
-
-	/**
-	 * Create a Scores element, and Score sub-elements.
-	 * @param rtmlElement The RTML document element to put the score element in.
-	 * @param rtmlDocument The RTML document
-	 * @see RTMLDocument#getScoresListCount
-	 * @see RTMLDocument#getScore
-	 * @see RTMLScore#getDelay
-	 * @see RTMLScore#getProbability
-	 * @see RTMLScore#getCumulative
-	 */
-	private void createScores(Element rtmlElement,RTMLDocument rtmlDocument)
-	{
-		RTMLScore score = null;
-		Element scoresElement = null;
-		Element scoreElement = null;
-		DecimalFormat df = null;
-
-		df = new DecimalFormat("#####0.0#");
-		// Create Scores element
-		scoresElement = (Element)document.createElement("Scores");
-		// loop on Score list
-		for(int i = 0; i < rtmlDocument.getScoresListCount(); i++)
-		{
-			// get score
-			score = rtmlDocument.getScore(i);
-			// create Score element
-			scoreElement = (Element)document.createElement("Score");
-			scoreElement.setAttribute("delay",score.getDelay().toString());
-			if(Double.isNaN(score.getProbability()))
-				scoreElement.setAttribute("probability","NaN");
-			else
-				scoreElement.setAttribute("probability",df.format(score.getProbability()));
-			if(Double.isNaN(score.getCumulative()))
-				scoreElement.setAttribute("cumulative","NaN");
-			else
-				scoreElement.setAttribute("cumulative",df.format(score.getCumulative()));
-			// Add score to Scores list
-			scoresElement.appendChild(scoreElement);
-
-		}
-		// Add Scores to RTML
-		rtmlElement.appendChild(scoresElement);
-	}
-
-	/**
-	 * Create the completion time node.
-	 * @param rtmlElement The RTML document element to put the completion time element in.
-	 * @param completionTime The date to use.
-	 * @see RTMLDateFormat
-	 */
-	private void createCompletionTime(Element rtmlElement,Date completionTime)
-	{
-		Element e = null;
-		String dateString = null;
-		RTMLDateFormat dateFormat = null;
-
-		dateFormat = new RTMLDateFormat();
-		e = (Element)document.createElement("CompletionTime");
-		dateString = dateFormat.format(completionTime);
-		e.appendChild(document.createTextNode(dateString));
-		rtmlElement.appendChild(e);
-	}
-
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.40  2008/03/27 17:14:31  cjm
+** Added createGrating for spectrograph support.
+**
 ** Revision 1.39  2007/07/09 11:47:48  cjm
 ** Added creation of MoonConstraint and SkyConstraint nodes.
 **
