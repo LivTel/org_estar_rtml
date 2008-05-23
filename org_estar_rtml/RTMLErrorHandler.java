@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLErrorHandler.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLErrorHandler.java,v 1.2 2007-01-30 18:31:14 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLErrorHandler.java,v 1.3 2008-05-23 14:24:03 cjm Exp $
 package org.estar.rtml;
 
 import org.xml.sax.ErrorHandler;
@@ -28,14 +28,14 @@ import org.xml.sax.SAXParseException;
 /**
  * This class is a JAXP compliant ErrorHandler, i.e. it implements org.xml.sax.ErrorHandler.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class RTMLErrorHandler implements org.xml.sax.ErrorHandler
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLErrorHandler.java,v 1.2 2007-01-30 18:31:14 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLErrorHandler.java,v 1.3 2008-05-23 14:24:03 cjm Exp $";
 	/**
 	 * The parser that is using this error handler.
 	 */
@@ -48,6 +48,16 @@ public class RTMLErrorHandler implements org.xml.sax.ErrorHandler
 	 * String buffer containing text of errors handled.
 	 */
 	private StringBuffer stringBuffer = null;
+
+	/**
+	 * Default constructor.
+	 * @see #stringBuffer
+	 */
+	public RTMLErrorHandler()
+	{
+		super();
+		stringBuffer = new StringBuffer();
+	}
 
 	/**
 	 * Default constructor.
@@ -91,7 +101,6 @@ public class RTMLErrorHandler implements org.xml.sax.ErrorHandler
 	public void warning(SAXParseException exception) throws SAXException
 	{
 		System.err.println(exception);
-		//diddly exception.printStackTrace();
 		stringBuffer.append(exception.toString()+"\n");
 	}
 
@@ -102,7 +111,6 @@ public class RTMLErrorHandler implements org.xml.sax.ErrorHandler
 	public void error(SAXParseException exception) throws SAXException
 	{
 		System.err.println(exception);
-		// diddly exception.printStackTrace();
 		stringBuffer.append(exception.toString()+"\n");
 	}
 
@@ -113,12 +121,14 @@ public class RTMLErrorHandler implements org.xml.sax.ErrorHandler
 	public void fatalError(SAXParseException exception) throws SAXException
 	{
 		System.err.println(exception);
-		//diddly exception.printStackTrace();
 		stringBuffer.append(exception.toString()+"\n");
 	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2007/01/30 18:31:14  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.1  2003/02/24 13:19:56  cjm
 ** Initial revision
 **
