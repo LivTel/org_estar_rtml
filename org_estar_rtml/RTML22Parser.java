@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML22Parser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.28 2008-05-13 10:30:48 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.29 2008-05-23 14:08:30 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -49,198 +49,28 @@ import org.estar.astrometry.*;
 /**
  * This class provides the capability of parsing an RTML document into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed, and relevant eSTAR data extracted.
+ * Extends RTMLParser to make use of methods common to this and RTML31Parser (parseIntegerNode etc), even though
+ * this subclass is created as part of the RTMLParser's parsing.
  * @author Chris Mottram
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.29 $
  */
-public class RTML22Parser
+public class RTML22Parser extends RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.28 2008-05-13 10:30:48 cjm Exp $";
-	/**
-	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
-	 */
-	private Document document = null;
-	/**
-	 * The instance of DocumentBuilder, used to build the document tree.
-	 */
-	private DocumentBuilder builder = null;
-	/**
-	 * The instance of RTMLErrorHandler, attached to the DocumentBuilder to handle DOM errors.
-	 */
-	RTMLErrorHandler errorHandler = null;
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.29 2008-05-23 14:08:30 cjm Exp $";
 
 	/**
 	 * Default constructor.
-	 * @exception Exception Thrown if init fails.
-	 * @see #init
 	 */
-	public RTML22Parser() throws Exception
+	public RTML22Parser()
 	{
 		super();
-		try
-		{
-			init();
-		}
-		catch(Exception e)
-		{
-			//SAXException,ParserConfigurationException,IOException
-			throw new RTMLException(this.getClass().getName()+":init:",e);
-		}
 	}
 
 	/**
-	 * Method to parse an RTML document.
-	 * @param f The file to parse from.
-	 * @return An instance of RTMLDocument, containing the data in the document.
-	 */
-	public RTMLDocument parse(File f) throws RTMLException
-	{
-		RTMLDocument rtmlDocument = null;
-
-		try
-		{
-			document = builder.parse(f);
-		}
-		catch(Exception e)
-		{
-			//SAXException,ParserConfigurationException,IOException
-			throw new RTMLException(this.getClass().getName()+":parse:",e);
-		}
-		rtmlDocument = parseDocument();
-		return rtmlDocument;
-	}
-
-	/**
-	 * Method to parse an RTML document.
-	 * @param i The input stream to parse from.
-	 * @return An instance of RTMLDocument, containing the data in the document.
-	 */
-	public RTMLDocument parse(InputStream i) throws RTMLException
-	{
-		RTMLDocument rtmlDocument = null;
-
-		try
-		{
-			document = builder.parse(i);
-		}
-		catch(Exception e)
-		{
-			//SAXException,ParserConfigurationException,IOException
-			throw new RTMLException(this.getClass().getName()+":parse:",e);
-		}
-		rtmlDocument = parseDocument();
-		return rtmlDocument;
-	}
-
-	/**
-	 * Method to parse an RTML document.
-	 * @param s The string to parse from.
-	 * @return An instance of RTMLDocument, containing the data in the document.
-	 */
-	public RTMLDocument parse(String s) throws RTMLException
-	{
-		RTMLDocument rtmlDocument = null;
-		InputSource is = null;
-		StringReader sr = null;
-
-		try
-		{
-			sr = new StringReader(s);
-			is = new InputSource(sr);
-			document = builder.parse(is);
-		}
-		catch(Exception e)
-		{
-			//SAXException,ParserConfigurationException,IOException
-			throw new RTMLException(this.getClass().getName()+":parse:",e);
-		}
-		rtmlDocument = parseDocument();
-		return rtmlDocument;
-	}
-
-	/**
-	 * Method to set a custom error handler. Should be called after init (constructor), before parse is called.
-	 * @param e The error handler to use. Must be a sub-class of RTMLErrorHandler, this
-	 *        should really be org.xml.sax.ErrorHandler.
-	 * @see #errorHandler
-	 * @see #builder
-	 */
-	public void setErrorHandler(RTMLErrorHandler e)
-	{
-		errorHandler = e;
-		builder.setErrorHandler(errorHandler);
-	}
-
-	/**
-	 * Method to get errorHandler assocated with this parser.
-	 */
-	public RTMLErrorHandler getErrorHandler()
-	{
-		return errorHandler;
-	}
-
-	// private methods
-	/**
-	 * Initialisation method.
-	 * @exception ParserConfigurationException Thrown if DocumentBuilderFactory.newDocumentBuilder fails.
-	 * @see #builder
-	 * @see #errorHandler
-	 */
-	private void init() throws ParserConfigurationException
-	{
-		DocumentBuilderFactory factory = null;
-
-		factory = DocumentBuilderFactory.newInstance();
-		factory.setValidating(true);   
-		factory.setNamespaceAware(true);
-		builder = factory.newDocumentBuilder();
-		errorHandler = new RTMLErrorHandler();
-		builder.setErrorHandler(errorHandler);
-	}
-
-	/**
-	 * Internal method to parse the root document node.
-	 * @return An instance of RTMLDocument, containing the data in the document.
-	 * @exception RTMLException Thrown if a strange child is in the node, or the document is not a document.
-	 * @see #document
-	 * @see #parseRTMLNode
-	 */
-	private RTMLDocument parseDocument() throws RTMLException
-	{
-		RTMLDocument rtmlDocument = null;
-		Node domNode,childNode;
-		NodeList childList;
-
-		domNode = (Node)document;
-		if(domNode.getNodeType() != Node.DOCUMENT_NODE)
-			throw new RTMLException(this.getClass().getName()+":parseDocument:Illegal Node"+domNode);
-		childList = domNode.getChildNodes();
-		for(int i = 0; i < childList.getLength(); i++)
-		{
-			childNode = childList.item(i);
-			switch(childNode.getNodeType())
-			{
-				case Node.ELEMENT_NODE:
-					rtmlDocument = parseRTMLNode(childNode);
-					break;
-				case Node.DOCUMENT_TYPE_NODE:
-					//System.err.println(childNode);
-					break;
-				case Node.COMMENT_NODE:
-					//System.err.println(childNode);
-					break;
-				default:
-					throw new RTMLException(this.getClass().getName()+
-								":parseDocument:Illegal Child:"+childNode);
-			}
-		}
-		return rtmlDocument;
-	}
-
-	/**
-	 * Internal method to parse the RTML node.
+	 * Method to parse the RTML node.
 	 * @param rtmlNode The XML DOM node for the RTML tag node.
 	 * @return An instance of RTMLDocument, containing the data in the document.
 	 * @exception RTMLException Thrown if a strange child is in the node, 
@@ -251,17 +81,14 @@ public class RTML22Parser
 	 * @see #parseScoreNode
 	 * @see #parseCompletionTimeNode
 	 */
-	private RTMLDocument parseRTMLNode(Node rtmlNode) throws RTMLException
+	protected void parseRTMLNode(Node rtmlNode,RTMLDocument rtmlDocument) throws RTMLException
 	{
-		RTMLDocument rtmlDocument = null;
 		NamedNodeMap attributeList = null;
 		Node childNode,attributeNode;
 		NodeList childList;
 		String type = null;
 		String version = null;
 
-		// create document to return
-		rtmlDocument = new RTMLDocument();
 		// check current XML node is correct
 		if(rtmlNode.getNodeType() != Node.ELEMENT_NODE)
 			throw new RTMLException(this.getClass().getName()+":parseRTMLNode:Illegal Node:"+rtmlNode);
@@ -272,10 +99,17 @@ public class RTML22Parser
 		}
 		// go through attribute list
 		attributeList = rtmlNode.getAttributes();
-		// version
+		// check version
 		attributeNode = attributeList.getNamedItem("version");
 		version = attributeNode.getNodeValue();
+		if(version == null)
+			throw new RTMLException(this.getClass().getName()+":parseRTMLNode:Version was null.");
 		rtmlDocument.setVersion(version);
+		if(version.equals(RTMLDocument.RTML_VERSION_22) == false)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseRTMLNode:Unsupported Version:"+
+						version);
+		}
 		// type (mode in RTML 3.1)
 		attributeNode = attributeList.getNamedItem("type");
 		type = attributeNode.getNodeValue();
@@ -311,10 +145,9 @@ public class RTML22Parser
 					rtmlDocument.setErrorString(childNode.getNodeValue());
 			}
 		}
-		// return created document
-		return rtmlDocument;
 	}
 
+	// private methods
 	/**
 	 * Internal method to parse an Contact node.
 	 * @param rtmlDocument The document to add the Contact to.
@@ -2308,87 +2141,12 @@ public class RTML22Parser
 		}
 	}
 
-	/**
-	 * Parse a child node, containing a text node with an integer number. 
-	 * This is a node (such as Count) containing an integer number.
-	 * @param integerNode The XML node containing an integer to parse as it's CDATA.
-	 * @return The parsed integer is returned. Note if no text is found in the node, 0 is returned.
-	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
-	 */
-	private int parseIntegerNode(Node integerNode) throws RTMLException
-	{
-		Node childNode;
-		NodeList childList;
-		String s = null;
-		int number = 0;
-
-		// check current XML node is correct
-		if(integerNode.getNodeType() != Node.ELEMENT_NODE)
-		{
-			throw new RTMLException(this.getClass().getName()+":parseIntegerNode:Illegal Node:"+
-						integerNode);
-		}
-		childList = integerNode.getChildNodes();
-		for(int i = 0; i < childList.getLength(); i++)
-		{
-			childNode = childList.item(i);
-			if(childNode.getNodeType() == Node.TEXT_NODE)
-			{
-				s = childNode.getNodeValue();
-				try
-				{
-					number = Integer.parseInt(s);
-				}
-				catch(NumberFormatException e)
-				{
-					throw new RTMLException(this.getClass().getName()+
-								":parseInteger:Illegal integer:"+s+":",e);
-				}
-			}
-		}
-		return number;
-	}
-
-	/**
-	 * Parse a child node, containing a text node with a period specification of the form:
-	 * <code>
-	 * P{(yyyy)Y{(mm)M}{(dd)D}{T{(hh)H}{(mm}M}{(ss.s..)S}
-	 * </code>
-	 * @param periodNode The XML node containing a period to parse as it's CDATA.
-	 * @return The parsed period is returned. Note if no text is found in the node, null is returned.
-	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
-	 */
-	private RTMLPeriodFormat parsePeriodNode(Node periodNode) throws RTMLException
-	{
-		RTMLPeriodFormat period = null;
-		Node childNode;
-		NodeList childList;
-		String s = null;
-
-		childList = periodNode.getChildNodes();
-		for(int i = 0; i < childList.getLength(); i++)
-		{
-			childNode = childList.item(i);
-			if(childNode.getNodeType() == Node.TEXT_NODE)
-			{
-				s = childNode.getNodeValue();
-				period = new RTMLPeriodFormat();
-				try
-				{
-					period.parse(s);
-				}
-				catch(Exception e)
-				{
-					throw new RTMLException(this.getClass().getName()+
-								":parsePeriodNode:Illegal period:"+s+":",e);
-				}
-			}
-		}
-		return period;
-	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.28  2008/05/13 10:30:48  cjm
+** Initial version of RTML22Parser copied from RTMLParser, based on version 1.27.
+**
 ** Revision 1.27  2008/03/27 17:13:54  cjm
 ** Added parseGratingNode and call in parseDeviceNode to handle spectrographs.
 **
