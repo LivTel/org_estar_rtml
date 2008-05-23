@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.19 2008-03-27 17:16:28 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.20 2008-05-23 17:11:17 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -37,16 +37,16 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.20 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.19 2008-03-27 17:16:28 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.20 2008-05-23 17:11:17 cjm Exp $";
 	/**
-	 * Create to use for parsing.
+	 * Create to use for creating the RTML XML from the document object model tree.
 	 */
 	protected RTMLCreate create = null;
 	/**
@@ -110,16 +110,17 @@ public class TestCreate
 	 */
 	protected RTMLImageData imageData = null;
 	/**
-	 * Version string used to set RTML Element's version attribute.
-	 * Leaving as null causes RTMLCreate to use the default.
-	 */
-	protected String rtmlVersionString = null;
-	/**
-	 * Doctype system ID - This is the URL of the RTML DTD. e.g.
+	 * RTML 2.2 Doctype system ID - This is the URL of the RTML DTD. e.g.
 	 * http://www.estar.org.uk/documents/rtml2.2.dtd
 	 * Leaving as null causes RTMLCreate to use the default.
 	 */
 	protected String doctypeSystemID = null;
+	/**
+	 * RTML 3.1a Schema URL string - This is the URL of the RTML Schema. e.g.:
+	 * http://monet.uni-sw.gwdg.de/XMLSchema/RTML/schemas/RTML-nightly.xsd
+	 * Leaving as null causes RTMLCreate to use the default.
+	 */
+	protected String schemaURLString = null;
 
 	/**
 	 * Default constructor. Initialise document.
@@ -141,7 +142,6 @@ public class TestCreate
 	 * @param args An array of arguments to parse.
 	 * @exception RTMLException Thrown if an error occurs during parsing command line arguments.
 	 * @exception Exception Thrown if an error occurs.
-	 * @see #rtmlVersionString
 	 * @see #doctypeSystemID
 	 */
 	public void parseArguments(String args[]) throws RTMLException,Exception
@@ -182,6 +182,7 @@ public class TestCreate
 			else if(args[i].equals("-complete"))
 			{
 				document.setType("observation");// this means the document has been completed.
+				document.setMode("complete");// this means the document has been completed.
 			}
 			else if(args[i].equals("-completion_time"))
 			{
@@ -199,7 +200,8 @@ public class TestCreate
 			}
 			else if(args[i].equals("-confirmation"))
 			{
-				document.setType("confirmation");
+				document.setType("confirmation");// RTML 2.2
+				document.setMode("confirm");// RTML 3.1a
 			}
 			else if(args[i].equals("-contact"))
 			{
@@ -543,7 +545,8 @@ public class TestCreate
 			}
 			else if(args[i].equals("-fail"))
 			{
-				document.setType("fail");
+				document.setType("fail");// RTML 2.2
+				document.setMode("fail");// RTML 3.1a
 			}
 			else if(args[i].equals("-grating_wavelength"))
 			{
@@ -576,6 +579,20 @@ public class TestCreate
 				help();
 				System.exit(0);
 			}
+			else if(args[i].equals("-history"))
+			{
+				if((i+3) < args.length)
+				{
+					document.addHistoryEntry(args[i+1],args[i+2],args[i+3]);
+					i+= 3;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+					   ":parseArguments:history requires <agent name> <uri> <description>.");
+					System.exit(2);
+				}
+			}
 			else if(args[i].equals("-iahost"))
 			{
 				if((i+1) < args.length)
@@ -590,7 +607,7 @@ public class TestCreate
 					System.exit(2);
 				}
 			}
-			else if(args[i].equals("-iaid"))
+			else if(args[i].equals("-iaid"))// really the document uid.
 			{
 				if((i+1) < args.length)
 				{
@@ -615,6 +632,20 @@ public class TestCreate
 				{
 					System.err.println(this.getClass().getName()+
 							   ":parseArguments:IA port needs a port number.");
+					System.exit(2);
+				}
+			}
+			else if(args[i].equals("-iauri"))
+			{
+				if((i+1) < args.length)
+				{
+					ia.setUri(args[i+1]);
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:IA URI needs a string.");
 					System.exit(2);
 				}
 			}
@@ -709,7 +740,8 @@ public class TestCreate
 			}
 			else if(args[i].equals("-incomplete"))
 			{
-				document.setType("incomplete");
+				document.setType("incomplete");// RTML 2.2
+				document.setMode("incomplete");// RTML 3.1a
 			}
 			else if(args[i].equals("-moon_constraint"))
 			{
@@ -770,7 +802,8 @@ public class TestCreate
 				}
 				observation = new RTMLObservation();
 				target = new RTMLTarget();
-				target.setEquinox("J2000");
+				//target.setEquinox("J2000"); RTML 2.2?
+				target.setEquinox("2000");
 				schedule = new RTMLSchedule();
 				seriesConstraint = null; // reset to blank for next schedule
 				imageData = null; // reset to blank for next image data
@@ -841,7 +874,8 @@ public class TestCreate
 			{
 				if((i+1) < args.length)
 				{
-					document.setType("reject");
+					document.setType("reject");// RTML 2.2
+					document.setMode("reject");// RTML 3.1a
 					document.setErrorString(args[i+1]);
 					i+= 1;
 				}
@@ -854,13 +888,14 @@ public class TestCreate
 			}
 			else if(args[i].equals("-request"))
 			{
-				document.setType("request");
+				document.setType("request");// RTML 2.2
+				document.setMode("request");// RTML 3.1a
 			}
 			else if(args[i].equals("-rtml_version"))
 			{
 				if((i+1) < args.length)
 				{
-					rtmlVersionString = args[i+1];
+					document.setVersion(args[i+1]);
 					i+= 1;
 				}
 				else
@@ -870,9 +905,29 @@ public class TestCreate
 					System.exit(2);
 				}
 			}
+			else if(args[i].equals("-schema_url"))
+			{
+				if((i+1) < args.length)
+				{
+					schemaURLString = args[i+1];
+					i+= 1;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:schema_url needs a string.");
+					System.exit(2);
+				}
+			}
 			else if(args[i].equals("-score"))
 			{
-				document.setType("score");
+				document.setType("score");// RTML 2.2
+				document.setMode("inquiry");// RTML 3.1a
+			}
+			else if(args[i].equals("-score_reply"))
+			{
+				document.setType("score");// RTML 2.2
+				document.setMode("offer");// RTML 3.1a
 			}
 			else if(args[i].equals("-seeing_constraint"))
 			{
@@ -1059,7 +1114,10 @@ public class TestCreate
 			{
 				if(target != null)
 				{
+					// RTML 2.2
 					target.setTypeTOOP();
+					// RTML 3.1a - overrides schedule priority
+					schedule.setPriority(0);
 				}
 				else
 				{
@@ -1068,9 +1126,24 @@ public class TestCreate
 					System.exit(4);
 				}
 			}
+			else if(args[i].equals("-uid"))// really the document uid.
+			{
+				if((i+1) < args.length)
+				{
+					document.setUId(args[i+1]);
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:document UID needs an ID string.");
+					System.exit(2);
+				}
+			}
 			else if(args[i].equals("-update"))
 			{
-				document.setType("update");
+				document.setType("update");// RTML 2.2
+				document.setMode("update");// RTML 3.1a
 			}
 			else
 			{
@@ -1086,22 +1159,25 @@ public class TestCreate
 			observation.setSchedule(schedule);
 			document.addObservation(observation);
 		}
-
 	}
 
 	/**
 	 * run method.
 	 * @see #create
 	 * @see #document
-	 * @see #rtmlVersionString
 	 * @see #doctypeSystemID
+	 * @see #schemaURLString
 	 */
 	public void run() throws Exception
 	{
+		// document must always have a history
+		if(document.getHistoryEntryCount() < 1)
+			document.addHistoryEntry(this.getClass().getName(),null,"Created.");
+		// set schema URL is configured
+		if(schemaURLString != null)
+			RTML31Create.setSchemaURLString(schemaURLString);
 		create = new RTMLCreate();
 		//System.out.println(document);
-		if(rtmlVersionString != null)
-			create.setRTMLVersionString(rtmlVersionString);
 		if(doctypeSystemID != null)
 			create.setDoctypeSystemID(doctypeSystemID);
 		create.create(document);
@@ -1114,10 +1190,11 @@ public class TestCreate
 	public void help()
 	{
 		System.err.println("java -Dhttp.proxyHost=wwwcache.livjm.ac.uk -Dhttp.proxyPort=8080 org.estar.rtml.test.TestCreate");
-		System.err.println("\t[-doctype_system_id <url string>]");
+		System.err.println("\t[-doctype_system_id <url string>][-schema_url <url string>]");
 		System.err.println("\t[-rtml_version <string>]");
-		System.err.println("\t<-request|-score|-confirmation|-update|-complete|-incomplete|-reject <error string>>");
-		System.err.println("\t<-iahost <hostname><-iaid <id>><-iaport <number>>[-help]");
+		System.err.println("\t<-request|-score|-score_reply|-confirmation|-update|-complete|-incomplete|-reject <error string>>");
+		System.err.println("\t[-uid <string>][-iahost <hostname>][-iaid <id>][-iaport <number>][-iauri <uri>][-help]");
+		System.err.println("\t[-history <agent name> <agent uri> <description>]");
 		System.err.println("\t[-project <proposal id>]");
 		System.err.println("\t[-contact [-contact_address <address>][-contact_email <email>]");
 		System.err.println("\t\t[-contact_fax <fax>][-contact_institution <institute>][-contact_name <name>]");
@@ -1126,9 +1203,9 @@ public class TestCreate
 		System.err.println("\t\t[-device_filter <filter type>]");
 		System.err.println("\t\t[-binning <x> <y>]");
 		System.err.println("\t\t[-grating_wavelength <wavelength> <m|cm|mm|micron|nm|nanometer|nanometers|Angstrom|Angstroms>]");
-		System.err.println("\t<-observation <-name <string>> [-target_ident <string>] ");
-		System.err.println("\t\t<-ra <HH:MM:SS>> <-dec <[+|-]DD:MM:SS>> [-toop]");
-		System.err.println("\t\t<-exposure <length> <units> <count>>");
+		System.err.println("\t-observation <-name <string> [-target_ident <string>] ");
+		System.err.println("\t\t-ra <HH:MM:SS> -dec <[+|-]DD:MM:SS> [-toop][-priority <0-3>]");
+		System.err.println("\t\t-exposure <length> <units> <count>");
 		System.err.println("\t\t[-series_constraint_count <number>]");
 		System.err.println("\t\t[-series_constraint_interval <P{(y)Y{(m)M}{(d)D}{T{(h)H}{(m}M}{(s.s..)S}>]");
 		System.err.println("\t\t[-series_constraint_tolerance <P{(y)Y{(m)M}{(d)D}{T{(h)H}{(m}M}{(s.s..)S}>]");
@@ -1168,6 +1245,11 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.19  2008/03/27 17:16:28  cjm
+** Added -grating_wavelength to specify a wavelength for spectrograph support.
+** Device filter elements are not mandatory anymore: removed 4th arg from -device and added optional
+** -device_filter to add filter element to device.
+**
 ** Revision 1.18  2007/07/09 12:53:14  cjm
 ** Added sky and moon constraint.
 **
