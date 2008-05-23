@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLTarget.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLTarget.java,v 1.6 2007-01-30 18:31:23 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLTarget.java,v 1.7 2008-05-23 17:09:42 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -27,14 +27,15 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the target nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
+ * @see org.estar.rtml.RTMLAttributes
  */
-public class RTMLTarget implements Serializable
+public class RTMLTarget extends RTMLAttributes implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLTarget.java,v 1.6 2007-01-30 18:31:23 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLTarget.java,v 1.7 2008-05-23 17:09:42 cjm Exp $";
 	/**
 	 * The type of the Target, the type attribute in the Target tag. Should be either "normal" or
 	 * "toop".
@@ -264,6 +265,7 @@ public class RTMLTarget implements Serializable
 	 * @see #ra
 	 * @see #dec
 	 * @see #equinox
+	 * @see org.estar.rtml.RTMLAttributes#toString(java.lang.String)
 	 */
 	public String toString(String prefix)
 	{
@@ -271,6 +273,7 @@ public class RTMLTarget implements Serializable
 		
 		sb = new StringBuffer();
 		sb.append(prefix+"Target: type = "+type+"\n");
+		sb.append(super.toString(prefix+"\t"));
 		if(name != null)
 			sb.append(prefix+"\tName:"+name+"\n");
 		if(ident != null)
@@ -280,12 +283,15 @@ public class RTMLTarget implements Serializable
 		if(dec != null)
 			sb.append(prefix+"\tDec:"+dec+"\n");
 		if(equinox != null)
-			sb.append(prefix+"\tEquinox:"+equinox);
+			sb.append(prefix+"\tEquinox:"+equinox+"\n");
 		return sb.toString();
 	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.6  2007/01/30 18:31:23  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.5  2005/06/08 11:38:41  cjm
 ** Fixed comments.
 **

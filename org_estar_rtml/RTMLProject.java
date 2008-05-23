@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLProject.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLProject.java,v 1.3 2007-01-30 18:31:20 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLProject.java,v 1.4 2008-05-23 17:06:01 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -26,14 +26,15 @@ import java.io.*;
 /**
  * This class is a data container for information contained in the Project nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
+ * @see org.estar.rtml.RTMLAttributes
  */
-public class RTMLProject implements Serializable
+public class RTMLProject extends RTMLAttributes implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLProject.java,v 1.3 2007-01-30 18:31:20 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLProject.java,v 1.4 2008-05-23 17:06:01 cjm Exp $";
 	/**
 	 * The project text node, currently used to store the proposal ID for LT/FTN/FTS.
 	 * In RTML3.0, this will change to ProjectID.
@@ -80,18 +81,23 @@ public class RTMLProject implements Serializable
 	 * String representation of this Project, with specified prefix.
 	 * @param prefix A string to prefix to each line of data we print out.
 	 * @see #getProject
+	 * @see org.estar.rtml.RTMLAttributes#toString(java.lang.String)
 	 */
-	public String toString( String prefix )
+	public String toString(String prefix)
 	{
 		StringBuffer sb = new StringBuffer();
 		
-		sb.append( prefix+"Project :\n" );
-		sb.append( prefix+"\t       Project : "+project+"\n" );
-		return( sb.toString() );
+		sb.append(prefix+"Project :\n");
+		sb.append(super.toString(prefix+"\t"));
+		sb.append(prefix+"\tProject : "+project+"\n");
+		return(sb.toString());
 	}
 }
 //
 // $Log: not supported by cvs2svn $
+// Revision 1.3  2007/01/30 18:31:20  cjm
+// gnuify: Added GNU General Public License.
+//
 // Revision 1.2  2005/01/19 15:30:38  cjm
 // Added Serializable.
 //
