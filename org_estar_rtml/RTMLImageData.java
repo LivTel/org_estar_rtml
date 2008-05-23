@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLImageData.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLImageData.java,v 1.3 2007-01-30 18:31:16 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLImageData.java,v 1.4 2008-05-23 14:25:33 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -27,14 +27,14 @@ import java.net.*;
 /**
  * This class is a data container for information contained in the ImageData nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RTMLImageData implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLImageData.java,v 1.3 2007-01-30 18:31:16 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLImageData.java,v 1.4 2008-05-23 14:25:33 cjm Exp $";
 	/**
 	 * The type of the object list belonging to this observation. Either "xml", "cluster" or "votable-url".
 	 */
@@ -49,7 +49,7 @@ public class RTMLImageData implements Serializable
 	private URL objectListVOTableURL = null;
 	/**
 	 * The ImageData type string containing the format of the image data.
-	 * Should be a valid %imageFormats; ENTITY, see DTD.
+	 * Should be a valid %imageFormats; ENTITY, see DTD (FITS|FITS16|gif|jpg|JPEG).
 	 */
 	private String imageDataType = null;
 	/**
@@ -263,6 +263,9 @@ public class RTMLImageData implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2007/01/30 18:31:16  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.2  2005/08/19 17:00:44  cjm
 ** Added VOTable URL support.
 **
