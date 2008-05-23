@@ -17,8 +17,8 @@
     along with org.estar.rtml; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-// RTMLCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.40 2008-03-27 17:14:31 cjm Exp $
+// RTML22Create.java
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.41 2008-05-23 14:07:11 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -58,45 +58,16 @@ import org.estar.astrometry.*;
  * This class provides the capability of creating an RTML document from Java data,
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
+ * The resultant XML document is in RTML 2.2.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.40 $
+ * @version $Revision: 1.41 $
  */
-public class RTMLCreate
+public class RTML22Create
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.40 2008-03-27 17:14:31 cjm Exp $";
-	/**
-	 * RTML version attribute constant string (2.2) for eSTAR documents.
-	 */
-	public final static String DEFAULT_RTML_VERSION_STRING = "2.2";
-	/**
-	 * System ID put into DOCTYPE statement. This is the URL of the RTML DTD.
-	 */
-        //public final static String DEFAULT_DOCTYPE_SYSTEM_ID = "http://150.204.240.111/~dev/robonet/rtml2.1.dtd";
-        //public final static String DEFAULT_DOCTYPE_SYSTEM_ID = "http://www.astro.livjm.ac.uk/~je/rtml2.1.dtd";
-        //public final static String DEFAULT_DOCTYPE_SYSTEM_ID = "http://www.estar.org.uk/documents/rtml2.1.dtd";
-        public final static String DEFAULT_DOCTYPE_SYSTEM_ID = "http://www.estar.org.uk/documents/rtml2.2.dtd";
-	/**
-	 * RTML version string. Defaults to DEFAULT_RTML_VERSION_STRING.
-	 * @see #DEFAULT_RTML_VERSION_STRING
-	 */
-	private String rtmlVersionString = new String(DEFAULT_RTML_VERSION_STRING);
-	/**
-	 * RTML doctype system ID. Put into DOCTYPE statement. This is the URL of the RTML DTD.
-	 * Defaults to DEFAULT_DOCTYPE_SYSTEM_ID.
-	 * @see #DEFAULT_DOCTYPE_SYSTEM_ID
-	 */
-	private String doctypeSystemID = new String(DEFAULT_DOCTYPE_SYSTEM_ID); 
-	/**
-	 * The instance of DocumentBuilder, used to build the document tree.
-	 */
-	private DocumentBuilder builder = null;
-	/**
-	 * The instance of RTMLErrorHandler, attached to the DocumentBuilder to handle DOM errors.
-	 */
-	RTMLErrorHandler errorHandler = null;
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.41 2008-05-23 14:07:11 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -104,165 +75,28 @@ public class RTMLCreate
 
 	/**
 	 * Default constructor.
-	 * @exception Exception Thrown if init fails.
-	 * @see #init
 	 */
-	public RTMLCreate() throws Exception
+	public RTML22Create()
 	{
 		super();
-		try
-		{
-			init();
-		}
-		catch(Exception e)
-		{
-			//SAXException,ParserConfigurationException,IOException
-			throw new RTMLException(this.getClass().getName()+":init:",e);
-		}
-	}
-
-	/**
-	 * Method to set the RTML version string. This is the value of the RTML elements's 
-	 * "version" attribute e.g.: "2.2".
-	 * @param s The string to use.
-	 * @see #DEFAULT_RTML_VERSION_STRING
-	 * @see #rtmlVersionString
-	 */
-	public void setRTMLVersionString(String s)
-	{
-		rtmlVersionString = s;
-	}
-
-	/**
-	 * Method to set the Doctype system ID. This is the URL of the RTML DTD. e.g.:
-	 * http://www.estar.org.uk/documents/rtml2.2.dtd
-	 * @param s The string to use. This is the URL of the RTML DTD.
-	 * @see #DEFAULT_DOCTYPE_SYSTEM_ID
-	 * @see #doctypeSystemID
-	 */
-	public void setDoctypeSystemID(String s)
-	{
-		doctypeSystemID = s;
 	}
 
 	/**
 	 * Create an XML representation (DOM tree) from the RTMLDocument (Java object tree).
-	 * @param d The Java representation of an RTML document.
+	 * @param rtmlDocument The Java representation of an RTML document.
+	 * @param doc The XML DOM document being created from the Java representation.
 	 * @see #createRTML
 	 */
-	public void create(RTMLDocument d) throws RTMLException
+	public void create(RTMLDocument rtmlDocument,Document doc) throws RTMLException
 	{
-		document = builder.newDocument();
-		createRTML(d);
-	}
-
-	/**
-	 * Method to send the created XML to a stream.
-	 * @see #doctypeSystemID
-	 */
-	public void toStream(OutputStream os) throws RTMLException
-	{
-		try
-		{
-			// Use a Transformer for output
-			TransformerFactory tFactory = TransformerFactory.newInstance();
-			Transformer transformer = tFactory.newTransformer();
-			
-			// setup DOCTYPE
-			transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,doctypeSystemID);
-			transformer.setOutputProperty(OutputKeys.ENCODING,"ISO-8859-1");
-			transformer.setOutputProperty(OutputKeys.INDENT,"yes");
-			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-			DOMSource source = new DOMSource(document);
-			StreamResult result = new StreamResult(os);
-			transformer.transform(source, result);
-			os.flush();
-		}
-		catch (Exception e)
-		{
-			throw new RTMLException(this.getClass().getName()+":toStream:Failed.",e);
-		}
-	}
-
-	/**
-	 * Method to send the created XML to a string.
-	 * @return A string.
-	 * @see #doctypeSystemID
-	 */
-	public String toXMLString() throws RTMLException
-	{
-		StringWriter stringWriter = null;
-
-		try
-		{
-			// Use a Transformer for output
-			TransformerFactory tFactory = TransformerFactory.newInstance();
-			Transformer transformer = tFactory.newTransformer();
-			
-			// setup DOCTYPE
-			transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM,doctypeSystemID);
-			transformer.setOutputProperty(OutputKeys.ENCODING,"ISO-8859-1");
-			transformer.setOutputProperty(OutputKeys.INDENT,"yes");
-			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-			DOMSource source = new DOMSource(document);
-
-			stringWriter = new StringWriter();
-			StreamResult result = new StreamResult(new BufferedWriter(stringWriter));
-			transformer.transform(source, result);
-		}
-		catch (Exception e)
-		{
-			throw new RTMLException(this.getClass().getName()+":toStream:Failed.",e);
-		}
-		return stringWriter.toString();
-	}
-
-	/**
-	 * Method to set a custom error handler. Should be called after init (constructor), before create is called.
-	 * @param e The error handler to use. Must be a sub-class of RTMLErrorHandler, this
-	 *        should really be org.xml.sax.ErrorHandler.
-	 * @see #errorHandler
-	 * @see #builder
-	 */
-	public void setErrorHandler(RTMLErrorHandler e)
-	{
-		errorHandler = e;
-		builder.setErrorHandler(errorHandler);
-	}
-
-	/**
-	 * Method to get errorHandler assocated with this parser.
-	 * @return The current error handler.
-	 * @see #errorHandler
-	 */
-	public RTMLErrorHandler getErrorHandler()
-	{
-		return errorHandler;
+		document = doc;
+		createRTML(rtmlDocument);
 	}
 
 	// private methods
 	/**
-	 * Initialisation method.
-	 * @exception ParserConfigurationException Thrown if DocumentBuilderFactory.newDocumentBuilder fails.
-	 * @see #builder
-	 * @see #errorHandler
-	 */
-	private void init() throws ParserConfigurationException
-	{
-		DocumentBuilderFactory factory = null;
-
-		factory = DocumentBuilderFactory.newInstance();
-		factory.setValidating(true);   
-		factory.setNamespaceAware(true);
-		builder = factory.newDocumentBuilder();
-		errorHandler = new RTMLErrorHandler(this);
-		builder.setErrorHandler(errorHandler);
-	}
-
-	/**
 	 * Create RTML element, and add to document.
 	 * @param d The Java representation of an RTML document.
-	 * @see #rtmlVersionString
 	 * @see #document
 	 * @see #createContact
 	 * @see #createProject
@@ -280,7 +114,7 @@ public class RTMLCreate
 
 		rtmlElement = (Element)document.createElement("RTML"); 
 		document.appendChild(rtmlElement);
-		rtmlElement.setAttribute("version",rtmlVersionString);
+		rtmlElement.setAttribute("version",d.getVersion());
 		rtmlElement.setAttribute("type",d.getType());
 		if(d.getContact() != null)
 			createContact(rtmlElement,d.getContact());
@@ -481,7 +315,7 @@ public class RTMLCreate
 	 * Method to create the Grating tags.
 	 * Create a grating node and associated attributes.
 	 * @param rtmlElement The RTML DOM element to add the Grating tag to.
-	 * @param detector The Java object containing the grating (instrument) data to add.
+	 * @param grating The Java object containing the grating (instrument) data to add.
 	 * @see #createDevice
 	 * @see org.estar.rtml.RTMLGrating
 	 * @see org.estar.rtml.RTMLGrating#getName
@@ -946,10 +780,12 @@ public class RTMLCreate
 		e.appendChild(document.createTextNode(dateString));
 		rtmlElement.appendChild(e);
 	}
-
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.40  2008/03/27 17:14:31  cjm
+** Added createGrating for spectrograph support.
+**
 ** Revision 1.39  2007/07/09 11:47:48  cjm
 ** Added creation of MoonConstraint and SkyConstraint nodes.
 **
