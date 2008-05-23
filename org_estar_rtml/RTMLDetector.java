@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLDetector.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDetector.java,v 1.3 2007-01-30 18:31:11 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDetector.java,v 1.4 2008-05-23 14:15:24 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -26,14 +26,15 @@ import java.io.*;
 /**
  * This class is a data container for information contained in the Detector nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
+ * @see org.estar.rtml.RTMLAttributes
  */
-public class RTMLDetector implements Serializable
+public class RTMLDetector extends RTMLAttributes implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDetector.java,v 1.3 2007-01-30 18:31:11 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDetector.java,v 1.4 2008-05-23 14:15:24 cjm Exp $";
 	/**
 	 * The Detector Binning row number.
 	 */
@@ -142,12 +143,14 @@ public class RTMLDetector implements Serializable
 	 * @param prefix A string to prefix to each line of data we print out.
 	 * @see #rowBinning
 	 * @see #columnBinning
+	 * @see org.estar.rtml.RTMLAttributes#toString(java.lang.String)
 	 */
 	public String toString(String prefix)
 	{
 		StringBuffer sb = new StringBuffer();
 		
 		sb.append(prefix+"Detector :\n");
+		sb.append(super.toString(prefix+"\t"));
 		sb.append(prefix+"\tRow Binning : "+rowBinning+"\n");
 		sb.append(prefix+"\tColumn Binning : "+columnBinning+"\n");
 		return(sb.toString());
@@ -155,6 +158,9 @@ public class RTMLDetector implements Serializable
 }
 //
 // $Log: not supported by cvs2svn $
+// Revision 1.3  2007/01/30 18:31:11  cjm
+// gnuify: Added GNU General Public License.
+//
 // Revision 1.2  2005/06/08 11:38:29  cjm
 // Fixed comments.
 // Reformatted.

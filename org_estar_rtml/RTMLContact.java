@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLContact.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLContact.java,v 1.5 2007-01-30 18:31:08 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLContact.java,v 1.6 2008-05-23 14:12:11 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -28,14 +28,15 @@ import java.net.URL;
  * This class is a data container for information contained in the Contact
  * nodes/tags of an RTML document.
  * @author Jason Etherton, CHris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
+ * @see org.estar.rtml.RTMLAttributes
  */
-public class RTMLContact implements Serializable
+public class RTMLContact extends RTMLAttributes implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLContact.java,v 1.5 2007-01-30 18:31:08 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLContact.java,v 1.6 2008-05-23 14:12:11 cjm Exp $";
 	/**
 	 * The User element for this Contact.
 	 */
@@ -237,7 +238,7 @@ public class RTMLContact implements Serializable
 	 */
 	public String toString()
 	{
-		return(toString( "" ));
+		return(toString(""));
 	}
 
 
@@ -252,30 +253,35 @@ public class RTMLContact implements Serializable
 	 * @see #getFax
 	 * @see #getEmail
 	 * @see #getUrl
+	 * @see org.estar.rtml.RTMLAttributes#toString
 	 */
 	public String toString(String prefix)
 	{
 		StringBuffer sb = new StringBuffer();
 
-		sb.append( prefix+"Contact :\n" );
-		sb.append( prefix+"\tName : "+name+"\n" );
-		sb.append( prefix+"\tUser : "+user+"\n" );
-		sb.append( prefix+"\tInstitution : "+institution+"\n" );
-		sb.append( prefix+"\tAddress : "+address+"\n" );
-		sb.append( prefix+"\tTelephone : "+telephone+"\n" );
-		sb.append( prefix+"\tFax : "+fax+"\n" );
-		sb.append( prefix+"\teMail : "+email+"\n" );
-		sb.append( prefix+"\tURL : "+url+"\n" );
+		sb.append(prefix+"Contact :\n");
+		sb.append(super.toString(prefix+"\t"));
+		sb.append(prefix+"\tName : "+name+"\n");
+		sb.append(prefix+"\tUser : "+user+"\n");
+		sb.append(prefix+"\tInstitution : "+institution+"\n");
+		sb.append(prefix+"\tAddress : "+address+"\n");
+		sb.append(prefix+"\tTelephone : "+telephone+"\n");
+		sb.append(prefix+"\tFax : "+fax+"\n");
+		sb.append(prefix+"\teMail : "+email+"\n");
+		sb.append(prefix+"\tURL : "+url+"\n");
 
 		return(sb.toString());
 	}
 }
 /*
- *    $Date: 2007-01-30 18:31:08 $
+ *    $Date: 2008-05-23 14:12:11 $
  * $RCSfile: RTMLContact.java,v $
  *  $Source: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLContact.java,v $
- *      $Id: RTMLContact.java,v 1.5 2007-01-30 18:31:08 cjm Exp $
+ *      $Id: RTMLContact.java,v 1.6 2008-05-23 14:12:11 cjm Exp $
  *     $Log: not supported by cvs2svn $
+ *     Revision 1.5  2007/01/30 18:31:08  cjm
+ *     gnuify: Added GNU General Public License.
+ *
  *     Revision 1.4  2005/06/08 11:37:52  cjm
  *     Fixed comments.
  *     Reformatted.

@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLDevice.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDevice.java,v 1.5 2008-03-27 17:15:02 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDevice.java,v 1.6 2008-05-23 14:19:47 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -26,20 +26,22 @@ import java.io.*;
 /**
  * This class is a data container for information contained in the device nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
+ * @see org.estar.rtml.RTMLAttributes
  */
-public class RTMLDevice implements Serializable
+public class RTMLDevice extends RTMLAttributes implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDevice.java,v 1.5 2008-03-27 17:15:02 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDevice.java,v 1.6 2008-05-23 14:19:47 cjm Exp $";
 	/**
 	 * The type of device this is. See the dtd: %deviceTypes;.
 	 */
 	private String type = null;
 	/**
-	 * The wavelength region this device is good for. See the dtd: %spectralRegions;
+	 * The wavelength region this device is good for. See the RTML 2.2 DTD: %spectralRegions;
+	 * See RTML 3.1a schema SpectralRegionTypes. e.g. infrared, optical.
 	 */
 	private String spectralRegion = null;
 	/**
@@ -70,9 +72,11 @@ public class RTMLDevice implements Serializable
 	}
 
 	/**
-	 * Set the type of instrument. This should be one of the types defined in the RTML DTD,
-	 * entity %deviceTypes;.
-	 * This corresponds to the <b>type</b> attribute in the RTML &lt;Device&gt; tag.
+	 * Set the type of instrument. This should be one of the types defined in the RTML v 2.2 DTD,
+	 * entity %deviceTypes;. 
+	 * This corresponds to the <b>type</b> attribute in the RTML &lt;Device&gt; tag. e.g:
+	 * camera, spectrograph, polarimeter, and a variety of others.
+	 * <p>The RTML 3.1a equivalent is the DeviceTypes type, which also contains the above.
 	 * @param s A valid type.
 	 * @exception IllegalArgumentException Thrown if s is not valid.
 	 * @see #type
@@ -187,6 +191,7 @@ public class RTMLDevice implements Serializable
 	 * @see #filterType
 	 * @see #detector
 	 * @see #grating
+	 * @see org.estar.rtml.RTMLAttributes#toString(java.lang.String)
 	 */
 	public String toString(String prefix)
 	{
@@ -194,6 +199,7 @@ public class RTMLDevice implements Serializable
 		
 		sb = new StringBuffer();
 		sb.append(prefix+"Device\n");
+		sb.append(super.toString(prefix+"\t"));
 		if(type != null)
 			sb.append(prefix+"\tType: "+type+"\n");
 		if(spectralRegion != null)
@@ -212,6 +218,9 @@ public class RTMLDevice implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.5  2008/03/27 17:15:02  cjm
+** Added RTMLGrating sub-element for spectrograph support.
+**
 ** Revision 1.4  2007/04/26 16:27:38  cjm
 ** Added more comments.
 **
