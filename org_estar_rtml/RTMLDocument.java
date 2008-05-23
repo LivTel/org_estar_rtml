@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.14 2007-03-27 19:16:58 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.15 2008-05-23 14:23:30 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -28,22 +28,57 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class RTMLDocument implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.14 2007-03-27 19:16:58 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.15 2008-05-23 14:23:30 cjm Exp $";
 	/**
-	 * The type of the document, as specified in the RTML node's "type" attribute.
+	 * Constant representing the value of the RTML version attribute specifying RTML version 2.2.
+	 * @see #version
+	 */
+	public final static String RTML_VERSION_22 = "2.2";
+	/**
+	 * Constant representing the value of the RTML version attribute specifying RTML version 3.1a.
+	 * @see #version
+	 */
+	public final static String RTML_VERSION_31 = "3.1a";
+	/**
+	 * The RTML version of the document.
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public String version = null;
+	/**
+	 * The type of the document, as specified in the RTML node's "type" attribute, of type %rtmlDocumentModes;.
+	 * Only used in RTML 2.2 documents, the equivalent is "mode" in RTML 3.1.
+	 * See the DTD for possible values, such as: score, request, confirmation, information, update, observation, 
+	 * reject, fail, abort, incomplete.
 	 */
 	public String type = null;
+	/**
+	 * The mode of the document, as specified in the RTML node's "mode" attribute.
+	 * Only used in RTML 3.1 documents, the equivalent is "type" in RTML 2.2.
+	 * See the schema for possible values, such as: abort, acknowledged, complete, confirm, fail, incomplete, 
+	 * inquiry, offer, reject, report, request, resource, update .
+	 */
+	public String mode = null;
+	/**
+	 * The unique ID of the document, as specified in the RTML node's "uid" attribute.
+	 * Only used in RTML 3.1 documents, the equivalent is some element of IntelligentAgent in RTML 2.2.
+	 */
+	public String uid = null;
 	/**
 	 * The details contained in the IntelligentAgent tag/node.
 	 */
 	public RTMLIntelligentAgent intelligentAgent = null;
+	/**
+	 * History info for this document.
+	 */
+	protected RTMLHistory history = null;
 	/**
 	 * Contact info for this document.
 	 */
@@ -89,41 +124,935 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 		scoresList = new Vector();
 	}
 
+	/**
+	 * Set the RTML version of the document.
+	 * @param s The version.
+	 * @see #version
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public void setVersion(String s)
+	{
+		version = s;
+	}
+
+	/**
+	 * Get the RTML version of the document.
+	 * @return The version.
+	 * @see #version
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public String getVersion()
+	{
+		return version;
+	}
+
+	/**
+	 * Set the type of the document (RTML 2.2).
+	 * @param s The type.
+	 * @see #type
+	 */
 	public void setType(String s)
 	{
 		type = s;
 	}
 
+	/**
+	 * Get the type of the document.
+	 * @return The type.
+	 * @see #type
+	 */
 	public String getType()
 	{
 		return type;
 	}
 
-	public void setContact(RTMLContact newContact)
+	/**
+	 * Set the mode of the document (RTML 3.1).
+	 * @param s The mode.
+	 * @see #mode
+	 */
+	public void setMode(String s)
 	{
-		contact = newContact;
+		mode = s;
 	}
 
+	/**
+	 * Get the mode of the document.
+	 * @return The mode.
+	 * @see #mode
+	 */
+	public String getMode()
+	{
+		return mode;
+	}
+
+	/**
+	 * Set the Unique ID of the document (RTML 3.1).
+	 * @param s The uid.
+	 * @see #uid
+	 */
+	public void setUId(String s)
+	{
+		uid = s;
+	}
+
+	/**
+	 * Get the Unique ID of the document. This is retrieved from the intelligent agent ID if that has been set 
+	 * (usually from RTML 2.2 documents),
+	 * or from the document uid (RTML 3.1a documents). The uid takes preference if it is non-null.
+	 * @return The uid.
+	 * @see #uid
+	 * @see #intelligentAgent
+	 */
+	public String getUId()
+	{
+		String s = null;
+
+		// if the intelligent agent data exists
+		if(intelligentAgent != null)
+		{
+			// we can use the id (extracted from the PCDATA) as the uid in RTML2.2 documents
+			if(intelligentAgent.getId() != null)
+				s = intelligentAgent.getId();
+		}
+		// RTML 3.1a documents should have the uid attribute of the document itself set
+		// This should override the intelligent agent data if it exists
+		if(uid != null)
+			s = uid;
+		return s;
+	}
+
+	/**
+	 * Is this document a score request document?
+	 * @return true if the document is a score request, false otherwise.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public boolean isScoreRequest()
+	{
+		// if we don't know what version of RTML this doc is, return false.
+		if(version == null)
+			return false;
+		if(version.equals(RTML_VERSION_22) && (type.equals("score")))
+			return true;
+		if(version.equals(RTML_VERSION_31) && (mode.equals("inquiry")))
+			return true;
+		return false;
+	}
+
+	/**
+	 * Is this document a reject document?
+	 * @return true if the document is a reject, false otherwise.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public boolean isReject()
+	{
+		// if we don't know what version of RTML this doc is, return false.
+		if(version == null)
+			return false;
+		if(version.equals(RTML_VERSION_22) && (type.equals("reject")))
+			return true;
+		if(version.equals(RTML_VERSION_31) && (mode.equals("reject")))
+			return true;
+		return false;
+	}
+
+	/**
+	 * Is this document a score reply document?
+	 * @return true if the document is a score reply, false otherwise.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public boolean isScoreReply()
+	{
+		// if we don't know what version of RTML this doc is, return false.
+		if(version == null)
+			return false;
+		if(version.equals(RTML_VERSION_22) && (type.equals("score")))
+			return true;
+		if(version.equals(RTML_VERSION_31) && (mode.equals("offer")))
+			return true;
+		return false;
+	}
+
+	/**
+	 * Is this document an observation request document?
+	 * @return true if the document is an observation request, false otherwise.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public boolean isRequest()
+	{
+		// if we don't know what version of RTML this doc is, return false.
+		if(version == null)
+			return false;
+		if(version.equals(RTML_VERSION_22) && (type.equals("request")))
+			return true;
+		if(version.equals(RTML_VERSION_31) && (mode.equals("request")))
+			return true;
+		return false;
+	}
+
+	/**
+	 * Is this document an observation request reply (confirmation) document?
+	 * @return true if the document is an observation request reply (confirmation), false otherwise.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public boolean isRequestConfirm()
+	{
+		// if we don't know what version of RTML this doc is, return false.
+		if(version == null)
+			return false;
+		if(version.equals(RTML_VERSION_22) && (type.equals("confirmation")))
+			return true;
+		if(version.equals(RTML_VERSION_31) && (mode.equals("confirm")))
+			return true;
+		return false;
+	}
+
+	/**
+	 * Is this document an observation update document?
+	 * @return true if the document is an observation update, false otherwise.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public boolean isUpdate()
+	{
+		// if we don't know what version of RTML this doc is, return false.
+		if(version == null)
+			return false;
+		if(version.equals(RTML_VERSION_22) && (type.equals("update")))
+			return true;
+		if(version.equals(RTML_VERSION_31) && (mode.equals("update")))
+			return true;
+		return false;
+	}
+
+	/**
+	 * Is this document a fail document?
+	 * @return true if the document is a fail, false otherwise.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public boolean isFail()
+	{
+		// if we don't know what version of RTML this doc is, return false.
+		if(version == null)
+			return false;
+		if(version.equals(RTML_VERSION_22) && (type.equals("fail")))
+			return true;
+		if(version.equals(RTML_VERSION_31) && (mode.equals("fail")))
+			return true;
+		return false;
+	}
+
+	/**
+	 * Is this document an abort document?
+	 * @return true if the document is a abort, false otherwise.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public boolean isAbort()
+	{
+		// if we don't know what version of RTML this doc is, return false.
+		if(version == null)
+			return false;
+		if(version.equals(RTML_VERSION_22) && (type.equals("abort")))
+			return true;
+		if(version.equals(RTML_VERSION_31) && (mode.equals("abort")))
+			return true;
+		return false;
+	}
+
+	/**
+	 * Is this document an incomplete document?
+	 * @return true if the document is an incomplete, false otherwise.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public boolean isIncomplete()
+	{
+		// if we don't know what version of RTML this doc is, return false.
+		if(version == null)
+			return false;
+		if(version.equals(RTML_VERSION_22) && (type.equals("incomplete")))
+			return true;
+		if(version.equals(RTML_VERSION_31) && (mode.equals("incomplete")))
+			return true;
+		return false;
+	}
+
+	/**
+	 * Is this document a complete/observation document?
+	 * @return true if the document is a complete/observation, false otherwise.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public boolean isComplete()
+	{
+		// if we don't know what version of RTML this doc is, return false.
+		if(version == null)
+			return false;
+		if(version.equals(RTML_VERSION_22) && (type.equals("observation")))
+			return true;
+		if(version.equals(RTML_VERSION_31) && (mode.equals("complete")))
+			return true;
+		return false;
+	}
+
+	/**
+	 * Set this document to be a score request document. The underlying type or mode is set based on
+	 * the document's version (which must have been set before this method is invoked using setVersion).
+	 * @exception NullPointerException Thrown if the version has not been set.
+	 * @exception IllegalArgumentException Thrown if the version is not supported.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #setType
+	 * @see #setMode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public void setScoreRequest() throws NullPointerException, IllegalArgumentException
+	{
+		if(version == null)
+			throw new NullPointerException(this.getClass().getName()+":setScoreRequest:version was null.");
+		if(version.equals(RTML_VERSION_22))
+			setType("score");
+		else if(version.equals(RTML_VERSION_31))
+			setMode("inquiry");
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setScoreRequest:Unsupported version:"+version);
+		}
+	}
+
+	/**
+	 * Set this document to be a score reject document. The underlying type or mode is set based on
+	 * the document's version (which must have been set before this method is invoked using setVersion).
+	 * @exception NullPointerException Thrown if the version has not been set.
+	 * @exception IllegalArgumentException Thrown if the version is not supported.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #setType
+	 * @see #setMode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public void setScoreReject() throws NullPointerException, IllegalArgumentException
+	{
+		if(version == null)
+			throw new NullPointerException(this.getClass().getName()+":setScoreReject:version was null.");
+		if(version.equals(RTML_VERSION_22))
+			setType("reject");
+		else if(version.equals(RTML_VERSION_31))
+			setMode("reject");
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setScoreReject:Unsupported version:"+version);
+		}
+	}
+
+	/**
+	 * Set this document to be a score reply document. The underlying type or mode is set based on
+	 * the document's version (which must have been set before this method is invoked using setVersion).
+	 * @exception NullPointerException Thrown if the version has not been set.
+	 * @exception IllegalArgumentException Thrown if the version is not supported.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #setType
+	 * @see #setMode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public void setScoreReply() throws NullPointerException, IllegalArgumentException
+	{
+		if(version == null)
+			throw new NullPointerException(this.getClass().getName()+":setScoreReply:version was null.");
+		if(version.equals(RTML_VERSION_22))
+			setType("score");
+		else if(version.equals(RTML_VERSION_31))
+			setMode("offer");
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setScoreReply:Unsupported version:"+version);
+		}
+	}
+
+	/**
+	 * Set this document to be a request document. The underlying type or mode is set based on
+	 * the document's version (which must have been set before this method is invoked using setVersion).
+	 * @exception NullPointerException Thrown if the version has not been set.
+	 * @exception IllegalArgumentException Thrown if the version is not supported.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #setType
+	 * @see #setMode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public void setRequest() throws NullPointerException, IllegalArgumentException
+	{
+		if(version == null)
+			throw new NullPointerException(this.getClass().getName()+":setRequest:version was null.");
+		if(version.equals(RTML_VERSION_22))
+			setType("request");
+		else if(version.equals(RTML_VERSION_31))
+			setMode("request");
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setRequest:Unsupported version:"+version);
+		}
+	}
+
+	/**
+	 * Set this document to be a request reply (confirmation) document. The underlying type or mode is set based on
+	 * the document's version (which must have been set before this method is invoked using setVersion).
+	 * @exception NullPointerException Thrown if the version has not been set.
+	 * @exception IllegalArgumentException Thrown if the version is not supported.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #setType
+	 * @see #setMode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public void setRequestReply() throws NullPointerException, IllegalArgumentException
+	{
+		if(version == null)
+			throw new NullPointerException(this.getClass().getName()+":setRequestReply:version was null.");
+		if(version.equals(RTML_VERSION_22))
+			setType("confirmation");
+		else if(version.equals(RTML_VERSION_31))
+			setMode("confirm");
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setRequestReply:Unsupported version:"+version);
+		}
+	}
+
+	/**
+	 * Set this document to be an update document. The underlying type or mode is set based on
+	 * the document's version (which must have been set before this method is invoked using setVersion).
+	 * @exception NullPointerException Thrown if the version has not been set.
+	 * @exception IllegalArgumentException Thrown if the version is not supported.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #setType
+	 * @see #setMode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public void setUpdate() throws NullPointerException, IllegalArgumentException
+	{
+		if(version == null)
+			throw new NullPointerException(this.getClass().getName()+":setUpdate:version was null.");
+		if(version.equals(RTML_VERSION_22))
+			setType("update");
+		else if(version.equals(RTML_VERSION_31))
+			setMode("update");
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setUpdate:Unsupported version:"+version);
+		}
+	}
+
+	/**
+	 * Set this document to be a fail document. The underlying type or mode is set based on
+	 * the document's version (which must have been set before this method is invoked using setVersion).
+	 * @exception NullPointerException Thrown if the version has not been set.
+	 * @exception IllegalArgumentException Thrown if the version is not supported.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #setType
+	 * @see #setMode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public void setFail() throws NullPointerException, IllegalArgumentException
+	{
+		if(version == null)
+			throw new NullPointerException(this.getClass().getName()+":setFail:version was null.");
+		if(version.equals(RTML_VERSION_22))
+			setType("fail");
+		else if(version.equals(RTML_VERSION_31))
+			setMode("fail");
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setFail:Unsupported version:"+version);
+		}
+	}
+
+	/**
+	 * Set this document to be a fail document. The underlying type or mode is set based on
+	 * the document's version (which must have been set before this method is invoked using setVersion).
+	 * @exception NullPointerException Thrown if the version has not been set.
+	 * @exception IllegalArgumentException Thrown if the version is not supported.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #setType
+	 * @see #setMode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public void setReject() throws NullPointerException, IllegalArgumentException
+	{
+		if(version == null)
+			throw new NullPointerException(this.getClass().getName()+":setReject:version was null.");
+		if(version.equals(RTML_VERSION_22))
+			setType("reject");
+		else if(version.equals(RTML_VERSION_31))
+			setMode("reject");
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setReject:Unsupported version:"+version);
+		}
+	}
+
+	/**
+	 * Set this document to be an abort document. The underlying type or mode is set based on
+	 * the document's version (which must have been set before this method is invoked using setVersion).
+	 * Note RTML 3.1a suggests an "abort reply" has the mode "confirm".
+	 * @exception NullPointerException Thrown if the version has not been set.
+	 * @exception IllegalArgumentException Thrown if the version is not supported.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #setType
+	 * @see #setMode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public void setAbort() throws NullPointerException, IllegalArgumentException
+	{
+		if(version == null)
+			throw new NullPointerException(this.getClass().getName()+":setAbort:version was null.");
+		if(version.equals(RTML_VERSION_22))
+			setType("abort");
+		else if(version.equals(RTML_VERSION_31))
+			setMode("abort");
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setAbort:Unsupported version:"+version);
+		}
+	}
+
+	/**
+	 * Set this document to be a incomplete document. The underlying type or mode is set based on
+	 * the document's version (which must have been set before this method is invoked using setVersion).
+	 * @exception NullPointerException Thrown if the version has not been set.
+	 * @exception IllegalArgumentException Thrown if the version is not supported.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #setType
+	 * @see #setMode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public void setIncomplete() throws NullPointerException, IllegalArgumentException
+	{
+		if(version == null)
+			throw new NullPointerException(this.getClass().getName()+":setIncomplete:version was null.");
+		if(version.equals(RTML_VERSION_22))
+			setType("incomplete");
+		else if(version.equals(RTML_VERSION_31))
+			setMode("incomplete");
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setIncomplete:Unsupported version:"+version);
+		}
+	}
+
+	/**
+	 * Set this document to be a complete document. The underlying type or mode is set based on
+	 * the document's version (which must have been set before this method is invoked using setVersion).
+	 * @exception NullPointerException Thrown if the version has not been set.
+	 * @exception IllegalArgumentException Thrown if the version is not supported.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #setType
+	 * @see #setMode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public void setComplete() throws NullPointerException, IllegalArgumentException
+	{
+		if(version == null)
+			throw new NullPointerException(this.getClass().getName()+":setComplete:version was null.");
+		if(version.equals(RTML_VERSION_22))
+			setType("observation");
+		else if(version.equals(RTML_VERSION_31))
+			setMode("complete");
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setComplete:Unsupported version:"+version);
+		}
+	}
+
+	/**
+	 * Method to return whether this documents represents a target of opportunity request (TOOP) which
+	 * must be serviced immediately, or a regular phase II scheduled observation.
+	 * @return true if the document is a TOOP, false otherwise.
+	 * @exception NullPointerException Thrown if the version has not been set, or a document's observation #
+	 *           target/schedule are null.
+	 * @exception IllegalArgumentException Thrown if the version is not supported, or the document
+	 *           contains multiple observations which don't agree as to whether they are a toop.
+	 * @see #version
+	 * @see #getObservationListCount
+	 * @see #getObservation
+	 * @see org.estar.rtml.RTMLObservation#getTarget
+	 * @see org.estar.rtml.RTMLObservation#getSchedule
+	 * @see org.estar.rtml.RTMTarget#isTypeTOOP
+	 * @see org.estar.rtml.RTMLSchedule#getPriority
+	 * @see org.estar.rtml.RTMLSchedule#SCHEDULE_PRIORITY_TOOP
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public boolean isTOOP() throws NullPointerException, IllegalArgumentException
+	{
+		RTMLObservation observation = null;
+		RTMLSchedule schedule = null;
+		RTMLTarget target = null;
+		boolean isToop = false;
+
+		if(version == null)
+			throw new NullPointerException(this.getClass().getName()+":isTOOP:version was null.");
+		for(int i = 0; i < getObservationListCount(); i++)
+		{
+			observation = getObservation(i);
+			target = observation.getTarget();
+			schedule = observation.getSchedule();
+			if(target == null)
+			{
+				throw new NullPointerException(this.getClass().getName()+":isTOOP:observation "+i+
+							       " has null target.");
+			}
+			if(schedule == null)
+			{
+				throw new NullPointerException(this.getClass().getName()+":isTOOP:observation "+i+
+							       " has null schedule.");
+			}
+			if(version.equals(RTML_VERSION_22)) // check target type == toop
+			{
+				// if first observation, set isToop
+				if(i == 0)
+				{
+					if(target.isTypeTOOP())
+						isToop = true;
+					else
+						isToop = false;
+				}
+				else // check this observation matches others in the list else error
+				{
+					if(target.isTypeTOOP())
+					{
+						if(isToop == false)
+						{
+							throw new IllegalArgumentException(this.getClass().getName()+
+							   ":isTOOP:Observations don't match toop-wise(1): "+i);
+						}
+					}
+					else
+					{
+						if(isToop)
+						{
+							throw new IllegalArgumentException(this.getClass().getName()+
+							   ":isTOOP:Observations don't match toop-wise(2): "+i);
+						}
+					}
+				}
+			}
+			else if(version.equals(RTML_VERSION_31))// check schedule priority == 0
+			{
+				// if first observation, set isToop
+				if(i == 0)
+				{
+					if(schedule.getPriority() ==  RTMLSchedule.SCHEDULE_PRIORITY_TOOP)
+						isToop = true;
+					else
+						isToop = false;
+				}
+				else // check this observation matches others in the list else error
+				{
+					if(schedule.getPriority() ==  RTMLSchedule.SCHEDULE_PRIORITY_TOOP)
+					{
+						if(isToop == false)
+						{
+							throw new IllegalArgumentException(this.getClass().getName()+
+							   ":isTOOP:Observations don't match toop-wise(3): "+i);
+						}
+					}
+					else
+					{
+						if(isToop)
+						{
+							throw new IllegalArgumentException(this.getClass().getName()+
+							   ":isTOOP:Observations don't match toop-wise(4): "+i);
+						}
+					}
+				}
+			}
+			else
+			{
+				throw new IllegalArgumentException(this.getClass().getName()+
+							   ":isTOOP:Unsupported version:"+version);
+			}
+		}// end for on observations
+		return isToop;
+	}
+
+	/**
+	 * Set the document's history.
+	 * @param h The history.
+	 * @see #history
+	 * @see org.estar.rtml.RTMLHistory
+	 */
+	public void setHistory(RTMLHistory h)
+	{
+		history = h;
+	}
+
+	/**
+	 * Get the document's history.
+	 * @return The history.
+	 * @see #history
+	 * @see org.estar.rtml.RTMLHistory
+	 */
+	public RTMLHistory getHistory()
+	{
+		return history;
+	}
+
+	/**
+	 * Get the number of Entrys in the History list.
+	 * @return The number of Entrys in the list.
+	 * @see #history
+	 * @see org.estar.rtml.RTMLHistory#getEntryListCount
+	 */
+	public int getHistoryEntryCount()
+	{
+		if(history == null)
+			return 0;
+		return history.getEntryListCount();
+	}
+
+	/**
+	 * Convenience method to add a normal history entry. The history container is initialised if
+	 * necessary. The entry timestamp is set to now.
+	 * @param agentName The name of the agent adding the history.
+	 * @param agentUri The agent URI.
+	 * @param description A description of the changes made to the document.
+	 * @see #history
+	 */
+	public void addHistoryEntry(String agentName,String agentUri,String description)
+	{
+		RTMLHistoryEntry entry = null;
+		RTMLIntelligentAgent ia = null;
+
+		// if no history in the document, add the list container
+		if(history == null)
+			history = new RTMLHistory();
+		// setup agent for this entry
+		ia = new RTMLIntelligentAgent();
+		ia.setId(agentName);
+		ia.setUri(agentUri);
+		// entry to add
+		entry = new RTMLHistoryEntry();
+		entry.setTimeStamp(new Date());
+		entry.setAgent(ia);
+		entry.setDescription(description);
+		// version ?
+		// add entry to history.
+		history.addEntry(entry);
+	}
+
+	/**
+	 * Convenience method to add a rejection history entry. The history container is initialised if
+	 * necessary. The entry timestamp is set to now.
+	 * @param agentName The name of the agent adding the history.
+	 * @param agentUri The agent URI.
+	 * @param rejectionReason The reason for rejection, one of: REJECTION_REASON_INSUFFICIENT_PRIORITY,
+	 *        REJECTION_REASON_NOT_AUTHORISED, REJECTION_REASON_NOT_AVAILABLE, REJECTION_REASON_OTHER,
+	 *        REJECTION_REASON_SYNTAX.
+	 * @param rejectionDescription A description of why the document was rejected.
+	 * @see #history
+	 * @see org.estar.rtml.RTMLHistoryEntry#REJECTION_REASON_INSUFFICIENT_PRIORITY
+	 * @see org.estar.rtml.RTMLHistoryEntry#REJECTION_REASON_NOT_AUTHORISED
+	 * @see org.estar.rtml.RTMLHistoryEntry#REJECTION_REASON_NOT_AVAILABLE 
+	 * @see org.estar.rtml.RTMLHistoryEntry#REJECTION_REASON_OTHER  
+	 * @see org.estar.rtml.RTMLHistoryEntry#REJECTION_REASON_SYNTAX
+	 */
+	public void addHistoryRejection(String agentName,String agentUri,String rejectionReason,
+					String rejectionDescription)
+	{
+		RTMLHistoryEntry entry = null;
+		RTMLIntelligentAgent ia = null;
+
+		// if no history in the document, add the list container
+		if(history == null)
+			history = new RTMLHistory();
+		// setup agent for this entry
+		ia = new RTMLIntelligentAgent();
+		ia.setId(agentName);
+		ia.setUri(agentUri);
+		// entry to add
+		entry = new RTMLHistoryEntry();
+		entry.setTimeStamp(new Date());
+		entry.setAgent(ia);
+		entry.setRejectionReason(rejectionReason);
+		entry.setRejectionDescription(rejectionDescription);
+		// version ?
+		// add entry to history.
+		history.addEntry(entry);
+	}
+
+	/**
+	 * Convenience method to add an error history entry. The history container is initialised if
+	 * necessary. The entry timestamp is set to now.
+	 * @param agentName The name of the agent adding the history.
+	 * @param agentUri The agent URI.
+	 * @param errorString The error.
+	 * @param description A description of this entry.
+	 * @see #history
+	 */
+	public void addHistoryError(String agentName,String agentUri,String errorString,String description)
+	{
+		RTMLHistoryEntry entry = null;
+		RTMLIntelligentAgent ia = null;
+
+		// if no history in the document, add the list container
+		if(history == null)
+			history = new RTMLHistory();
+		// setup agent for this entry
+		ia = new RTMLIntelligentAgent();
+		ia.setId(agentName);
+		ia.setUri(agentUri);
+		// entry to add
+		entry = new RTMLHistoryEntry();
+		entry.setTimeStamp(new Date());
+		entry.setAgent(ia);
+		entry.setError(errorString);
+		entry.setDescription(description);
+		// version ?
+		// add entry to history.
+		history.addEntry(entry);
+	}
+
+	/**
+	 * Set the document's contact.
+	 * @param c The contact.
+	 * @see #contact
+	 * @see org.estar.rtml.RTMLContact
+	 */
+	public void setContact(RTMLContact c)
+	{
+		contact = c;
+	}
+
+	/**
+	 * Get the document's contact.
+	 * @return The contact.
+	 * @see #contact
+	 * @see org.estar.rtml.RTMLContact
+	 */
 	public RTMLContact getContact()
 	{
-		return(contact);
+		return contact;
 	}
 
+	/**
+	 * Set the document's project.
+	 * @param p The project.
+	 * @see #project
+	 * @see org.estar.rtml.RTMLProject
+	 */
 	public void setProject(RTMLProject p)
 	{
 		project = p;
 	}
 
+	/**
+	 * Get the document's project.
+	 * @return The project.
+	 * @see #project
+	 * @see org.estar.rtml.RTMLProject
+	 */
 	public RTMLProject getProject()
 	{
 		return(project);
 	}
 
+	/**
+	 * Set the document's intelligent agent information.
+	 * @param ia The intelligent agent information.
+	 * @see #intelligentAgent
+	 * @see org.estar.rtml.RTMLIntelligentAgent
+	 */
 	public void setIntelligentAgent(RTMLIntelligentAgent ia)
 	{
 		intelligentAgent = ia;
 	}
 
+	/**
+	 * Get the document's intelligent agent information.
+	 * @return The intelligent agent information.
+	 * @see #intelligentAgent
+	 * @see org.estar.rtml.RTMLIntelligentAgent
+	 */
 	public RTMLIntelligentAgent getIntelligentAgent()
 	{
 		return intelligentAgent;
@@ -132,6 +1061,8 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	/**
 	 * Set the device.
 	 * @param d The device to set.
+	 * @see #device
+	 * @see org.estar.rtml.RTMLDevice
 	 */
 	public void setDevice(RTMLDevice d)
 	{
@@ -141,6 +1072,8 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	/**
 	 * Get the device.
 	 * @return The device.
+	 * @see #device
+	 * @see org.estar.rtml.RTMLDevice
 	 */
 	public RTMLDevice getDevice()
 	{
@@ -151,6 +1084,7 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	 * Add an observation to the document.
 	 * @param ob The observation to add.
 	 * @see #observationList
+	 * @see org.estar.rtml.RTMLObservation
 	 */
 	public void addObservation(RTMLObservation ob)
 	{
@@ -171,6 +1105,7 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	 * @param index The index in the observation list.
 	 * @return The observation to the specicifed index is returned.
 	 * @see #observationList
+	 * @see org.estar.rtml.RTMLObservation
 	 */
 	public RTMLObservation getObservation(int index)
 	{
@@ -245,7 +1180,9 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 
 	/**
 	 * Add an score to the Scores list.
-	 * @param s The score, as a string representing a double.
+	 * @param delayString The delay, as a valid period format: P{(yyyy)Y{(mm)M}{(dd)D}{T{(hh)H}{(mm}M}{(ss.s..)S}.
+	 * @param probabilityString The differential probability, a valid double or "NaN".
+	 * @param cumulativeString The cumulative probability as a string, a valid double or "NaN".
 	 * @exception RTMLException Thrown if the string is not a valid double.
 	 * @see #score
 	 */
@@ -425,7 +1362,9 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	/**
 	 * Method to print out a string representation of this node, with a prefix.
 	 * @param prefix A string to prefix to each line of data we print out.
+	 * @see #getHistory
 	 * @see #getContact
+	 * @see #getMode
 	 * @see #getType
 	 * @see #getIntelligentAgent
 	 * @see #getDevice
@@ -442,7 +1381,18 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 		StringBuffer sb = null;
 		
 		sb = new StringBuffer();
-		sb.append(prefix+"RTML : type = "+getType()+"\n");
+		sb.append(prefix+"RTML :");
+		if(version != null)
+			sb.append(" version = "+getVersion());
+		if(uid != null)
+			sb.append(" uid = "+getUId());
+		if(type != null)
+			sb.append(" type = "+getType());
+		if(mode != null)
+			sb.append(" mode = "+getMode());
+		sb.append("\n");
+		if(getHistory() != null)
+			sb.append( prefix+getHistory().toString("\t")+"\n");
 		if(getContact() != null)
 			sb.append( prefix+getContact().toString("\t")+"\n");
 		if(getProject() != null)
@@ -467,13 +1417,18 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 		}
 		if(getCompletionTime() != null)
 			sb.append(prefix+"\tCompletion Time:"+getCompletionTime()+"\n");
-		if(type.equals("reject") && (errorString != null))
+		if((type != null) && type.equals("reject") && (errorString != null))
 			sb.append(prefix+"\tError:"+getErrorString()+"\n");
 		return sb.toString();
 	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.14  2007/03/27 19:16:58  cjm
+** Added Scores list handling.
+** Added scoresList.
+** Added methods to add/retrieve scores from the list and reset it.
+**
 ** Revision 1.13  2007/01/30 18:31:13  cjm
 ** gnuify: Added GNU General Public License.
 **
