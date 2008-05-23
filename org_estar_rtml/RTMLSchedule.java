@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.13 2007-07-09 11:45:52 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.14 2008-05-23 17:07:39 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -30,22 +30,62 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
+ * @see org.estar.rtml.RTMLAttributes
  */
-public class RTMLSchedule implements Serializable
+public class RTMLSchedule extends RTMLAttributes implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.13 2007-07-09 11:45:52 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.14 2008-05-23 17:07:39 cjm Exp $";
 	/**
-	 * Schedule priority attribute. Accordin to the DTD, The required
+	 * Schedule priority constant. This means TOOP in RTML 3.1a, but TOOP in RTML 2.2. only with
+	 * the target type also being set to toop.
+	 * @see #priority
+	 * @see org.estar.rtml.RTMLTarget#type
+	 */
+	public final static int SCHEDULE_PRIORITY_TOOP = 0;
+	/**
+	 * Schedule priority constant.
+	 * @see #priority
+	 */
+	public final static int SCHEDULE_PRIORITY_QUITE_URGENT = 0;
+	/**
+	 * Schedule priority constant.
+	 * @see #priority
+	 */
+	public final static int SCHEDULE_PRIORITY_HIGH = 1;
+	/**
+	 * Schedule priority constant.
+	 * @see #priority
+	 */
+	public final static int SCHEDULE_PRIORITY_MEDIUM = 2;
+	/**
+	 * Schedule priority constant.
+	 * @see #priority
+	 */
+	public final static int SCHEDULE_PRIORITY_NORMAL = 3;
+	/**
+	 * Schedule priority attribute. According to the DTD, The required
 	 * priority attribute is an integer: 0=Target-of-Opportunity
 	 * (highest priority), 1=high priority, 2=lower priority, etc.
 	 * Though eSTAR have changed the attribute to implied, not required.
 	 * See also RTMLTarget type atrribute, which eSTAR uses to distinguish TOOP vs. non-toop. 
+	 * Here is a LT mapping table reproduced from :/home/dev/src/estar/tea/docs/tea_schedule_priorities.txt.
+	 * <table border="1">
+	 * <tr><th>Schedule (RTML) priority</th><th>PhaseII (ODB)</th><th>PhaseII (GUI)</th></tr>
+	 * <tr><td></td><td>5</td><td>Urgent</td></tr>
+	 * <tr><td>0</td><td>4(RTML3.1a toop!)</td><td>Quite Urgent(RTML3.1a toop!)</td></tr>
+	 * <tr><td>1</td><td>3</td><td>High</td></tr>
+	 * <tr><td>2</td><td>2</td><td>Medium</td></tr>
+	 * <tr><td>3</td><td>1</td><td>Normal</td></tr>
+	 * <tr><td>default(other)</td><td>1</td><td>Normal</td></tr>
+	 * <tr><td></td><td>0</td><td>Normal</td></tr>
+	 * <tr><td>(n/a)</td><td>-2</td><td>Background</td></tr>
+	 * </table>
 	 */
-	private int priority = 1;
+	private int priority = SCHEDULE_PRIORITY_NORMAL;
 	/**
 	 * The type of the Exposure, the "type" attribute in the Exposure tag. Should be either "time" or
 	 * "snr".
@@ -94,10 +134,6 @@ public class RTMLSchedule implements Serializable
 	 * This reference can be null, if no sky constraint was specified.
 	 */
 	private RTMLSkyConstraint skyConstraint = null;
-	/**
-	 * The calibration data that may be contained a a sub-tag.
-	 */
-	/*diddly	private RTMLCalibration calibration = null;*/
 
 	/**
 	 * Default constructor.
@@ -241,7 +277,7 @@ public class RTMLSchedule implements Serializable
 
 	/**
 	 * Get the exposure length as milliseconds.
-	 * Supported values for exposure units are defined in the DTD. All %timeUnits are supported, 
+	 * Supported values for exposure units are defined in the RTML 2.2 DTD. All %timeUnits are supported, 
 	 * except those defined in the %calendarUnits and %timeSystemUnits sub-entities.
 	 * @return The length in milliseconds.
 	 * @see #exposureLength
@@ -257,7 +293,7 @@ public class RTMLSchedule implements Serializable
 			throw new IllegalArgumentException(this.getClass().getName()+
 							   ":getExposureLengthMilliseconds:Exposure Type is SNR.");
 		}
-		// see RTML DTD timeUnits entity, which also contains %calendarUnits and %timeSystemUnits
+		// see RTML2.2  DTD timeUnits entity, which also contains %calendarUnits and %timeSystemUnits
 		// We only support a (sensible) subset here
 		if(exposureUnits.equals("ms") ||
 		   exposureUnits.equals("msec") ||
@@ -289,6 +325,57 @@ public class RTMLSchedule implements Serializable
 		{
 			throw new IllegalArgumentException(this.getClass().getName()+
 				":getExposureLengthMilliseconds:Exposure Units "+exposureUnits+" not supported.");
+		}
+	}
+
+	/**
+	 * Get the exposure length in seconds. Useful for RTML3.1, which only supports these units.
+	 * @return The length in seconds.
+	 * @see #exposureLength
+	 * @see #exposureType
+	 * @see #exposureUnits
+	 * @exception IllegalArgumentException Thrown if exposureType is "snr", or the units specified in exposureUnits
+	 *          are not supported.
+	 */
+	public double getExposureLengthSeconds() throws IllegalArgumentException
+	{
+		if(exposureType.equals("snr"))
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":getExposureLengthSeconds:Exposure Type is SNR.");
+		}
+		// see RTML2.2  DTD timeUnits entity, which also contains %calendarUnits and %timeSystemUnits
+		// We only support a (sensible) subset here
+		if(exposureUnits.equals("ms") ||
+		   exposureUnits.equals("msec") ||
+		   exposureUnits.equals("msecs") ||
+		   exposureUnits.equals("millisecond") ||
+		   exposureUnits.equals("milliseconds"))
+			return exposureLength/1000.0;
+		else if(exposureUnits.equals("microsec") ||
+			exposureUnits.equals("microsecs") ||
+			exposureUnits.equals("microsecond") ||
+			exposureUnits.equals("microseconds"))
+			return exposureLength/(1000.0*1000.0);
+		else if(exposureUnits.equals("s") ||
+			exposureUnits.equals("sec") ||
+			exposureUnits.equals("secs") ||
+			exposureUnits.equals("second") ||
+			exposureUnits.equals("seconds"))
+			return exposureLength;
+		else if(exposureUnits.equals("min") ||
+			exposureUnits.equals("mins") ||
+			exposureUnits.equals("minutes"))
+			return exposureLength*60.0;
+		else if(exposureUnits.equals("hr") ||
+			exposureUnits.equals("hrs") ||
+			exposureUnits.equals("hour") ||
+			exposureUnits.equals("hours"))
+			return exposureLength*60.0*60.0;
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+				":getExposureLengthSeconds:Exposure Units "+exposureUnits+" not supported.");
 		}
 	}
 
@@ -546,6 +633,7 @@ public class RTMLSchedule implements Serializable
 	 * @see #moonConstraint
 	 * @see #skyConstraint
 	 * @see #isMonitorGroup
+	 * @see org.estar.rtml.RTMLAttributes#toString(java.lang.String)
 	 */
 	public String toString(String prefix)
 	{
@@ -553,6 +641,7 @@ public class RTMLSchedule implements Serializable
 		
 		sb = new StringBuffer();
 		sb.append(prefix+"Schedule: (Monitor Group:"+isMonitorGroup()+")\n");
+		sb.append(super.toString(prefix+"\t"));
 		sb.append(prefix+"\tPriority: "+priority+"\n");
 		sb.append(prefix+"\tExposure: type = "+exposureType+": units = "+exposureUnits+"\n");
 		sb.append(prefix+"\t\tLength:"+exposureLength+"\n");
@@ -571,6 +660,9 @@ public class RTMLSchedule implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.13  2007/07/09 11:45:52  cjm
+** Added moonConstraint and skyConstraint support.
+**
 ** Revision 1.12  2007/01/30 18:31:21  cjm
 ** gnuify: Added GNU General Public License.
 **
