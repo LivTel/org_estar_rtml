@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.14 2008-05-23 17:07:39 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.15 2008-05-27 14:27:22 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -30,7 +30,7 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLSchedule extends RTMLAttributes implements Serializable
@@ -38,7 +38,11 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.14 2008-05-23 17:07:39 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.15 2008-05-27 14:27:22 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = 7331008515579023515L;
 	/**
 	 * Schedule priority constant. This means TOOP in RTML 3.1a, but TOOP in RTML 2.2. only with
 	 * the target type also being set to toop.
@@ -660,6 +664,11 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.14  2008/05/23 17:07:39  cjm
+** Now extends RTMLAttributes.
+** Added more priority documentation/constants.
+** Added getExposureLengthSeconds (RTML 3.1a only supports seconds as units).
+**
 ** Revision 1.13  2007/07/09 11:45:52  cjm
 ** Added moonConstraint and skyConstraint support.
 **
