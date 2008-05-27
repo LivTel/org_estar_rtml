@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLScore.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLScore.java,v 1.1 2007-03-27 19:15:01 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLScore.java,v 1.2 2008-05-27 14:58:25 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -28,14 +28,18 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the Score tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RTMLScore implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLScore.java,v 1.1 2007-03-27 19:15:01 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLScore.java,v 1.2 2008-05-27 14:58:25 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = 6600424686842633408L;
 	/**
 	 * The delay attribute specified in the score, can be null.
 	 * @see RTMLPeriodFormat
@@ -219,4 +223,7 @@ public class RTMLScore implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2007/03/27 19:15:01  cjm
+** Initial revision
+**
 */

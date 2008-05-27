@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLSkyConstraint.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSkyConstraint.java,v 1.1 2007-07-09 11:44:55 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSkyConstraint.java,v 1.2 2008-05-27 15:00:09 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -35,14 +35,18 @@ import java.text.*;
  * </ul>
  * Only the <i>sky</i> value is used by the TEA at the moment. 
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RTMLSkyConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSkyConstraint.java,v 1.1 2007-07-09 11:44:55 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSkyConstraint.java,v 1.2 2008-05-27 15:00:09 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = 1685937304465026200L;
 	/**
 	 * A description of the sky brightness: (dark|gray|grey|bright) are acceptable.
 	 */
@@ -239,4 +243,7 @@ public class RTMLSkyConstraint implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2007/07/09 11:44:55  cjm
+** Initial revision
+**
 */

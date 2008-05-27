@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLSeeingConstraint.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSeeingConstraint.java,v 1.2 2007-01-30 18:31:22 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSeeingConstraint.java,v 1.3 2008-05-27 14:59:26 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -38,14 +38,18 @@ import java.text.*;
  * by the (nominal-actual seeing) * ExposureFactor in some manner. This is not implemented, as it does not exist
  * in RTML 3. RTML 3 has the minimum and maximum attributes as sub-elements, and a fixed Units element.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class RTMLSeeingConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSeeingConstraint.java,v 1.2 2007-01-30 18:31:22 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSeeingConstraint.java,v 1.3 2008-05-27 14:59:26 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = -6093777153073022079L;
 	/**
 	 * The minimum (best) required seeing in arcseconds.
 	 */
@@ -152,6 +156,9 @@ public class RTMLSeeingConstraint implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2007/01/30 18:31:22  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.1  2005/06/08 11:39:35  cjm
 ** Initial revision
 **

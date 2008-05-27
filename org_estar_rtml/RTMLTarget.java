@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLTarget.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLTarget.java,v 1.7 2008-05-23 17:09:42 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLTarget.java,v 1.8 2008-05-27 15:01:06 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -27,7 +27,7 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the target nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLTarget extends RTMLAttributes implements Serializable
@@ -35,7 +35,11 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLTarget.java,v 1.7 2008-05-23 17:09:42 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLTarget.java,v 1.8 2008-05-27 15:01:06 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = -4226657892010129299L;
 	/**
 	 * The type of the Target, the type attribute in the Target tag. Should be either "normal" or
 	 * "toop".
@@ -289,6 +293,9 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.7  2008/05/23 17:09:42  cjm
+** Now extends RTMLAttributes.
+**
 ** Revision 1.6  2007/01/30 18:31:23  cjm
 ** gnuify: Added GNU General Public License.
 **
