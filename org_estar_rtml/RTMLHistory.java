@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLHistory.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLHistory.java,v 1.1 2008-05-23 14:25:08 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLHistory.java,v 1.2 2008-05-27 14:14:43 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -28,14 +28,18 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the History nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RTMLHistory implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLHistory.java,v 1.1 2008-05-23 14:25:08 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLHistory.java,v 1.2 2008-05-27 14:14:43 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = -1729123909863642410L;
 	/**
 	 * List containing History entries.
 	 */
@@ -124,4 +128,7 @@ public class RTMLHistory implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2008/05/23 14:25:08  cjm
+** Initial revision
+**
 */

@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLAttributes.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLAttributes.java,v 1.1 2008-05-23 14:10:41 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLAttributes.java,v 1.2 2008-05-27 14:01:18 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -29,14 +29,18 @@ import java.util.*;
  * This class is a data container for information contained RTMLAttrubutes attribute group.
  * Most RTML 3.1a element tags have these attributes.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RTMLAttributes implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLAttributes.java,v 1.1 2008-05-23 14:10:41 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLAttributes.java,v 1.2 2008-05-27 14:01:18 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = 810725666443890501L;
 	/**
 	 * The ID (local key) of this element.
 	 */
@@ -148,4 +152,7 @@ public class RTMLAttributes implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2008/05/23 14:10:41  cjm
+** Initial revision
+**
 */

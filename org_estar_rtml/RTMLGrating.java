@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLGrating.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLGrating.java,v 1.2 2008-05-23 14:24:41 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLGrating.java,v 1.3 2008-05-27 14:12:47 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -27,14 +27,18 @@ import java.text.*;
 /**
  * This class is a data container for information contained in the Grating nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class RTMLGrating implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLGrating.java,v 1.2 2008-05-23 14:24:41 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLGrating.java,v 1.3 2008-05-27 14:12:47 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = -3776514019215482505L;
 	/**
 	 * The name of the grating.
 	 */
@@ -360,6 +364,9 @@ public class RTMLGrating implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2008/05/23 14:24:41  cjm
+** Comment fixes.
+**
 ** Revision 1.1  2008/03/27 17:13:18  cjm
 ** Initial revision
 **

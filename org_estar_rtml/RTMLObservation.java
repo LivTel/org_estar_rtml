@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLObservation.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLObservation.java,v 1.8 2007-01-30 18:31:17 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLObservation.java,v 1.9 2008-05-27 14:18:38 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -28,14 +28,18 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the observation nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class RTMLObservation implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLObservation.java,v 1.8 2007-01-30 18:31:17 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLObservation.java,v 1.9 2008-05-27 14:18:38 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = 3570970220652251564L;
 	/**
 	 * The device (instrument) of this observation.
 	 * This can be null, in which case pick up the generic document device information.
@@ -237,6 +241,9 @@ public class RTMLObservation implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.8  2007/01/30 18:31:17  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.7  2005/06/08 11:38:51  cjm
 ** Fixed comments.
 **

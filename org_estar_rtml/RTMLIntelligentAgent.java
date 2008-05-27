@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLIntelligentAgent.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLIntelligentAgent.java,v 1.4 2008-05-23 14:30:56 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLIntelligentAgent.java,v 1.5 2008-05-27 14:16:49 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -27,14 +27,18 @@ import java.io.*;
  * This class is a data container for information contained in the intelligent agent nodes/tags of an RTML document.
  * These are IntelligentAgent nodes in RTML2.2, and Agent nodes in RTML3.1.
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class RTMLIntelligentAgent implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLIntelligentAgent.java,v 1.4 2008-05-23 14:30:56 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLIntelligentAgent.java,v 1.5 2008-05-27 14:16:49 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = 3463829464314530120L;
 	/**
 	 * The unique identifier for the RTML request, the #PCDATA in the IntelligentAgent tag.
 	 */
@@ -157,6 +161,9 @@ public class RTMLIntelligentAgent implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2008/05/23 14:30:56  cjm
+** Added URI for RTML 3.1a integration.
+**
 ** Revision 1.3  2007/01/30 18:31:16  cjm
 ** gnuify: Added GNU General Public License.
 **

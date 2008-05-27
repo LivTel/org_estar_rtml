@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLMoonConstraint.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLMoonConstraint.java,v 1.1 2007-07-09 11:44:46 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLMoonConstraint.java,v 1.2 2008-05-27 14:17:33 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -38,14 +38,18 @@ import java.text.*;
  * </ul>
  * Only the <i>distance</i> and <i>units</i> attributes are currently used by the TEA.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RTMLMoonConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLMoonConstraint.java,v 1.1 2007-07-09 11:44:46 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLMoonConstraint.java,v 1.2 2008-05-27 14:17:33 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = -4022437107166870039L;
 	/**
 	 * The maximum acceptable phase of the moon. Full moon is phase=1.0.
 	 */
@@ -234,6 +238,9 @@ public class RTMLMoonConstraint implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2007/07/09 11:44:46  cjm
+** Initial revision
+**
 ** Revision 1.2  2007/01/30 18:31:22  cjm
 ** gnuify: Added GNU General Public License.
 **

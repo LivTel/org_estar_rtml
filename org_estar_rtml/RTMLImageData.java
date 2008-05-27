@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLImageData.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLImageData.java,v 1.4 2008-05-23 14:25:33 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLImageData.java,v 1.5 2008-05-27 14:15:55 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -27,14 +27,18 @@ import java.net.*;
 /**
  * This class is a data container for information contained in the ImageData nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class RTMLImageData implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLImageData.java,v 1.4 2008-05-23 14:25:33 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLImageData.java,v 1.5 2008-05-27 14:15:55 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = -6324753364425492455L;
 	/**
 	 * The type of the object list belonging to this observation. Either "xml", "cluster" or "votable-url".
 	 */
@@ -263,6 +267,9 @@ public class RTMLImageData implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2008/05/23 14:25:33  cjm
+** Comment changes.
+**
 ** Revision 1.3  2007/01/30 18:31:16  cjm
 ** gnuify: Added GNU General Public License.
 **

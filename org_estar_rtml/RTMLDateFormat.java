@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLDateFormat.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDateFormat.java,v 1.4 2008-04-07 15:45:06 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDateFormat.java,v 1.5 2008-05-27 14:06:37 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -34,14 +34,18 @@ import java.util.*;
  * ISO8601 dates without a timezone should be parsed as being UTC dates, but we currently parse them in the parser's
  * locale timezone , which makes specifying local-relative dates easy.
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class RTMLDateFormat implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDateFormat.java,v 1.4 2008-04-07 15:45:06 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDateFormat.java,v 1.5 2008-05-27 14:06:37 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = 1276512555252464615L;
 	/**
 	 * This is the index in a string of the form '2006-02-28T18:00:00+1100' of the first minute
 	 * position in the TimeZone. Used to support xsd:dateTime Schema which should be of the form:
@@ -127,6 +131,10 @@ public class RTMLDateFormat implements Serializable
 }
 //
 // $Log: not supported by cvs2svn $
+// Revision 1.4  2008/04/07 15:45:06  cjm
+// Added formatWithColonTimezone.
+// This formats a Date into an acceptable String for use with the XML Schema xsd:dateTime.
+//
 // Revision 1.3  2007/01/30 18:31:10  cjm
 // gnuify: Added GNU General Public License.
 //

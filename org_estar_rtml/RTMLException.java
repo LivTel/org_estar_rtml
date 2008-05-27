@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLException.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLException.java,v 1.3 2007-01-30 18:31:15 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLException.java,v 1.4 2008-05-27 14:11:45 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -26,14 +26,18 @@ import java.io.*;
 /**
  * This class extends Exception. 
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RTMLException extends Exception
 {
 	/**
 	 * Revision Control System id string, showing the version of the Class
 	 */
-	public final static String RCSID = new String("$Id: RTMLException.java,v 1.3 2007-01-30 18:31:15 cjm Exp $");
+	public final static String RCSID = new String("$Id: RTMLException.java,v 1.4 2008-05-27 14:11:45 cjm Exp $");
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = -8256433613564970665L;
 	/**
 	 * An exception that caused this exception to be generated.
 	 */
@@ -110,6 +114,9 @@ public class RTMLException extends Exception
 
 //
 // $Log: not supported by cvs2svn $
+// Revision 1.3  2007/01/30 18:31:15  cjm
+// gnuify: Added GNU General Public License.
+//
 // Revision 1.2  2005/06/08 11:14:01  cjm
 // Fixed Documentation.
 // Removed spurious errorString.

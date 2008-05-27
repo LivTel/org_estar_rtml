@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLDevice.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDevice.java,v 1.6 2008-05-23 14:19:47 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDevice.java,v 1.7 2008-05-27 14:09:46 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -26,7 +26,7 @@ import java.io.*;
 /**
  * This class is a data container for information contained in the device nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLDevice extends RTMLAttributes implements Serializable
@@ -34,7 +34,11 @@ public class RTMLDevice extends RTMLAttributes implements Serializable
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDevice.java,v 1.6 2008-05-23 14:19:47 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDevice.java,v 1.7 2008-05-27 14:09:46 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = 1527480918462068854L;
 	/**
 	 * The type of device this is. See the dtd: %deviceTypes;.
 	 */
@@ -218,6 +222,9 @@ public class RTMLDevice extends RTMLAttributes implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.6  2008/05/23 14:19:47  cjm
+** Now extends RTMLAttributes.
+**
 ** Revision 1.5  2008/03/27 17:15:02  cjm
 ** Added RTMLGrating sub-element for spectrograph support.
 **

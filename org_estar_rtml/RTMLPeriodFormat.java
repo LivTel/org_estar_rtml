@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLPeriodFormat.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLPeriodFormat.java,v 1.5 2008-05-08 14:03:29 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLPeriodFormat.java,v 1.6 2008-05-27 14:19:36 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -32,14 +32,18 @@ import java.util.*;
  * </code>
  * For the purposes of this implementation, we have assumed 30 days in 1 month, and 365 days in 1 year.
  * @author Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class RTMLPeriodFormat implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLPeriodFormat.java,v 1.5 2008-05-08 14:03:29 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLPeriodFormat.java,v 1.6 2008-05-27 14:19:36 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = 5144074596612293135L;
 	/**
 	 * Number of milliseconds in a second. 
 	 */
@@ -505,6 +509,13 @@ public class RTMLPeriodFormat implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.5  2008/05/08 14:03:29  cjm
+** Added special case to toString for 0 length period, to make it conform to:
+** http://www.w3.org/TR/xmlschema-2/#duration
+** "If the number of years, months, days, hours, minutes, or seconds in any expression equals zero,
+** the number and its corresponding designator ·may· be omitted.
+** However, at least one number and its designator ·must· be present."
+**
 ** Revision 1.4  2007/01/30 18:31:19  cjm
 ** gnuify: Added GNU General Public License.
 **

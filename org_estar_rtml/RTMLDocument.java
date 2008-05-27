@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.15 2008-05-23 14:23:30 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.16 2008-05-27 14:00:06 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -28,14 +28,18 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
 public class RTMLDocument implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.15 2008-05-23 14:23:30 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.16 2008-05-27 14:00:06 cjm Exp $";
+	/**
+	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
+	 */
+	static final long serialVersionUID = -8805723117207611978L;
 	/**
 	 * Constant representing the value of the RTML version attribute specifying RTML version 2.2.
 	 * @see #version
@@ -1424,6 +1428,13 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.15  2008/05/23 14:23:30  cjm
+** New version after RTML 3.1a integration.
+** Now supports version/mode/uid/history.
+** Has various helper methods to determine/set what type/mode document is based on version.
+** Has helper method to determine whether the document is a toop.
+** Has helper methods for adding history.
+**
 ** Revision 1.14  2007/03/27 19:16:58  cjm
 ** Added Scores list handling.
 ** Added scoresList.
