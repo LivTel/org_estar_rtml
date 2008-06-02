@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLParser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.28 2008-05-23 17:05:14 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLParser.java,v 1.29 2008-06-02 11:21:48 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -53,14 +53,14 @@ import org.estar.astrometry.*;
  * @see #init
  * @see #parse
  * @author Chris Mottram
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.29 $
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLParser.java,v 1.28 2008-05-23 17:05:14 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLParser.java,v 1.29 2008-06-02 11:21:48 cjm Exp $";
 	/**
 	 * Constant used to configure schema parsing.
 	 */
@@ -158,6 +158,11 @@ public class RTMLParser
 	{
 		RTMLDocument rtmlDocument = null;
 
+		if(builder == null)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parse:RTMLParser.init not called:builder was null.");
+		}
 		try
 		{
 			document = builder.parse(f);
@@ -185,6 +190,11 @@ public class RTMLParser
 	{
 		RTMLDocument rtmlDocument = null;
 
+		if(builder == null)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parse:RTMLParser.init not called:builder was null.");
+		}
 		try
 		{
 			document = builder.parse(i);
@@ -214,6 +224,11 @@ public class RTMLParser
 		InputSource is = null;
 		StringReader sr = null;
 
+		if(builder == null)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parse:RTMLParser.init not called:builder was null.");
+		}
 		try
 		{
 			sr = new StringReader(s);
@@ -552,6 +567,9 @@ public class RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.28  2008/05/23 17:05:14  cjm
+** New version after RTML 3.1a integration.
+**
 ** Revision 1.27  2008/03/27 17:13:54  cjm
 ** Added parseGratingNode and call in parseDeviceNode to handle spectrographs.
 **
