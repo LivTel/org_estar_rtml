@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.16 2008-05-27 14:00:06 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.17 2008-06-03 15:32:40 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -28,14 +28,14 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.17 $
  */
 public class RTMLDocument implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.16 2008-05-27 14:00:06 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.17 2008-06-03 15:32:40 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -91,6 +91,10 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	 * Project info for this document.
 	 */
 	protected RTMLProject project = null;
+	/**
+	 * Telescope info for this document.
+	 */
+	protected RTMLTelescope telescope = null;
 	/**
 	 * The instrument device this document wants to use.
 	 */
@@ -1041,6 +1045,28 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	}
 
 	/**
+	 * Set the document's telescope.
+	 * @param o The telescope.
+	 * @see #telescope
+	 * @see org.estar.rtml.RTMLTelescope
+	 */
+	public void setTelescope(RTMLTelescope o)
+	{
+		telescope = o;
+	}
+
+	/**
+	 * Get the document's telescope.
+	 * @return The telescope.
+	 * @see #telescope
+	 * @see org.estar.rtml.RTMLTelescope
+	 */
+	public RTMLTelescope getTelescope()
+	{
+		return(telescope);
+	}
+
+	/**
 	 * Set the document's intelligent agent information.
 	 * @param ia The intelligent agent information.
 	 * @see #intelligentAgent
@@ -1377,6 +1403,8 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	 * @see #getScore
 	 * @see #getCompletionTime
 	 * @see #getErrorString
+	 * @see #getProject
+	 * @see #getTelescope
 	 */
 	public String toString(String prefix)
 	{
@@ -1401,6 +1429,8 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 			sb.append( prefix+getContact().toString("\t")+"\n");
 		if(getProject() != null)
 			sb.append( prefix+getProject().toString("\t")+"\n");
+		if(getTelescope() != null)
+			sb.append( prefix+getTelescope().toString("\t")+"\n");
 		if(getIntelligentAgent() != null)
 			sb.append(prefix+getIntelligentAgent().toString("\t")+"\n");
 		if(getDevice() != null)
@@ -1428,6 +1458,9 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.16  2008/05/27 14:00:06  cjm
+** Added serialVersionUID.
+**
 ** Revision 1.15  2008/05/23 14:23:30  cjm
 ** New version after RTML 3.1a integration.
 ** Now supports version/mode/uid/history.
