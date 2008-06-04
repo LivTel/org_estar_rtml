@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.15 2008-05-27 14:27:22 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.16 2008-06-04 14:45:22 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -30,7 +30,7 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLSchedule extends RTMLAttributes implements Serializable
@@ -38,7 +38,7 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.15 2008-05-27 14:27:22 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.16 2008-06-04 14:45:22 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -160,11 +160,20 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 	/**
 	 * Set the schedule priority.
 	 * @param s A string representing an integer, the priority.
+	 * @exception RTMLException Thrown if the string cannot be parsed into a valid integer.
 	 * @see #priority
 	 */
-	public void setPriority(String s) throws NumberFormatException
+	public void setPriority(String s) throws RTMLException
 	{
-		priority = Integer.parseInt(s);
+		try
+		{
+			priority = Integer.parseInt(s);
+		}
+		catch(Exception e)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":setPriority:priority was not parsable:"+s,e);
+		}
 	}
 
 	/**
@@ -246,13 +255,22 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 	/**
 	 * Set the exposure length. What this value actually means is based on the units and type fields.
 	 * @param s The length, either as a length or a signal to noise ratio.
+	 * @exception RTMLException Thrown if the exposure length was not parsable.
 	 * @see #exposureLength
 	 * @see #exposureType
 	 * @see #exposureUnits
 	 */
-	public void setExposureLength(String s) throws NumberFormatException
+	public void setExposureLength(String s) throws RTMLException
 	{
-		exposureLength = Double.parseDouble(s);
+		try
+		{
+			exposureLength = Double.parseDouble(s);
+		}
+		catch(Exception e)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":setExposureLength:exposure length was not parsable:"+s,e);
+		}
 	}
 
 	/**
@@ -389,13 +407,22 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 	 *         The string should represent a number of at least 1.
 	 * @see #exposureCount
 	 * @see #setExposureCount
-	 * @exception NumberFormatException Thrown if the string is not a valid number.
+	 * @exception RTMLException Thrown if the string is not a valid number.
+	 * @exception IllegalArgumentException Thrown if the string is not a valid number.
 	 */
-	public void setExposureCount(String s) throws NumberFormatException,IllegalArgumentException
+	public void setExposureCount(String s) throws RTMLException, IllegalArgumentException
 	{
 		int i;
 
-		i = Integer.parseInt(s);
+		try
+		{
+			i = Integer.parseInt(s);
+		}
+		catch(Exception e)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":setExposureCount:exposure count was not parsable:"+s,e);
+		}
 		setExposureCount(i);
 	}
 
@@ -664,6 +691,9 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.15  2008/05/27 14:27:22  cjm
+** Added serialVersionUID.
+**
 ** Revision 1.14  2008/05/23 17:07:39  cjm
 ** Now extends RTMLAttributes.
 ** Added more priority documentation/constants.
