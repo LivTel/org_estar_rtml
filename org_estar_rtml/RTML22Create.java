@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML22Create.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.41 2008-05-23 14:07:11 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.42 2008-06-05 14:20:39 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -60,14 +60,14 @@ import org.estar.astrometry.*;
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * The resultant XML document is in RTML 2.2.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.41 $
+ * @version $Revision: 1.42 $
  */
 public class RTML22Create
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.41 2008-05-23 14:07:11 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.42 2008-06-05 14:20:39 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -120,7 +120,8 @@ public class RTML22Create
 			createContact(rtmlElement,d.getContact());
 		if(d.getProject() != null)
 			createProject(rtmlElement,d.getProject());
-		createTelescope(rtmlElement);
+		if(d.getTelescope() != null)
+			createTelescope(rtmlElement,d.getTelescope());
 		if(d.getIntelligentAgent() != null)
 			createIntelligentAgent(rtmlElement,d.getIntelligentAgent());
 		if(d.getDevice() != null)
@@ -222,12 +223,105 @@ public class RTML22Create
 		rtmlElement.appendChild(projectElement);
 	}
 
-	private void createTelescope(Element rtmlElement)
+	/**
+	 * Create RTML Telescope node.
+	 * @param rtmlElement The RTML DOM element to add the Telescope tag to.
+	 * @param telescope The Java object containing the telescope data to add.
+	 * @see #createTelescopeLocation
+	 * @see org.estar.rtml.RTMLTelescope
+	 * @see org.estar.rtml.RTMLTelescope#getName
+	 * @see org.estar.rtml.RTMLTelescope#getAperture
+	 * @see org.estar.rtml.RTMLTelescope#getApertureUnits
+	 * @see org.estar.rtml.RTMLTelescope#getFocalRatio
+	 * @see org.estar.rtml.RTMLTelescope#getFocalLength
+	 * @see org.estar.rtml.RTMLTelescope#getFocalLengthUnits
+	 */
+	private void createTelescope(Element rtmlElement,RTMLTelescope telescope)
 	{
-		Element e = null;
+		Element telescopeElement = null;
+		Element subElement = null;
+		DecimalFormat nf = null;
 
-		e = (Element)document.createElement("Telescope");
-		rtmlElement.appendChild(e);
+		nf = new DecimalFormat("#####0.0#");
+		telescopeElement = (Element)document.createElement("Telescope");
+		if(telescope.getName() != null)
+		{
+			subElement = (Element)document.createElement("Name");
+			subElement.appendChild(document.createTextNode(telescope.getName()));
+			telescopeElement.appendChild(subElement);
+		}
+		if((telescope.getAperture() != 0.0)&&(telescope.getApertureUnits() != null))
+		{
+			subElement = (Element)document.createElement("Aperture");
+			subElement.appendChild(document.createTextNode(nf.format(telescope.getAperture())));
+			subElement.setAttribute("units",telescope.getApertureUnits());
+			telescopeElement.appendChild(subElement);
+		}
+		if(telescope.getFocalRatio() != null)
+		{
+			subElement = (Element)document.createElement("FocalRatio");
+			subElement.appendChild(document.createTextNode(telescope.getFocalRatio()));
+			telescopeElement.appendChild(subElement);
+		}
+		if((telescope.getFocalLength() != 0.0)&&(telescope.getFocalLengthUnits() != null))
+		{
+			subElement = (Element)document.createElement("FocalLength");
+			subElement.appendChild(document.createTextNode(nf.format(telescope.getFocalLength())));
+			subElement.setAttribute("units",telescope.getFocalLengthUnits());
+			telescopeElement.appendChild(subElement);
+		}
+		if(telescope.getLocation() != null)
+			createTelescopeLocation(telescopeElement,telescope.getLocation());
+		rtmlElement.appendChild(telescopeElement);
+	}
+
+	/**
+	 * Create RTML Telescope Location node.
+	 * @param rtmlElement The RTML DOM element to add the Telescope Location tag to.
+	 * @param telescopeLocation The Java object containing the telescope location data to add.
+	 * @see org.estar.rtml.RTMLTelescopeLocation
+	 * @see org.estar.rtml.RTMLTelescopeLocation#getName
+	 * @see org.estar.rtml.RTMLTelescopeLocation#getLongitude
+	 * @see org.estar.rtml.RTMLTelescopeLocation#getLatitude
+	 * @see org.estar.rtml.RTMLTelescopeLocation#getAltitude
+	 */
+	private void createTelescopeLocation(Element rtmlElement,RTMLTelescopeLocation telescopeLocation)
+	{
+		Element telescopeLocationElement = null;
+		Element subElement = null;
+		DecimalFormat nf = null;
+
+		nf = new DecimalFormat("#####0.0#");
+		telescopeLocationElement = (Element)document.createElement("Location");
+		if(telescopeLocation.getName() != null)
+		{
+			subElement = (Element)document.createElement("Name");
+			subElement.appendChild(document.createTextNode(telescopeLocation.getName()));
+			telescopeLocationElement.appendChild(subElement);
+		}
+		if(telescopeLocation.getLongitude() != 0.0)
+		{
+			subElement = (Element)document.createElement("Longitude");
+			subElement.setAttribute("format","dddddd.dd E");
+			subElement.appendChild(document.createTextNode(nf.format(telescopeLocation.getLongitude())+
+								       " E"));
+			telescopeLocationElement.appendChild(subElement);
+		}
+		if(telescopeLocation.getLatitude() != 0.0)
+		{
+			subElement = (Element)document.createElement("Latitude");
+			subElement.setAttribute("units","degrees");
+			subElement.appendChild(document.createTextNode(nf.format(telescopeLocation.getLatitude())));
+			telescopeLocationElement.appendChild(subElement);
+		}
+		if(telescopeLocation.getAltitude() != 0.0)
+		{
+			subElement = (Element)document.createElement("Altitude");
+			subElement.setAttribute("units","meters");
+			subElement.appendChild(document.createTextNode(nf.format(telescopeLocation.getAltitude())));
+			telescopeLocationElement.appendChild(subElement);
+		}
+		rtmlElement.appendChild(telescopeLocationElement);
 	}
 
 	/**
@@ -783,6 +877,9 @@ public class RTML22Create
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.41  2008/05/23 14:07:11  cjm
+** New version after RTML 3.1a integration.
+**
 ** Revision 1.40  2008/03/27 17:14:31  cjm
 ** Added createGrating for spectrograph support.
 **
