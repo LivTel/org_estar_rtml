@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML22Parser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.29 2008-05-23 14:08:30 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.30 2008-06-05 14:26:08 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -52,14 +52,14 @@ import org.estar.astrometry.*;
  * Extends RTMLParser to make use of methods common to this and RTML31Parser (parseIntegerNode etc), even though
  * this subclass is created as part of the RTMLParser's parsing.
  * @author Chris Mottram
- * @version $Revision: 1.29 $
+ * @version $Revision: 1.30 $
  */
 public class RTML22Parser extends RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.29 2008-05-23 14:08:30 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.30 2008-06-05 14:26:08 cjm Exp $";
 
 	/**
 	 * Default constructor.
@@ -79,7 +79,11 @@ public class RTML22Parser extends RTMLParser
 	 * @see #parseDeviceNode
 	 * @see #parseObservationNode
 	 * @see #parseScoreNode
+	 * @see #parseScoresNode
 	 * @see #parseCompletionTimeNode
+	 * @see #parseTelescopeNode
+	 * @see #parseContactNode
+	 * @see #parseProjectNode
 	 */
 	protected void parseRTMLNode(Node rtmlNode,RTMLDocument rtmlDocument) throws RTMLException
 	{
@@ -136,6 +140,8 @@ public class RTML22Parser extends RTMLParser
 					parseScoreNode(rtmlDocument,childNode);
 				else if(childNode.getNodeName() == "Scores")
 					parseScoresNode(rtmlDocument,childNode);
+				else if(childNode.getNodeName() == "Telescope")
+					parseTelescopeNode(rtmlDocument,childNode);
 				else if(childNode.getNodeName() == "CompletionTime")
 					parseCompletionTimeNode(rtmlDocument,childNode);
 			}
@@ -160,15 +166,15 @@ public class RTML22Parser extends RTMLParser
 		NodeList childList;
 
 		// check current XML node is correct
-		if( contactNode.getNodeType() != Node.ELEMENT_NODE )
+		if(contactNode.getNodeType() != Node.ELEMENT_NODE)
 		{
-			throw new RTMLException( this.getClass().getName()+":parseContactNode:Illegal Node:"+
-						 contactNode );
+			throw new RTMLException(this.getClass().getName()+":parseContactNode:Illegal Node:"+
+						 contactNode);
 		}
-		if( contactNode.getNodeName() != "Contact" )
+		if(contactNode.getNodeName() != "Contact")
 		{
-			throw new RTMLException( this.getClass().getName()+":parseContactNode:Illegal Node Name:"+
-						 contactNode.getNodeName() );
+			throw new RTMLException(this.getClass().getName()+":parseContactNode:Illegal Node Name:"+
+						 contactNode.getNodeName());
 		}
 
 		// add contact node
@@ -176,34 +182,34 @@ public class RTML22Parser extends RTMLParser
 
 		// go through child nodes
 		childList = contactNode.getChildNodes();
-		for( int i = 0; i < childList.getLength(); i++ )
+		for(int i = 0; i < childList.getLength(); i++)
 		{
-			childNode = childList.item( i );
+			childNode = childList.item(i);
 
-			if( childNode.getNodeType() == Node.ELEMENT_NODE )
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
 			{
-				if( childNode.getNodeName() == "User" )
-					parseUserNode( contact, childNode );
-				else if( childNode.getNodeName() == "Name" )
-					parseNameNode( contact, childNode );
-				else if( childNode.getNodeName() == "Institution" )
-					parseInstitutionNode( contact, childNode );
-				else if( childNode.getNodeName() == "Address" )
-					parseAddressNode( contact, childNode );
-				else if( childNode.getNodeName() == "Telephone" )
-					parseTelephoneNode( contact, childNode );
-				else if( childNode.getNodeName() == "Fax" )
-					parseFaxNode( contact, childNode );
-				else if( childNode.getNodeName() == "Email" )
-					parseEmailNode( contact, childNode );
-				else if( childNode.getNodeName() == "Url" )
-					parseUrlNode( contact, childNode );
+				if(childNode.getNodeName() == "User")
+					parseUserNode(contact, childNode);
+				else if(childNode.getNodeName() == "Name")
+					parseNameNode(contact, childNode);
+				else if(childNode.getNodeName() == "Institution")
+					parseInstitutionNode(contact, childNode);
+				else if(childNode.getNodeName() == "Address")
+					parseAddressNode(contact, childNode);
+				else if(childNode.getNodeName() == "Telephone")
+					parseTelephoneNode(contact, childNode);
+				else if(childNode.getNodeName() == "Fax")
+					parseFaxNode(contact, childNode);
+				else if(childNode.getNodeName() == "Email")
+					parseEmailNode(contact, childNode);
+				else if(childNode.getNodeName() == "Url")
+					parseUrlNode(contact, childNode);
 				else
-					System.err.println( "parseContactNode:ELEMENT:"+childNode );
+					System.err.println("parseContactNode:ELEMENT:"+childNode);
 			}
 		}
 		// Set contact in RTML document.
-		rtmlDocument.setContact( contact );
+		rtmlDocument.setContact(contact);
 	}
 
 	/**
@@ -232,9 +238,9 @@ public class RTML22Parser extends RTMLParser
 		RTMLProject project = new RTMLProject();
 		// go through child nodes
 		childList = projectNode.getChildNodes();
-		for( int i = 0; i < childList.getLength(); i++ )
+		for(int i = 0; i < childList.getLength(); i++)
 		{
-			childNode = childList.item( i );
+			childNode = childList.item(i);
 
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
@@ -249,8 +255,8 @@ public class RTML22Parser extends RTMLParser
 			}
 			if(childNode.getNodeType() == Node.ELEMENT_NODE)
 			{
-				//if( childNode.getNodeName() == "User" )
-				//	parseUserNode( contact, childNode );
+				//if(childNode.getNodeName() == "User")
+				//	parseUserNode(contact, childNode);
 				//else
 					System.err.println("parseProjectNode:ELEMENT:"+childNode);
 			}
@@ -265,39 +271,39 @@ public class RTML22Parser extends RTMLParser
 	 * @param userNode The XML DOM node for the User tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
 	 */
-	private void parseUserNode( RTMLContact contact, Node userNode )
+	private void parseUserNode(RTMLContact contact, Node userNode)
 		throws RTMLException
 	{
 		Node childNode;
 		NodeList childList;
 
 		// check current XML node is correct
-		if( userNode.getNodeType() != Node.ELEMENT_NODE )
+		if(userNode.getNodeType() != Node.ELEMENT_NODE)
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseNameNode:Illegal Node:"+userNode );
+				(this.getClass().getName()+":parseNameNode:Illegal Node:"+userNode);
 		}
-		if( userNode.getNodeName() != "User" )
+		if(userNode.getNodeName() != "User")
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseNameNode:Illegal Node Name:"+
-				  userNode.getNodeName() );
+				(this.getClass().getName()+":parseNameNode:Illegal Node Name:"+
+				  userNode.getNodeName());
 		}
 
 		// go through child nodes
 		childList = userNode.getChildNodes();
-		for( int i = 0; i < childList.getLength(); i++ )
+		for(int i = 0; i < childList.getLength(); i++)
 		{
-			childNode = childList.item( i );
+			childNode = childList.item(i);
 			
-			if( childNode.getNodeType() == Node.TEXT_NODE )
+			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
 				if(childNode.getNodeValue() != null)
 				{
 					// ensure it is not all whitespace
 					if(childNode.getNodeValue().trim().length() > 0)
 					{
-						contact.setUser( childNode.getNodeValue() );
+						contact.setUser(childNode.getNodeValue());
 					}
 				}
 			}
@@ -311,39 +317,39 @@ public class RTML22Parser extends RTMLParser
 	 * @param nameNode The XML DOM node for the Name tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
 	 */
-	private void parseNameNode( RTMLContact contact, Node nameNode )
+	private void parseNameNode(RTMLContact contact, Node nameNode)
 		throws RTMLException
 	{
 		Node childNode;
 		NodeList childList;
 
 		// check current XML node is correct
-		if( nameNode.getNodeType() != Node.ELEMENT_NODE )
+		if(nameNode.getNodeType() != Node.ELEMENT_NODE)
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseNameNode:Illegal Node:"+nameNode );
+				(this.getClass().getName()+":parseNameNode:Illegal Node:"+nameNode);
 		}
-		if( nameNode.getNodeName() != "Name" )
+		if(nameNode.getNodeName() != "Name")
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseNameNode:Illegal Node Name:"+
-				  nameNode.getNodeName() );
+				(this.getClass().getName()+":parseNameNode:Illegal Node Name:"+
+				  nameNode.getNodeName());
 		}
 
 		// go through child nodes
 		childList = nameNode.getChildNodes();
-		for( int i = 0; i < childList.getLength(); i++ )
+		for(int i = 0; i < childList.getLength(); i++)
 		{
-			childNode = childList.item( i );
+			childNode = childList.item(i);
 			
-			if( childNode.getNodeType() == Node.TEXT_NODE )
+			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
 				if(childNode.getNodeValue() != null)
 				{
 					// ensure it is not all whitespace
 					if(childNode.getNodeValue().trim().length() > 0)
 					{
-						contact.setName( childNode.getNodeValue() );
+						contact.setName(childNode.getNodeValue());
 					}
 				}
 			}
@@ -357,39 +363,39 @@ public class RTML22Parser extends RTMLParser
 	 * @param institutionNode The XML DOM node for the Institution tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
 	 */
-	private void parseInstitutionNode( RTMLContact contact, Node institutionNode )
+	private void parseInstitutionNode(RTMLContact contact, Node institutionNode)
 		throws RTMLException
 	{
 		Node childNode;
 		NodeList childList;
 
 		// check current XML node is correct
-		if( institutionNode.getNodeType() != Node.ELEMENT_NODE )
+		if(institutionNode.getNodeType() != Node.ELEMENT_NODE)
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseInstitutionNode:Illegal Node:"+institutionNode );
+				(this.getClass().getName()+":parseInstitutionNode:Illegal Node:"+institutionNode);
 		}
-		if( institutionNode.getNodeName() != "Institution" )
+		if(institutionNode.getNodeName() != "Institution")
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseInstitutionNode:Illegal Node Institution:"+
-				  institutionNode.getNodeName() );
+				(this.getClass().getName()+":parseInstitutionNode:Illegal Node Institution:"+
+				  institutionNode.getNodeName());
 		}
 
 		// go through child nodes
 		childList = institutionNode.getChildNodes();
-		for( int i = 0; i < childList.getLength(); i++ )
+		for(int i = 0; i < childList.getLength(); i++)
 		{
-			childNode = childList.item( i );
+			childNode = childList.item(i);
 			
-			if( childNode.getNodeType() == Node.TEXT_NODE )
+			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
 				if(childNode.getNodeValue() != null)
 				{
 					// ensure it is not all whitespace
 					if(childNode.getNodeValue().trim().length() > 0)
 					{
-						contact.setInstitution( childNode.getNodeValue() );
+						contact.setInstitution(childNode.getNodeValue());
 					}
 				}
 			}
@@ -403,39 +409,39 @@ public class RTML22Parser extends RTMLParser
 	 * @param addressNode The XML DOM node for the Address tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
 	 */
-	private void parseAddressNode( RTMLContact contact, Node addressNode )
+	private void parseAddressNode(RTMLContact contact, Node addressNode)
 		throws RTMLException
 	{
 		Node childNode;
 		NodeList childList;
 
 		// check current XML node is correct
-		if( addressNode.getNodeType() != Node.ELEMENT_NODE )
+		if(addressNode.getNodeType() != Node.ELEMENT_NODE)
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseAddressNode:Illegal Node:"+addressNode );
+				(this.getClass().getName()+":parseAddressNode:Illegal Node:"+addressNode);
 		}
-		if( addressNode.getNodeName() != "Address" )
+		if(addressNode.getNodeName() != "Address")
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseAddressNode:Illegal Node Address:"+
-				  addressNode.getNodeName() );
+				(this.getClass().getName()+":parseAddressNode:Illegal Node Address:"+
+				  addressNode.getNodeName());
 		}
 
 		// go through child nodes
 		childList = addressNode.getChildNodes();
-		for( int i = 0; i < childList.getLength(); i++ )
+		for(int i = 0; i < childList.getLength(); i++)
 		{
-			childNode = childList.item( i );
+			childNode = childList.item(i);
 			
-			if( childNode.getNodeType() == Node.TEXT_NODE )
+			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
 				if(childNode.getNodeValue() != null)
 				{
 					// ensure it is not all whitespace
 					if(childNode.getNodeValue().trim().length() > 0)
 					{
-						contact.setAddress( childNode.getNodeValue() );
+						contact.setAddress(childNode.getNodeValue());
 					}
 				}
 			}
@@ -449,39 +455,39 @@ public class RTML22Parser extends RTMLParser
 	 * @param telephoneNode The XML DOM node for the Telephone tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
 	 */
-	private void parseTelephoneNode( RTMLContact contact, Node telephoneNode )
+	private void parseTelephoneNode(RTMLContact contact, Node telephoneNode)
 		throws RTMLException
 	{
 		Node childNode;
 		NodeList childList;
 
 		// check current XML node is correct
-		if( telephoneNode.getNodeType() != Node.ELEMENT_NODE )
+		if(telephoneNode.getNodeType() != Node.ELEMENT_NODE)
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseTelephoneNode:Illegal Node:"+telephoneNode );
+				(this.getClass().getName()+":parseTelephoneNode:Illegal Node:"+telephoneNode);
 		}
-		if( telephoneNode.getNodeName() != "Telephone" )
+		if(telephoneNode.getNodeName() != "Telephone")
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseTelephoneNode:Illegal Node Telephone:"+
-				  telephoneNode.getNodeName() );
+				(this.getClass().getName()+":parseTelephoneNode:Illegal Node Telephone:"+
+				  telephoneNode.getNodeName());
 		}
 
 		// go through child nodes
 		childList = telephoneNode.getChildNodes();
-		for( int i = 0; i < childList.getLength(); i++ )
+		for(int i = 0; i < childList.getLength(); i++)
 		{
-			childNode = childList.item( i );
+			childNode = childList.item(i);
 			
-			if( childNode.getNodeType() == Node.TEXT_NODE )
+			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
 				if(childNode.getNodeValue() != null)
 				{
 					// ensure it is not all whitespace
 					if(childNode.getNodeValue().trim().length() > 0)
 					{
-						contact.setTelephone( childNode.getNodeValue() );
+						contact.setTelephone(childNode.getNodeValue());
 					}
 				}
 			}
@@ -495,45 +501,44 @@ public class RTML22Parser extends RTMLParser
 	 * @param faxNode The XML DOM node for the Fax tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
 	 */
-	private void parseFaxNode( RTMLContact contact, Node faxNode )
+	private void parseFaxNode(RTMLContact contact, Node faxNode)
 		throws RTMLException
 	{
 		Node childNode;
 		NodeList childList;
 
 		// check current XML node is correct
-		if( faxNode.getNodeType() != Node.ELEMENT_NODE )
+		if(faxNode.getNodeType() != Node.ELEMENT_NODE)
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseFaxNode:Illegal Node:"+faxNode );
+				(this.getClass().getName()+":parseFaxNode:Illegal Node:"+faxNode);
 		}
-		if( faxNode.getNodeName() != "Fax" )
+		if(faxNode.getNodeName() != "Fax")
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseFaxNode:Illegal Node Fax:"+
-				  faxNode.getNodeName() );
+				(this.getClass().getName()+":parseFaxNode:Illegal Node Fax:"+
+				  faxNode.getNodeName());
 		}
 
 		// go through child nodes
 		childList = faxNode.getChildNodes();
-		for( int i = 0; i < childList.getLength(); i++ )
+		for(int i = 0; i < childList.getLength(); i++)
 		{
-			childNode = childList.item( i );
+			childNode = childList.item(i);
 			
-			if( childNode.getNodeType() == Node.TEXT_NODE )
+			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
 				if(childNode.getNodeValue() != null)
 				{
 					// ensure it is not all whitespace
 					if(childNode.getNodeValue().trim().length() > 0)
 					{
-						contact.setFax( childNode.getNodeValue() );
+						contact.setFax(childNode.getNodeValue());
 					}
 				}
 			}
 		}
 	}
-
 
 	/**
 	 * Internal method to parse a Contact.Email node
@@ -541,39 +546,39 @@ public class RTML22Parser extends RTMLParser
 	 * @param emailNode The XML DOM node for the Email tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
 	 */
-	private void parseEmailNode( RTMLContact contact, Node emailNode )
+	private void parseEmailNode(RTMLContact contact, Node emailNode)
 		throws RTMLException
 	{
 		Node childNode;
 		NodeList childList;
 
 		// check current XML node is correct
-		if( emailNode.getNodeType() != Node.ELEMENT_NODE )
+		if(emailNode.getNodeType() != Node.ELEMENT_NODE)
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseEmailNode:Illegal Node:"+emailNode );
+				(this.getClass().getName()+":parseEmailNode:Illegal Node:"+emailNode);
 		}
-		if( emailNode.getNodeName() != "Email" )
+		if(emailNode.getNodeName() != "Email")
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseEmailNode:Illegal Node Email:"+
-				  emailNode.getNodeName() );
+				(this.getClass().getName()+":parseEmailNode:Illegal Node Email:"+
+				  emailNode.getNodeName());
 		}
 
 		// go through child nodes
 		childList = emailNode.getChildNodes();
-		for( int i = 0; i < childList.getLength(); i++ )
+		for(int i = 0; i < childList.getLength(); i++)
 		{
-			childNode = childList.item( i );
+			childNode = childList.item(i);
 			
-			if( childNode.getNodeType() == Node.TEXT_NODE )
+			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
 				if(childNode.getNodeValue() != null)
 				{
 					// ensure it is not all whitespace
 					if(childNode.getNodeValue().trim().length() > 0)
 					{
-						contact.setEmail( childNode.getNodeValue() );
+						contact.setEmail(childNode.getNodeValue());
 					}
 				}
 			}
@@ -587,32 +592,32 @@ public class RTML22Parser extends RTMLParser
 	 * @param urlNode The XML DOM node for the Url tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
 	 */
-	private void parseUrlNode( RTMLContact contact, Node urlNode )
+	private void parseUrlNode(RTMLContact contact, Node urlNode)
 		throws RTMLException
 	{
 		Node childNode;
 		NodeList childList;
 
 		// check current XML node is correct
-		if( urlNode.getNodeType() != Node.ELEMENT_NODE )
+		if(urlNode.getNodeType() != Node.ELEMENT_NODE)
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseUrlNode:Illegal Node:"+urlNode );
+				(this.getClass().getName()+":parseUrlNode:Illegal Node:"+urlNode);
 		}
-		if( urlNode.getNodeName() != "Url" )
+		if(urlNode.getNodeName() != "Url")
 		{
 			throw new RTMLException
-				( this.getClass().getName()+":parseUrlNode:Illegal Node Url:"+
-				  urlNode.getNodeName() );
+				(this.getClass().getName()+":parseUrlNode:Illegal Node Url:"+
+				  urlNode.getNodeName());
 		}
 
 		// go through child nodes
 		childList = urlNode.getChildNodes();
-		for( int i = 0; i < childList.getLength(); i++ )
+		for(int i = 0; i < childList.getLength(); i++)
 		{
-			childNode = childList.item( i );
+			childNode = childList.item(i);
 			
-			if( childNode.getNodeType() == Node.TEXT_NODE )
+			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
 				if(childNode.getNodeValue() != null)
 				{
@@ -624,21 +629,268 @@ public class RTML22Parser extends RTMLParser
 
 						try
 						{
-							url = new URL( urlString );
+							url = new URL(urlString);
 						}
-						catch( MalformedURLException e )
+						catch(MalformedURLException e)
 						{
 							throw new RTMLException
-							( this.getClass().getName()+":parseUrlNode:Illegal URL ["+
-							  urlString+"]", e );
+							(this.getClass().getName()+":parseUrlNode:Illegal URL ["+
+							  urlString+"]", e);
 						}
-						contact.setUrl( url );
+						contact.setUrl(url);
 					}
 				}
 			}
 		}
 	}
 
+	/**
+	 * Internal method to parse an Telescope node.
+	 * @param rtmlDocument The document to add the Telescope to.
+	 * @param telescopeNode The XML DOM node for the Telescope tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node.
+	 * @see #parseStringNode
+	 * @see #parseApertureNode
+	 * @see #parseFocalLengthNode
+	 * @see #parseStringNode
+	 * @see #parseTelescopeLocationNode
+	 * @see org.estar.rtml.RTMLTelescope
+	 * @see org.estar.rtml.RTMLTelescope#setName
+	 * @see org.estar.rtml.RTMLTelescope#setFocalRatio
+	 * @see org.estar.rtml.RTMLDocument#setTelescope
+	 */
+	private void parseTelescopeNode(RTMLDocument rtmlDocument,Node telescopeNode) throws RTMLException
+	{
+		Node childNode;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(telescopeNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseTelescopeNode:Illegal Node:"+
+						telescopeNode);
+		}
+		if(telescopeNode.getNodeName() != "Telescope")
+		{
+			throw new RTMLException(this.getClass().getName()+":parseTelescopeNode:Illegal Node Name:"+
+						 telescopeNode.getNodeName());
+		}
+		// add telescope node
+		RTMLTelescope telescope = new RTMLTelescope();
+		// go through child nodes
+		childList = telescopeNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "Name")
+					telescope.setName(parseStringNode("Name",childNode));
+				else if(childNode.getNodeName() == "Aperture")
+					parseApertureNode(telescope,childNode);
+				else if(childNode.getNodeName() == "FocalLength")
+					parseFocalLengthNode(telescope,childNode);
+				else if(childNode.getNodeName() == "FocalRatio")
+					telescope.setFocalRatio(parseStringNode("FocalRatio",childNode));
+				else if(childNode.getNodeName() == "Location")
+					parseTelescopeLocationNode(telescope,childNode);
+				else
+					System.err.println("parseTelescopeNode:ELEMENT:"+childNode);
+			}
+		}
+		// Set telescope in RTML document.
+		rtmlDocument.setTelescope(telescope);
+	}
+
+	/**
+	 * Internal method to parse an Aperture node.
+	 * @param telescope The instance of Telescope to set the aperture data for.
+	 * @param apertureNode The XML DOM node for the Aperture tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @exception NumberFormatException Thrown if parsing the aperture value fails.
+	 * @see org.estar.rtml.RTMLTelescope#setApertureUnits
+	 * @see org.estar.rtml.RTMLTelescope#setAperture(java.lang.String)
+	 */
+	private void parseApertureNode(RTMLTelescope telescope, Node apertureNode)
+		throws RTMLException, NumberFormatException
+	{
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(apertureNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException
+				(this.getClass().getName()+":parseApertureNode:Illegal Node:"+apertureNode);
+		}
+		if(apertureNode.getNodeName() != "Aperture")
+		{
+			throw new RTMLException
+				(this.getClass().getName()+":parseApertureNode:Illegal Node Aperture:"+
+				  apertureNode.getNodeName());
+		}
+		// go through attribute list
+		attributeList = apertureNode.getAttributes();
+		// units
+		attributeNode = attributeList.getNamedItem("units");
+		if(attributeNode != null)
+			telescope.setApertureUnits(attributeNode.getNodeValue());
+		else
+			telescope.setApertureUnits(null);
+		// go through child nodes
+		childList = apertureNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+			
+			if(childNode.getNodeType() == Node.TEXT_NODE)
+			{
+				if(childNode.getNodeValue() != null)
+				{
+					// ensure it is not all whitespace
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						telescope.setAperture(childNode.getNodeValue());
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Internal method to parse an FocalLength node.
+	 * @param telescope The instance of Telescope to set the focal length data for.
+	 * @param focalLengthNode The XML DOM node for the FocalLength tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @exception NumberFormatException Thrown if parsing the focal length value fails.
+	 * @see org.estar.rtml.RTMLTelescope#setFocalLengthUnits
+	 * @see org.estar.rtml.RTMLTelescope#setFocalLength(java.lang.String)
+	 */
+	private void parseFocalLengthNode(RTMLTelescope telescope, Node focalLengthNode)
+		throws RTMLException, NumberFormatException
+	{
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(focalLengthNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException
+				(this.getClass().getName()+":parseFocalLengthNode:Illegal Node:"+focalLengthNode);
+		}
+		if(focalLengthNode.getNodeName() != "FocalLength")
+		{
+			throw new RTMLException
+				(this.getClass().getName()+":parseFocalLengthNode:Illegal Node FocalLength:"+
+				  focalLengthNode.getNodeName());
+		}
+		// go through attribute list
+		attributeList = focalLengthNode.getAttributes();
+		// units
+		attributeNode = attributeList.getNamedItem("units");
+		if(attributeNode != null)
+			telescope.setFocalLengthUnits(attributeNode.getNodeValue());
+		else
+			telescope.setFocalLengthUnits(null);
+		// go through child nodes
+		childList = focalLengthNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+			
+			if(childNode.getNodeType() == Node.TEXT_NODE)
+			{
+				if(childNode.getNodeValue() != null)
+				{
+					// ensure it is not all whitespace
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						telescope.setFocalLength(childNode.getNodeValue());
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Internal method to parse an Telescope Location node.
+	 * @param telescope The telescope to add the Location data to.
+	 * @param locationNode The XML DOM node for the Location tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node.
+	 * @see #parseStringNode
+	 * @see org.estar.rtml.RTMLTelescopeLocation
+	 * @see org.estar.rtml.RTMLTelescopeLocation#setName
+	 * @see org.estar.rtml.RTMLTelescopeLocation#setLongitude
+	 * @see org.estar.rtml.RTMLTelescopeLocation#setLatitude
+	 * @see org.estar.rtml.RTMLTelescopeLocation#setAltitude
+	 * @see org.estar.rtml.RTMLTelescope#setLocation
+	 */
+	private void parseTelescopeLocationNode(RTMLTelescope telescope,Node locationNode) throws RTMLException
+	{
+		Node childNode;
+		NodeList childList;
+		String s = null;
+
+		// check current XML node is correct
+		if(locationNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseTelescopeLocationNode:Illegal Node:"+
+						locationNode);
+		}
+		if(locationNode.getNodeName() != "Location")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseTelescopeLocationNode:Illegal Node Name:"+
+						locationNode.getNodeName());
+		}
+		// add location data to telescope
+		RTMLTelescopeLocation location = new RTMLTelescopeLocation();
+		// go through child nodes
+		childList = locationNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "Name")
+					location.setName(parseStringNode("Name",childNode));
+				else if(childNode.getNodeName() == "Longitude")
+				{
+					// assume value is a double in degrees, east of Greenwich
+					// In the format "d.ddd E"
+					// we could check format/units attribute here
+					// This will work with default created document with this library
+					s = parseStringNode("Longitude",childNode);
+					// if string ends with " E" strip this to get parsable double
+					if(s.endsWith(" E"))
+						s = s.substring(0,s.length()-2);
+					location.setLongitude(s);
+				}
+				else if(childNode.getNodeName() == "Latitude")
+				{
+					// assume value is a double in degrees
+					// we could check format/units attribute here
+					// This will work with default created document with this library
+					location.setLatitude(parseStringNode("Latitude",childNode));
+				}
+				else if(childNode.getNodeName() == "Altitude")
+				{
+					// assume value is a double in meters
+					// we could check units attribute here
+					// This will work with default created document with this library
+					location.setAltitude(parseStringNode("Altitude",childNode));
+				}
+				else
+					System.err.println("parseTelescopeLocationNode:ELEMENT:"+childNode);
+			}
+		}
+		// Set location in telescope.
+		telescope.setLocation(location);
+	}
 
 	/**
 	 * Internal method to parse an IntelligentAgent node.
@@ -2144,6 +2396,10 @@ public class RTML22Parser extends RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.29  2008/05/23 14:08:30  cjm
+** New version after RTML 3.1a integration.
+** Removed common methods and put into RTMLParser.
+**
 ** Revision 1.28  2008/05/13 10:30:48  cjm
 ** Initial version of RTML22Parser copied from RTMLParser, based on version 1.27.
 **

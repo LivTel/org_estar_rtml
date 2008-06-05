@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML31Parser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Parser.java,v 1.1 2008-05-23 14:09:04 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Parser.java,v 1.2 2008-06-05 14:25:45 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -52,14 +52,14 @@ import org.estar.astrometry.*;
  * Extends RTMLParser to make use of methods common to this and RTML22Parser (parseIntegerNode etc), even though
  * this subclass is created as part of the RTMLParser's parsing.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class RTML31Parser extends RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Parser.java,v 1.1 2008-05-23 14:09:04 cjm Exp $";
+	public final static String RCSID = "$Id: RTML31Parser.java,v 1.2 2008-06-05 14:25:45 cjm Exp $";
 
 	/**
 	 * Default constructor.
@@ -83,7 +83,9 @@ public class RTML31Parser extends RTMLParser
 	 * @see #parseDeviceNode
 	 * @see #parseScheduleNode
 	 * @see #parseScoringNode
-	 * @see #parseCompletionTimeNode
+	 * @see #parseProjectNode
+	 * @see #parseHistoryNode
+	 * @see #parseTelescopeNode
 	 */
 	protected void parseRTMLNode(Node rtmlNode,RTMLDocument rtmlDocument) throws RTMLException, 
 											   ParseException
@@ -156,6 +158,8 @@ public class RTML31Parser extends RTMLParser
 					parseScheduleNode(rtmlDocument,childNode);
 				else if(childNode.getNodeName() == "Scoring")
 					parseScoringNode(rtmlDocument,childNode);
+				else if(childNode.getNodeName() == "Telescope")
+					parseTelescopeNode(rtmlDocument,childNode);
 				else
 					System.err.println("parseRTMLNode:ELEMENT:"+childNode);
 			}
@@ -545,6 +549,257 @@ public class RTML31Parser extends RTMLParser
 		}
 		// Set project in RTML document.
 		rtmlDocument.setProject(project);
+	}
+
+	/**
+	 * Internal method to parse a Telescope node.
+	 * @param rtmlDocument The document to add the Telescope to.
+	 * @param telescopeNode The XML DOM node for the Telescope tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node.
+	 * @see #parseRTMLAttributes
+	 * @see #parseApertureNode
+	 * @see #parseStringNode
+	 * @see #parseTelescopeLocationNode
+	 * @see org.estar.rtml.RTMLTelescope
+	 * @see org.estar.rtml.RTMLTelescope#setName
+	 * @see org.estar.rtml.RTMLTelescope#setFocalRatio
+	 * @see org.estar.rtml.RTMLDocument#setTelescope
+	 */
+	private void parseTelescopeNode(RTMLDocument rtmlDocument,Node telescopeNode) throws RTMLException
+	{
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(telescopeNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseTelescopeNode:Illegal Node:"+
+						telescopeNode);
+		}
+		if(telescopeNode.getNodeName() != "Telescope")
+		{
+			throw new RTMLException(this.getClass().getName()+":parseTelescopeNode:Illegal Node Name:"+
+						telescopeNode.getNodeName());
+		}
+		// add project node
+		RTMLTelescope telescope = new RTMLTelescope();
+		// go through attribute list
+		attributeList = telescopeNode.getAttributes();
+		// get standard RTML attributes id,ref,uref
+		parseRTMLAttributes(telescope,attributeList);
+		// name
+		attributeNode = attributeList.getNamedItem("name");
+		if(attributeNode != null)
+			telescope.setName(attributeNode.getNodeValue());
+		else
+			telescope.setName(null);
+		// go through child nodes
+		childList = telescopeNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "Aperture")
+					parseApertureNode(telescope,childNode);
+				else if(childNode.getNodeName() == "FocalLength")
+					parseFocalLengthNode(telescope,childNode);
+				else if(childNode.getNodeName() == "FocalRatio")
+					telescope.setFocalRatio(parseStringNode("FocalRatio",childNode));
+				else if(childNode.getNodeName() == "Location")
+					parseTelescopeLocationNode(telescope,childNode);
+				else
+					System.err.println("parseTelescopeNode:ELEMENT:"+childNode);
+			}
+		}
+		// Set telescope in RTML document.
+		rtmlDocument.setTelescope(telescope);
+	}
+
+	/**
+	 * Internal method to parse an Aperture node.
+	 * @param telescope The instance of Telescope to set the aperture data for.
+	 * @param apertureNode The XML DOM node for the Aperture tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @exception NumberFormatException Thrown if parsing the aperture value fails.
+	 * @see org.estar.rtml.RTMLTelescope#setApertureUnits
+	 * @see org.estar.rtml.RTMLTelescope#setApertureType
+	 * @see org.estar.rtml.RTMLTelescope#setAperture(java.lang.String)
+	 */
+	private void parseApertureNode(RTMLTelescope telescope, Node apertureNode)
+		throws RTMLException, NumberFormatException
+	{
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(apertureNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException
+				(this.getClass().getName()+":parseApertureNode:Illegal Node:"+apertureNode);
+		}
+		if(apertureNode.getNodeName() != "Aperture")
+		{
+			throw new RTMLException
+				(this.getClass().getName()+":parseApertureNode:Illegal Node Aperture:"+
+				  apertureNode.getNodeName());
+		}
+		// go through attribute list
+		attributeList = apertureNode.getAttributes();
+		// units
+		attributeNode = attributeList.getNamedItem("units");
+		if(attributeNode != null)
+			telescope.setApertureUnits(attributeNode.getNodeValue());
+		else
+			telescope.setApertureUnits(null);
+		// type
+		attributeNode = attributeList.getNamedItem("type");
+		if(attributeNode != null)
+			telescope.setApertureType(attributeNode.getNodeValue());
+		else
+			telescope.setApertureType("geometric"); // default is geometric
+		// go through child nodes
+		childList = apertureNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+			
+			if(childNode.getNodeType() == Node.TEXT_NODE)
+			{
+				if(childNode.getNodeValue() != null)
+				{
+					// ensure it is not all whitespace
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						telescope.setAperture(childNode.getNodeValue());
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Internal method to parse an FocalLength node.
+	 * @param telescope The instance of Telescope to set the focal length data for.
+	 * @param focalLengthNode The XML DOM node for the FocalLength tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @exception NumberFormatException Thrown if parsing the focal length value fails.
+	 * @see org.estar.rtml.RTMLTelescope#setFocalLengthUnits
+	 * @see org.estar.rtml.RTMLTelescope#setFocalLength(java.lang.String)
+	 */
+	private void parseFocalLengthNode(RTMLTelescope telescope, Node focalLengthNode)
+		throws RTMLException, NumberFormatException
+	{
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(focalLengthNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException
+				(this.getClass().getName()+":parseFocalLengthNode:Illegal Node:"+focalLengthNode);
+		}
+		if(focalLengthNode.getNodeName() != "FocalLength")
+		{
+			throw new RTMLException
+				(this.getClass().getName()+":parseFocalLengthNode:Illegal Node FocalLength:"+
+				  focalLengthNode.getNodeName());
+		}
+		// go through attribute list
+		attributeList = focalLengthNode.getAttributes();
+		// units
+		attributeNode = attributeList.getNamedItem("units");
+		if(attributeNode != null)
+			telescope.setFocalLengthUnits(attributeNode.getNodeValue());
+		else
+			telescope.setFocalLengthUnits(null);
+		// go through child nodes
+		childList = focalLengthNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+			
+			if(childNode.getNodeType() == Node.TEXT_NODE)
+			{
+				if(childNode.getNodeValue() != null)
+				{
+					// ensure it is not all whitespace
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						telescope.setFocalLength(childNode.getNodeValue());
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Internal method to parse an Telescope Location node.
+	 * @param telescope The telescope to add the Location data to.
+	 * @param locationNode The XML DOM node for the Location tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node.
+	 * @see #parseStringNode
+	 * @see org.estar.rtml.RTMLTelescopeLocation
+	 * @see org.estar.rtml.RTMLTelescopeLocation#setName
+	 * @see org.estar.rtml.RTMLTelescopeLocation#setLongitude
+	 * @see org.estar.rtml.RTMLTelescopeLocation#setLatitude
+	 * @see org.estar.rtml.RTMLTelescopeLocation#setAltitude
+	 * @see org.estar.rtml.RTMLTelescope#setLocation
+	 */
+	private void parseTelescopeLocationNode(RTMLTelescope telescope,Node locationNode) throws RTMLException
+	{
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(locationNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseTelescopeLocationNode:Illegal Node:"+
+						locationNode);
+		}
+		if(locationNode.getNodeName() != "Location")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseTelescopeLocationNode:Illegal Node Name:"+
+						locationNode.getNodeName());
+		}
+		// add location data to telescope
+		RTMLTelescopeLocation location = new RTMLTelescopeLocation();
+		// go through attribute list
+		attributeList = locationNode.getAttributes();
+		// get standard RTML attributes id,ref,uref
+		parseRTMLAttributes(location,attributeList);
+		// name
+		attributeNode = attributeList.getNamedItem("name");
+		if(attributeNode != null)
+			location.setName(attributeNode.getNodeValue());
+		else
+			location.setName(null);
+		// go through child nodes
+		childList = locationNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "EastLongitude")
+					location.setLongitude(parseStringNode("EastLongitude",childNode));
+				else if(childNode.getNodeName() == "Latitude")
+					location.setLatitude(parseStringNode("Latitude",childNode));
+				else if(childNode.getNodeName() == "Height")
+					location.setAltitude(parseStringNode("Height",childNode));
+				else
+					System.err.println("parseTelescopeLocationNode:ELEMENT:"+childNode);
+			}
+		}
+		// Set location in telescope.
+		telescope.setLocation(location);
 	}
 
 	/**
@@ -2111,49 +2366,6 @@ public class RTML31Parser extends RTMLParser
 	}
 
 	/**
-	 * Internal method to parse an Completion Time node.
-	 * @param rtmlDocument The document to set the completion time in.
-	 * @param completionTimeNode The XML DOM node for the CompletionTime tag node.
-	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
-	 */
-	private void parseCompletionTimeNode(RTMLDocument rtmlDocument,Node completionTimeNode) throws RTMLException
-	{
-		Node childNode;
-		NodeList childList;
-		String s;
-
-		// check current XML node is correct
-		if(completionTimeNode.getNodeType() != Node.ELEMENT_NODE)
-		{
-			throw new RTMLException(this.getClass().getName()+":parseCompletionTimeNode:Illegal Node:"+
-						completionTimeNode);
-		}
-		if(completionTimeNode.getNodeName() != "CompletionTime")
-		{
-			throw new RTMLException(this.getClass().getName()+
-						":parseCompletionTimeNode:Illegal Node Name:"+
-						completionTimeNode.getNodeName());
-		}
-		// go through child nodes
-		childList = completionTimeNode.getChildNodes();
-		for(int i = 0; i < childList.getLength(); i++)
-		{
-			childNode = childList.item(i);
-			
-			if(childNode.getNodeType() == Node.TEXT_NODE)
-			{
-				s = childNode.getNodeValue();
-				if(s.equals("never"))
-					rtmlDocument.setCompletionTime((Date)null);
-				else
-					rtmlDocument.setCompletionTime(s);
-			}
-			else
-				System.err.println("parseCompletionTimeNode:"+childNode);
-		}
-	}
-
-	/**
 	 * Parse the id, ref, and uref RTMLAttributes out of the specified node.
 	 * @param attributes An instance of RTMLAttributes (or subclass thereof) to store the parsed attributes.
 	 * @param attributeList The XML attribute list to query.
@@ -2200,4 +2412,7 @@ public class RTML31Parser extends RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2008/05/23 14:09:04  cjm
+** Initial revision
+**
 */
