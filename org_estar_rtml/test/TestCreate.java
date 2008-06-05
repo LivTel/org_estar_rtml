@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.20 2008-05-23 17:11:17 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.21 2008-06-05 14:18:52 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -37,14 +37,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.20 $
+ * @version $Revision: 1.21 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.20 2008-05-23 17:11:17 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.21 2008-06-05 14:18:52 cjm Exp $";
 	/**
 	 * Create to use for creating the RTML XML from the document object model tree.
 	 */
@@ -61,6 +61,10 @@ public class TestCreate
 	 * RTML project data.
 	 */
 	protected RTMLProject project = null;
+	/**
+	 * RTML telescope data.
+	 */
+	protected RTMLTelescope telescope = null;
 	/**
 	 * RTML intelligent agent data.
 	 */
@@ -143,6 +147,14 @@ public class TestCreate
 	 * @exception RTMLException Thrown if an error occurs during parsing command line arguments.
 	 * @exception Exception Thrown if an error occurs.
 	 * @see #doctypeSystemID
+	 * @see #document
+	 * @see #detector
+	 * @see #project
+	 * @see #contact
+	 * @see #telescope
+	 * @see #device
+	 * @see #target
+	 * @see #observation
 	 */
 	public void parseArguments(String args[]) throws RTMLException,Exception
 	{
@@ -1110,6 +1122,124 @@ public class TestCreate
 					System.exit(2);
 				}
 			}
+			else if(args[i].equals("-telescope"))
+			{
+				if((i+1) < args.length)
+				{
+					telescope = new RTMLTelescope();
+					document.setTelescope(telescope);
+					telescope.setName(args[i+1]);
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Telescope needs a name.");
+					System.exit(3);
+				}
+			}
+			else if(args[i].equals("-telescope_aperture"))
+			{
+				if((i+2) < args.length)
+				{
+					if(telescope != null)
+					{
+						telescope.setAperture(args[i+1]);
+						telescope.setApertureUnits(args[i+2]);
+						i += 2;
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+			       			   ":parseArguments:Telescope Aperture:telescope was null.");
+						System.exit(4);
+					}
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+						    ":parseArguments:telescope_aperture needs <aperture> <units>.");
+					System.exit(2);
+				}
+			}
+			else if(args[i].equals("-telescope_focal_length"))
+			{
+				if((i+2) < args.length)
+				{
+					if(telescope != null)
+					{
+						telescope.setFocalLength(args[i+1]);
+						telescope.setFocalLengthUnits(args[i+2]);
+						i += 2;
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+			       			   ":parseArguments:Telescope FocalLength:telescope was null.");
+						System.exit(4);
+					}
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+						    ":parseArguments:telescope_focal_length needs <focal length> <units>.");
+					System.exit(2);
+				}
+			}
+			else if(args[i].equals("-telescope_focal_ratio"))
+			{
+				if((i+1) < args.length)
+				{
+					if(telescope != null)
+					{
+						telescope.setFocalRatio(args[i+1]);
+						i += 1;
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+			       			   ":parseArguments:Telescope Focal Ratio:telescope was null.");
+						System.exit(4);
+					}
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+						    ":parseArguments:telescope_focal_ratio needs <f/n>.");
+					System.exit(2);
+				}
+			}
+			else if(args[i].equals("-telescope_location"))
+			{
+				if((i+5) < args.length)
+				{
+					if(telescope != null)
+					{
+						RTMLTelescopeLocation location = null;
+
+						location = new RTMLTelescopeLocation();
+						location.setName(args[i+1]);
+						location.setLongitude(args[i+2]);
+						location.setLatitude(args[i+3]);
+						location.setAltitude(args[i+4]);
+						//location.setTimeZone(args[i+5]);
+						telescope.setLocation(location);
+						i += 5;
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+			       			   ":parseArguments:Telescope Location:telescope was null.");
+						System.exit(4);
+					}
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+						    ":parseArguments:telescope_location <name> <longitude> <latitude> <altitude> <time zone>.");
+					System.exit(2);
+				}
+			}
 			else if(args[i].equals("-toop"))
 			{
 				if(target != null)
@@ -1196,6 +1326,8 @@ public class TestCreate
 		System.err.println("\t[-uid <string>][-iahost <hostname>][-iaid <id>][-iaport <number>][-iauri <uri>][-help]");
 		System.err.println("\t[-history <agent name> <agent uri> <description>]");
 		System.err.println("\t[-project <proposal id>]");
+		System.err.println("\t[-telescope <name> [-telescope_aperture <aperture> <m|cm|inch|ft>][-telescope_focal_ratio <f/<n>>][-telescope_focal_length <focal length> <m|cm|inch|ft>]]");
+		System.err.println("\t[-telescope_location  <name> <long> <lat> <altitude> <timezone>]");
 		System.err.println("\t[-contact [-contact_address <address>][-contact_email <email>]");
 		System.err.println("\t\t[-contact_fax <fax>][-contact_institution <institute>][-contact_name <name>]");
 		System.err.println("\t\t[-contact_telephone <telno>][-contact_url <URL>][-contact_user <user>]]");
@@ -1245,6 +1377,10 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.20  2008/05/23 17:11:17  cjm
+** Modified to support new RTML3.1a support.
+** History support added.
+**
 ** Revision 1.19  2008/03/27 17:16:28  cjm
 ** Added -grating_wavelength to specify a wavelength for spectrograph support.
 ** Device filter elements are not mandatory anymore: removed 4th arg from -device and added optional
