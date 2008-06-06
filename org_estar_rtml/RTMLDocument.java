@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.17 2008-06-03 15:32:40 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.18 2008-06-06 12:00:31 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -28,14 +28,14 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 public class RTMLDocument implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.17 2008-06-03 15:32:40 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.18 2008-06-06 12:00:31 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -864,6 +864,63 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	}
 
 	/**
+	 * Method to set that this documents represents a target of opportunity request (TOOP) which
+	 * must be serviced immediately.
+	 * @exception NullPointerException Thrown if the version has not been set, or a document's observation #
+	 *           target/schedule are null.
+	 * @exception IllegalArgumentException Thrown if the version is not supported.
+	 * @see #version
+	 * @see #getObservationListCount
+	 * @see #getObservation
+	 * @see org.estar.rtml.RTMLObservation#getTarget
+	 * @see org.estar.rtml.RTMLObservation#getSchedule
+	 * @see org.estar.rtml.RTMTarget#setTypeTOOP
+	 * @see org.estar.rtml.RTMLSchedule#setPriority
+	 * @see org.estar.rtml.RTMLSchedule#SCHEDULE_PRIORITY_TOOP
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public void setTOOP() throws NullPointerException, IllegalArgumentException
+	{
+		RTMLObservation observation = null;
+		RTMLSchedule schedule = null;
+		RTMLTarget target = null;
+		boolean isToop = false;
+
+		if(version == null)
+			throw new NullPointerException(this.getClass().getName()+":setTOOP:version was null.");
+		for(int i = 0; i < getObservationListCount(); i++)
+		{
+			observation = getObservation(i);
+			target = observation.getTarget();
+			schedule = observation.getSchedule();
+			if(target == null)
+			{
+				throw new NullPointerException(this.getClass().getName()+":setTOOP:observation "+i+
+							       " has null target.");
+			}
+			if(schedule == null)
+			{
+				throw new NullPointerException(this.getClass().getName()+":setTOOP:observation "+i+
+							       " has null schedule.");
+			}
+			if(version.equals(RTML_VERSION_22)) // target type == toop
+			{
+				target.setTypeTOOP();
+			}
+			else if(version.equals(RTML_VERSION_31))// schedule priority == 0
+			{
+				schedule.setPriority(RTMLSchedule.SCHEDULE_PRIORITY_TOOP);
+			}
+			else
+			{
+				throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setTOOP:Unsupported version:"+version);
+			}
+		}// end for on observations
+	}
+
+	/**
 	 * Set the document's history.
 	 * @param h The history.
 	 * @see #history
@@ -1458,6 +1515,9 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.17  2008/06/03 15:32:40  cjm
+** Added RTMLTelescope sub-element.
+**
 ** Revision 1.16  2008/05/27 14:00:06  cjm
 ** Added serialVersionUID.
 **
