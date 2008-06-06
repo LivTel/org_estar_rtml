@@ -13,7 +13,8 @@ DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 SRCS = RTMLException.java RTMLErrorHandler.java RTMLDateFormat.java RTMLPeriodFormat.java RTMLAttributes.java \
 	RTMLIntelligentAgent.java RTMLTarget.java \
 	RTMLSeeingConstraint.java RTMLSeriesConstraint.java RTMLMoonConstraint.java RTMLSkyConstraint.java \
-	RTMLSchedule.java RTMLGrating.java RTMLDevice.java RTMLDetector.java RTMLObservation.java RTMLTelescope.java \
+	RTMLSchedule.java RTMLGrating.java RTMLDevice.java RTMLDetector.java RTMLObservation.java \
+	RTMLTelescope.java RTMLTelescopeLocation.java \
 	RTMLDocument.java RTMLParser.java RTMLCreate.java RTMLContact.java RTMLProject.java RTMLScore.java \
 	RTML22Parser.java RTML31Parser.java RTMLHistory.java RTMLHistoryEntry.java RTML22Create.java RTML31Create.java 
 OBJS = $(SRCS:%.java=$(LIBDIR)/$(PACKAGEDIR)/%.class)
