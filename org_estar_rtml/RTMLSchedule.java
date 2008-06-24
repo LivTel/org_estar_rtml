@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.17 2008-06-24 16:51:48 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.18 2008-06-24 16:53:26 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -30,7 +30,7 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLSchedule extends RTMLAttributes implements Serializable
@@ -38,7 +38,7 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.17 2008-06-24 16:51:48 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.18 2008-06-24 16:53:26 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -234,7 +234,8 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 
 	/**
 	 * Set the exposure units.
-	 * @param s The units.
+	 * @param s The units. Should be one of the following:
+	 *         ms|msec|msecs|millisecond|milliseconds|s|sec|secs|second|seconds|min|mins|minutes|hr|hrs|hour|hours.
 	 * @see #exposureUnits
 	 */
 	public void setExposureUnits(String s)
@@ -693,6 +694,9 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.17  2008/06/24 16:51:48  cjm
+** Added exposure units documentation.
+**
 ** Revision 1.16  2008/06/04 14:45:22  cjm
 ** Added some try/catch blocks around integer/double parsing, so the RTML parser generates a more meaningful error
 ** message when parsing a document with a null number.
