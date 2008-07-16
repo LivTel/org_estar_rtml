@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.18 2008-06-06 12:00:31 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.19 2008-07-16 13:32:38 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -28,14 +28,14 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.19 $
  */
 public class RTMLDocument implements Serializable, RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.18 2008-06-06 12:00:31 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.19 2008-07-16 13:32:38 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -1400,19 +1400,38 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	}
 
 	/**
-	 * Set the error string. The error String is the TEXT node in the RTML element, if 
-	 * the document has type "reject","fail" or "abort".
+	 * Set the error string. In RTML2.2, the error String is the TEXT node in the RTML element, if 
+	 * the document has type "reject","fail" or "abort". In RTML 3.1a, we call addHistoryError with the agent 
+	 *Id and URI set to unknown.
 	 * @param s The error string.
-	 * @exception RTMLException Thrown if the document type was not "reject","fail" or "abort".
+	 * @exception RTMLException Thrown if the document type was not "reject","fail" or "abort" in RTML 2.2.
+	 *            Thrown if the version is not supported.
+	 * @see #version
+	 * @see #type
+	 * @see #addHistoryError
 	 */
 	public void setErrorString(String s) throws RTMLException
 	{
-		if((type.equals("reject") == false)&&(type.equals("fail") == false)&&(type.equals("abort") == false))
+		if(version.equals(RTML_VERSION_22))
+		{
+			if((type.equals("reject") == false)&&(type.equals("fail") == false)&&
+			   (type.equals("abort") == false))
+			{
+				throw new RTMLException(this.getClass().getName()+
+				    ":setErrorString:Trying to set error string in document of wrong type:"+type+".");
+			}
+			errorString = s;
+		}
+		else if(version.equals(RTML_VERSION_31))
+		{
+			addHistoryError("unknown","unknown",s,s);
+		}
+		else
 		{
 			throw new RTMLException(this.getClass().getName()+
-				    ":setErrorString:Trying to set error string in document of wrong type:"+type+".");
+						":setErrorString:Unsupported document version:"+version+
+						" when trying to set error string:"+s);
 		}
-		errorString = s;
 	}
 
 	public String getErrorString()
@@ -1515,6 +1534,9 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.18  2008/06/06 12:00:31  cjm
+** Added setTOOP method.
+**
 ** Revision 1.17  2008/06/03 15:32:40  cjm
 ** Added RTMLTelescope sub-element.
 **
