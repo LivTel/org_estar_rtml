@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.21 2008-06-05 14:18:52 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.22 2008-07-22 10:11:23 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -37,14 +37,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.21 $
+ * @version $Revision: 1.22 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.21 2008-06-05 14:18:52 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.22 2008-07-22 10:11:23 cjm Exp $";
 	/**
 	 * Create to use for creating the RTML XML from the document object model tree.
 	 */
@@ -1242,17 +1242,29 @@ public class TestCreate
 			}
 			else if(args[i].equals("-toop"))
 			{
+				// document.setTOOP does not work here, because the observation/target/schedule
+				// are not set in the document at this point
+				//document.setTOOP();
 				if(target != null)
 				{
 					// RTML 2.2
 					target.setTypeTOOP();
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:TOOP:Target was null.");
+					System.exit(4);
+				}
+				if(schedule != null)
+				{
 					// RTML 3.1a - overrides schedule priority
 					schedule.setPriority(0);
 				}
 				else
 				{
 					System.err.println(this.getClass().getName()+
-							   ":parseArguments:TOOP:Target was null.");
+							   ":parseArguments:TOOP:Schedule was null.");
 					System.exit(4);
 				}
 			}
@@ -1377,6 +1389,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.21  2008/06/05 14:18:52  cjm
+** Added telescope and telescope_location information.
+**
 ** Revision 1.20  2008/05/23 17:11:17  cjm
 ** Modified to support new RTML3.1a support.
 ** History support added.
