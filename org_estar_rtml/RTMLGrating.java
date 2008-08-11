@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLGrating.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLGrating.java,v 1.3 2008-05-27 14:12:47 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLGrating.java,v 1.4 2008-08-11 13:54:54 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -27,14 +27,14 @@ import java.text.*;
 /**
  * This class is a data container for information contained in the Grating nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RTMLGrating implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLGrating.java,v 1.3 2008-05-27 14:12:47 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLGrating.java,v 1.4 2008-08-11 13:54:54 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -138,6 +138,7 @@ public class RTMLGrating implements Serializable
 	 *       We currently only recognise a small subset:
 	 *       m|meter|meters|metres|cm|centimeter|centimeters|mm|millimeter|millimeters|
 	 *       micron|microns|nm|nanometer|nanometers|Angstrom|Angstroms.
+	 *       And now some from the RTML 3.1a Schema:micrometers.
 	 * @exception IllegalArgumentException Thrown if the units are not recognised.
 	 * @see #wavelengthUnits
 	 */
@@ -146,7 +147,7 @@ public class RTMLGrating implements Serializable
 		if((s.equals("m")||s.equals("meter")||s.equals("meters")||s.equals("metres")||
 		   s.equals("cm")||s.equals("centimeter")||s.equals("centimeters")||
 		   s.equals("mm")||s.equals("millimeter")||s.equals("millimeters")||
-		   s.equals("micron")||s.equals("microns")||
+		   s.equals("micron")||s.equals("microns")||s.equals("micrometers")||
 		   s.equals("nm")||s.equals("nanometer")||s.equals("nanometers")||
 		    s.equals("Angstrom")||s.equals("Angstroms")) == false)
 		{
@@ -364,6 +365,9 @@ public class RTMLGrating implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2008/05/27 14:12:47  cjm
+** Added serialVersionUID.
+**
 ** Revision 1.2  2008/05/23 14:24:41  cjm
 ** Comment fixes.
 **
