@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML31Parser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Parser.java,v 1.2 2008-06-05 14:25:45 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Parser.java,v 1.3 2008-08-11 13:54:54 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -52,14 +52,14 @@ import org.estar.astrometry.*;
  * Extends RTMLParser to make use of methods common to this and RTML22Parser (parseIntegerNode etc), even though
  * this subclass is created as part of the RTMLParser's parsing.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class RTML31Parser extends RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Parser.java,v 1.2 2008-06-05 14:25:45 cjm Exp $";
+	public final static String RCSID = "$Id: RTML31Parser.java,v 1.3 2008-08-11 13:54:54 cjm Exp $";
 
 	/**
 	 * Default constructor.
@@ -1355,6 +1355,10 @@ public class RTML31Parser extends RTMLParser
 					ra.setSeconds(parseDoubleNode(childNode));
 					target.setRA(ra);
 				}
+				else if(childNode.getNodeName() == "Offset")
+				{
+					target.setRAOffset(parseDoubleNode(childNode));
+				}
 				else if(childNode.getNodeName() == "Value")
 				{
 					// value has fixed units hours
@@ -1445,6 +1449,10 @@ public class RTML31Parser extends RTMLParser
 				{
 					dec.setSeconds(parseDoubleNode(childNode));
 					target.setDec(dec);
+				}
+				else if(childNode.getNodeName() == "Offset")
+				{
+					target.setDecOffset(parseDoubleNode(childNode));
 				}
 				else if(childNode.getNodeName() == "Value")
 				{
@@ -2412,6 +2420,9 @@ public class RTML31Parser extends RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2008/06/05 14:25:45  cjm
+** Added Telescope and Telescope Location support.
+**
 ** Revision 1.1  2008/05/23 14:09:04  cjm
 ** Initial revision
 **
