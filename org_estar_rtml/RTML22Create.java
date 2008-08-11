@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML22Create.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.42 2008-06-05 14:20:39 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.43 2008-08-11 13:54:54 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -60,14 +60,14 @@ import org.estar.astrometry.*;
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * The resultant XML document is in RTML 2.2.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.42 $
+ * @version $Revision: 1.43 $
  */
 public class RTML22Create
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.42 2008-06-05 14:20:39 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.43 2008-08-11 13:54:54 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -480,7 +480,10 @@ public class RTML22Create
 		Element raElement = null;
 		Element decElement = null;
 		Element equinoxElement = null;
+		Element angleOffsetElement = null;
+		DecimalFormat df = null;
 
+		df = new DecimalFormat("###0.0#");
 		// target element
 		targetElement = (Element)document.createElement("Target");
 		// type attribute
@@ -506,6 +509,16 @@ public class RTML22Create
 			raElement.appendChild(document.createTextNode(target.getRA().toString(' ')));
 			raElement.setAttribute("units","hms");
 			raElement.setAttribute("format","hh mm ss.ss");
+			// ra Offset
+			if(target.getRAOffset() != 0.0)
+			{
+				angleOffsetElement = (Element)document.createElement("AngleOffset");
+				angleOffsetElement.appendChild(document.createTextNode(
+							       df.format(target.getRAOffset())));
+				angleOffsetElement.setAttribute("units","arcseconds");
+				// add angle offset to RA
+				raElement.appendChild(angleOffsetElement);
+			}
 			// add ra element to coordElement.
 			coordElement.appendChild(raElement);
 		}
@@ -516,6 +529,16 @@ public class RTML22Create
 			decElement.appendChild(document.createTextNode(target.getDec().toString(' ')));
 			decElement.setAttribute("units","dms");
 			decElement.setAttribute("format","sdd mm ss.ss");
+			// dec Offset
+			if(target.getDecOffset() != 0.0)
+			{
+				angleOffsetElement = (Element)document.createElement("AngleOffset");
+				angleOffsetElement.appendChild(document.createTextNode(df.format(
+							       target.getDecOffset())));
+				angleOffsetElement.setAttribute("units","arcseconds");
+				// add angle offset to Dec
+				decElement.appendChild(angleOffsetElement);
+			}
 			// add dec element to coordElement.
 			coordElement.appendChild(decElement);
 		}
@@ -829,7 +852,7 @@ public class RTML22Create
 		Element scoreElement = null;
 		DecimalFormat df = null;
 
-		df = new DecimalFormat("#####0.0#");
+		df = new DecimalFormat("#####0.0#####");
 		// Create Scores element
 		scoresElement = (Element)document.createElement("Scores");
 		// loop on Score list
@@ -877,6 +900,9 @@ public class RTML22Create
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.42  2008/06/05 14:20:39  cjm
+** Added Telescope and Telescope Location support.
+**
 ** Revision 1.41  2008/05/23 14:07:11  cjm
 ** New version after RTML 3.1a integration.
 **
