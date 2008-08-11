@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML22Parser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.30 2008-06-05 14:26:08 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.31 2008-08-11 13:54:54 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -52,14 +52,14 @@ import org.estar.astrometry.*;
  * Extends RTMLParser to make use of methods common to this and RTML31Parser (parseIntegerNode etc), even though
  * this subclass is created as part of the RTMLParser's parsing.
  * @author Chris Mottram
- * @version $Revision: 1.30 $
+ * @version $Revision: 1.31 $
  */
 public class RTML22Parser extends RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.30 2008-06-05 14:26:08 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.31 2008-08-11 13:54:54 cjm Exp $";
 
 	/**
 	 * Default constructor.
@@ -1424,6 +1424,7 @@ public class RTML22Parser extends RTMLParser
 	 * @param target The instance of RTMLTarget to set the right ascension for.
 	 * @param rightAscensionNode The XML DOM node for the RightAscension tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @see #parseAngleOffsetNode
 	 */
 	private void parseRightAscensionNode(RTMLTarget target,Node rightAscensionNode) throws RTMLException
 	{
@@ -1458,27 +1459,40 @@ public class RTML22Parser extends RTMLParser
 		{
 			childNode = childList.item(i);
 			
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "AngleOffset")
+				{
+					target.setRAOffset(parseAngleOffsetNode(childNode));
+				}
+			}
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
-				valueString = childNode.getNodeValue();
-				if(units.equals("radians"))
+				if(childNode.getNodeValue() != null)
 				{
-					radians = Double.parseDouble(valueString);
-					ra = new RA();
-					ra.fromRadians(radians);
-					target.setRA(ra);
-				}
-				else if(units.equals("hms"))
-				{
-					ra = new RA();
-					ra.parseSpace(valueString);
-					target.setRA(ra);
-				}
-				else
-				{
-					throw new RTMLException(this.getClass().getName()+
-								":parseRightAscensionNode:Illegal Units:"+units+
-								":value:"+valueString);
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						valueString = childNode.getNodeValue();
+						if(units.equals("radians"))
+						{
+							radians = Double.parseDouble(valueString);
+							ra = new RA();
+							ra.fromRadians(radians);
+							target.setRA(ra);
+						}
+						else if(units.equals("hms"))
+						{
+							ra = new RA();
+							ra.parseSpace(valueString);
+							target.setRA(ra);
+						}
+						else
+						{
+							throw new RTMLException(this.getClass().getName()+
+								   ":parseRightAscensionNode:Illegal Units:"+units+
+										":value:"+valueString);
+						}
+					}
 				}
 			}
 		}
@@ -1489,6 +1503,7 @@ public class RTML22Parser extends RTMLParser
 	 * @param target The instance of RTMLTarget to set the declination for.
 	 * @param declinationNode The XML DOM node for the Declination tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @see #parseAngleOffsetNode
 	 */
 	private void parseDeclinationNode(RTMLTarget target,Node declinationNode) throws RTMLException
 	{
@@ -1523,30 +1538,97 @@ public class RTML22Parser extends RTMLParser
 		{
 			childNode = childList.item(i);
 			
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "AngleOffset")
+				{
+					target.setDecOffset(parseAngleOffsetNode(childNode));
+				}
+			}
 			if(childNode.getNodeType() == Node.TEXT_NODE)
 			{
-				valueString = childNode.getNodeValue();
-				if(units.equals("radians"))
+				if(childNode.getNodeValue() != null)
 				{
-					radians = Double.parseDouble(valueString);
-					dec = new Dec();
-					dec.fromRadians(radians);
-					target.setDec(dec);
-				}
-				else if(units.equals("dms"))
-				{
-					dec = new Dec();
-					dec.parseSpace(valueString);
-					target.setDec(dec);
-				}
-				else
-				{
-					throw new RTMLException(this.getClass().getName()+
-								":parseDeclinationNode:Illegal Units:"+units+
-								":value:"+valueString);
+					if(childNode.getNodeValue().trim().length() > 0)
+					{
+						valueString = childNode.getNodeValue();
+						if(units.equals("radians"))
+						{
+							radians = Double.parseDouble(valueString);
+							dec = new Dec();
+							dec.fromRadians(radians);
+							target.setDec(dec);
+						}
+						else if(units.equals("dms"))
+						{
+							dec = new Dec();
+							dec.parseSpace(valueString);
+							target.setDec(dec);
+						}
+						else
+						{
+							throw new RTMLException(this.getClass().getName()+
+								       	":parseDeclinationNode:Illegal Units:"+units+
+										":value:"+valueString);
+						}
+					}
 				}
 			}
 		}
+	}
+
+	/**
+	 * Internal method to parse an Angle offset inside a Right Ascension or a Declination node.
+	 * @param angleOffsetNode The XML DOM node for the AngleOffset tag node.
+	 * @return A double, the value of the Angle offset in arcseconds.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @see #parseAngleOffsetNode
+	 */
+	private double parseAngleOffsetNode(Node angleOffsetNode) throws RTMLException
+	{
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+		String units = null;
+		String valueString = null;
+		double value = 0.0;
+
+		// check current XML node is correct
+		if(angleOffsetNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseAngleOffsetNode:Illegal Node:"+
+						angleOffsetNode);
+		}
+		if(angleOffsetNode.getNodeName() != "AngleOffset")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseAngleOffsetNode:Illegal Node Name:"+
+						angleOffsetNode.getNodeName());
+		}
+		// go through attribute list
+		attributeList = angleOffsetNode.getAttributes();
+		// units
+		attributeNode = attributeList.getNamedItem("units");
+		units = attributeNode.getNodeValue();
+		if(units.equals("arcsec")||units.equals("arcsecs")||units.equals("arcseconds") == false)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseAngleOffsetNode:Units are not arcseconds:"+
+						units);
+		}
+		// go through child nodes
+		childList = angleOffsetNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+			
+			if(childNode.getNodeType() == Node.TEXT_NODE)
+			{
+				valueString = childNode.getNodeValue();
+				value =  Double.parseDouble(valueString);
+			}
+		}
+		return value;
 	}
 
 	/**
@@ -2396,6 +2478,9 @@ public class RTML22Parser extends RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.30  2008/06/05 14:26:08  cjm
+** Added Telescope and Telescope Location support.
+**
 ** Revision 1.29  2008/05/23 14:08:30  cjm
 ** New version after RTML 3.1a integration.
 ** Removed common methods and put into RTMLParser.
