@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.22 2008-07-22 10:11:23 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.23 2008-08-11 14:55:49 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -37,14 +37,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.22 $
+ * @version $Revision: 1.23 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.22 2008-07-22 10:11:23 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.23 2008-08-11 14:55:49 cjm Exp $";
 	/**
 	 * Create to use for creating the RTML XML from the document object model tree.
 	 */
@@ -416,6 +416,32 @@ public class TestCreate
 					{
 						System.err.println(this.getClass().getName()+
 								   ":parseArguments:Dec:Target was null.");
+						System.exit(4);
+					}
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Dec needs value.");
+					System.exit(3);
+				}
+			}
+			else if(args[i].equals("-dec_offset"))
+			{
+				double dvalue;
+
+				if((i+1) < args.length)
+				{
+					if(target != null)
+					{
+						dvalue = Double.parseDouble(args[i+1]);
+						target.setDecOffset(dvalue);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:Dec offset:Target was null.");
 						System.exit(4);
 					}
 					i++;
@@ -871,6 +897,32 @@ public class TestCreate
 					{
 						System.err.println(this.getClass().getName()+
 								   ":parseArguments:RA:Target was null.");
+						System.exit(4);
+					}
+					i++;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:RA needs value.");
+					System.exit(3);
+				}
+			}
+			else if(args[i].equals("-ra_offset"))
+			{
+				double dvalue;
+
+				if((i+1) < args.length)
+				{
+					if(target != null)
+					{
+						dvalue = Double.parseDouble(args[i+1]);
+						target.setRAOffset(dvalue);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:RA:Target offset was null.");
 						System.exit(4);
 					}
 					i++;
@@ -1348,7 +1400,8 @@ public class TestCreate
 		System.err.println("\t\t[-binning <x> <y>]");
 		System.err.println("\t\t[-grating_wavelength <wavelength> <m|cm|mm|micron|nm|nanometer|nanometers|Angstrom|Angstroms>]");
 		System.err.println("\t-observation <-name <string> [-target_ident <string>] ");
-		System.err.println("\t\t-ra <HH:MM:SS> -dec <[+|-]DD:MM:SS> [-toop][-priority <0-3>]");
+		System.err.println("\t\t-ra <HH:MM:SS> -ra_offset <arcsec> -dec <[+|-]DD:MM:SS> -dec_offset <arcsec>"); 
+		System.err.println("\t\t[-toop][-priority <0-3>]");
 		System.err.println("\t\t-exposure <length> <units> <count>");
 		System.err.println("\t\t[-series_constraint_count <number>]");
 		System.err.println("\t\t[-series_constraint_interval <P{(y)Y{(m)M}{(d)D}{T{(h)H}{(m}M}{(s.s..)S}>]");
@@ -1389,6 +1442,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.22  2008/07/22 10:11:23  cjm
+** Checking -toop option.
+**
 ** Revision 1.21  2008/06/05 14:18:52  cjm
 ** Added telescope and telescope_location information.
 **
