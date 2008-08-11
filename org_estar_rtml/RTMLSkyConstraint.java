@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLSkyConstraint.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSkyConstraint.java,v 1.2 2008-05-27 15:00:09 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSkyConstraint.java,v 1.3 2008-08-11 13:54:54 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -35,14 +35,14 @@ import java.text.*;
  * </ul>
  * Only the <i>sky</i> value is used by the TEA at the moment. 
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class RTMLSkyConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSkyConstraint.java,v 1.2 2008-05-27 15:00:09 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSkyConstraint.java,v 1.3 2008-08-11 13:54:54 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -219,6 +219,25 @@ public class RTMLSkyConstraint implements Serializable
 	}
 
 	/**
+	 * Test the equality of the sky constraint.
+	 * @param obj The other instance we are testing against.
+	 * @return Returns true if the contents are the same, and false if they are not.
+	 */
+	public boolean equals(Object obj)
+	{
+		RTMLSkyConstraint other = null;
+
+		if(obj == null)
+			return false;
+		if((obj instanceof RTMLSkyConstraint) == false)
+			return false;
+		other = (RTMLSkyConstraint)obj;
+		if(other.getSky().equals(sky) == false)
+			return false;
+		return true;
+	}
+
+	/**
 	 * Method to print out a string representation of this node.
 	 */
 	public String toString()
@@ -243,6 +262,9 @@ public class RTMLSkyConstraint implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2008/05/27 15:00:09  cjm
+** Added serialVersionUID.
+**
 ** Revision 1.1  2007/07/09 11:44:55  cjm
 ** Initial revision
 **

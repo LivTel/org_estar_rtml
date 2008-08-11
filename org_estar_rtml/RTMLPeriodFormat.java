@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLPeriodFormat.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLPeriodFormat.java,v 1.6 2008-05-27 14:19:36 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLPeriodFormat.java,v 1.7 2008-08-11 13:54:54 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -32,14 +32,14 @@ import java.util.*;
  * </code>
  * For the purposes of this implementation, we have assumed 30 days in 1 month, and 365 days in 1 year.
  * @author Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class RTMLPeriodFormat implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLPeriodFormat.java,v 1.6 2008-05-27 14:19:36 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLPeriodFormat.java,v 1.7 2008-08-11 13:54:54 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -420,6 +420,41 @@ public class RTMLPeriodFormat implements Serializable
 	}
 
 	/**
+	 * Test whether one period format is equal to another.
+	 * @param obj The other instance we are testing against.
+	 * @return Returns true if the contents are the same, and false if they are not.
+	 * @see #years
+	 * @see #months
+	 * @see #days
+	 * @see #hours
+	 * @see #minutes
+	 * @see #seconds
+	 */
+	public boolean equals(Object obj)
+	{
+		RTMLPeriodFormat other = null;
+
+		if(obj == null)
+			return false;
+		if((obj instanceof RTMLPeriodFormat) == false)
+			return false;
+		other = (RTMLPeriodFormat)obj;
+		if(other.getYears() != years)
+			return false;
+		if(other.getMonths() != months)
+			return false;
+		if(other.getDays() != days)
+			return false;
+		if(other.getHours() != hours)
+			return false;
+		if(other.getMinutes() != minutes)
+			return false;
+		if(Math.abs(other.getSeconds()-seconds) > 0.0001)
+			return false;
+		return true;
+	}
+
+	/**
 	 * Method to print out a string representation of this period.
 	 * @return A string.
 	 * @see #toString(java.lang.String)
@@ -509,6 +544,9 @@ public class RTMLPeriodFormat implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.6  2008/05/27 14:19:36  cjm
+** Added serialVersionUID.
+**
 ** Revision 1.5  2008/05/08 14:03:29  cjm
 ** Added special case to toString for 0 length period, to make it conform to:
 ** http://www.w3.org/TR/xmlschema-2/#duration

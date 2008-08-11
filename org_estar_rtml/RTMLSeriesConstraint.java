@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLSeriesConstraint.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSeriesConstraint.java,v 1.5 2007-01-30 18:31:22 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSeriesConstraint.java,v 1.6 2008-08-11 13:54:54 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -36,14 +36,14 @@ import java.text.*;
  * <i>Do the observation <b>count</b> times with a time period of <b>interval</b> 
  * +/- <b>tolerance</b> between them.</i>
  * @author Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class RTMLSeriesConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSeriesConstraint.java,v 1.5 2007-01-30 18:31:22 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSeriesConstraint.java,v 1.6 2008-08-11 13:54:54 cjm Exp $";
 	/**
 	 * The number of times the observation associated wit this SeriesConstraint should be executed.
 	 */
@@ -180,6 +180,39 @@ public class RTMLSeriesConstraint implements Serializable
 	}
 
 	/**
+	 * Test whether one series constraint is equal to another.
+	 * @param obj The other instance we are testing against.
+	 * @return Returns true if the contents are the same, and false if they are not.
+	 * @see #count
+	 * @see #interval
+	 * @see #tolerance
+	 * @see org.estar.rtml.RTMLPeriodFormat#equals
+	 */
+	public boolean equals(Object obj)
+	{
+		RTMLSeriesConstraint otherSC = null;
+
+		if(obj == null)
+			return false;
+		if((obj instanceof RTMLSeriesConstraint) == false)
+		{
+			return false;
+		}
+		otherSC = (RTMLSeriesConstraint)obj;
+		if(otherSC.getCount() != count)
+			return false;
+		if(otherSC.getInterval() == null)
+			return false;
+		if(otherSC.getInterval().equals(interval)  == false)
+			return false;
+		if(otherSC.getTolerance() == null)
+			return false;
+		if(otherSC.getTolerance().equals(tolerance) == false)
+			return false;
+		return true;
+	}
+
+	/**
 	 * Method to print out a string representation of this node.
 	 */
 	public String toString()
@@ -210,6 +243,9 @@ public class RTMLSeriesConstraint implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.5  2007/01/30 18:31:22  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.4  2005/04/28 09:23:27  cjm
 ** spell check fix.
 **

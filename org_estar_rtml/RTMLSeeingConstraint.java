@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLSeeingConstraint.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSeeingConstraint.java,v 1.3 2008-05-27 14:59:26 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSeeingConstraint.java,v 1.4 2008-08-11 13:54:54 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -38,14 +38,14 @@ import java.text.*;
  * by the (nominal-actual seeing) * ExposureFactor in some manner. This is not implemented, as it does not exist
  * in RTML 3. RTML 3 has the minimum and maximum attributes as sub-elements, and a fixed Units element.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RTMLSeeingConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSeeingConstraint.java,v 1.3 2008-05-27 14:59:26 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSeeingConstraint.java,v 1.4 2008-08-11 13:54:54 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -130,6 +130,27 @@ public class RTMLSeeingConstraint implements Serializable
 	}
 
 	/**
+	 * Test the equality of the seeing constraint.
+	 * @param obj The other instance we are testing against.
+	 * @return Returns true if the contents are the same, and false if they are not.
+	 */
+	public boolean equals(Object obj)
+	{
+		RTMLSeeingConstraint other = null;
+
+		if(obj == null)
+			return false;
+		if((obj instanceof RTMLSeeingConstraint) == false)
+			return false;
+		other = (RTMLSeeingConstraint)obj;
+		if(Math.abs(other.getMinimum() - minimum) > 0.0001)
+			return false;
+		if(Math.abs(other.getMaximum() - maximum) > 0.0001)
+			return false;
+		return true;
+	}
+
+	/**
 	 * Method to print out a string representation of this node.
 	 */
 	public String toString()
@@ -156,6 +177,9 @@ public class RTMLSeeingConstraint implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2008/05/27 14:59:26  cjm
+** Added serialVersionUID.
+**
 ** Revision 1.2  2007/01/30 18:31:22  cjm
 ** gnuify: Added GNU General Public License.
 **
