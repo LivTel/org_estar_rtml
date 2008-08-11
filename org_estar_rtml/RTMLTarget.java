@@ -18,16 +18,17 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLTarget.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLTarget.java,v 1.8 2008-05-27 15:01:06 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLTarget.java,v 1.9 2008-08-11 13:54:54 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
+import java.text.*;
 import org.estar.astrometry.*;
 
 /**
  * This class is a data container for information contained in the target nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLTarget extends RTMLAttributes implements Serializable
@@ -35,7 +36,7 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLTarget.java,v 1.8 2008-05-27 15:01:06 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLTarget.java,v 1.9 2008-08-11 13:54:54 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -65,6 +66,14 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	 * The equinox of the coordinates.
 	 */
 	private String equinox = null;
+	/**
+	 * An offset to be applied to the Right Ascension.
+	 */
+	private double raOffset = 0.0;
+	/**
+	 * An offset to be applied to the Declination.
+	 */
+	private double decOffset = 0.0;
 
 	/**
 	 * Default constructor.
@@ -253,6 +262,46 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	}
 
 	/**
+	 * Set an offset from right ascension.
+	 * @param d The offset, in decimal arcseconds.
+	 * @see #raOffset
+	 */
+	public void setRAOffset(double d)
+	{
+		raOffset = d;
+	}
+
+	/**
+	 * Return an offset to be applied from the target's position.
+	 * @return The offset in RA, in arcseconds. 
+	 * @see #raOffset
+	 */
+	public double getRAOffset()
+	{
+		return raOffset;
+	}
+
+	/**
+	 * Set an offset from declination.
+	 * @param d The offset, in decimal arcseconds.
+	 * @see #decOffset
+	 */
+	public void setDecOffset(double d)
+	{
+		decOffset = d;
+	}
+
+	/**
+	 * Return an declination offset to be applied from the target's position.
+	 * @return The offset in declination, in arcseconds. 
+	 * @see #decOffset
+	 */
+	public double getDecOffset()
+	{
+		return decOffset;
+	}
+
+	/**
 	 * Method to print out a string representation of this node.
 	 */
 	public String toString()
@@ -269,12 +318,16 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	 * @see #ra
 	 * @see #dec
 	 * @see #equinox
+	 * @see #raOffset
+	 * @see #decOffset
 	 * @see org.estar.rtml.RTMLAttributes#toString(java.lang.String)
 	 */
 	public String toString(String prefix)
 	{
 		StringBuffer sb = null;
-		
+		DecimalFormat df = null;
+
+		df = new DecimalFormat("#0.0#");
 		sb = new StringBuffer();
 		sb.append(prefix+"Target: type = "+type+"\n");
 		sb.append(super.toString(prefix+"\t"));
@@ -284,8 +337,10 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 			sb.append(prefix+"\tIdent:"+ident+"\n");
 		if(ra != null)
 			sb.append(prefix+"\tRA:"+ra+"\n");
+		sb.append(prefix+"\tRA offset:"+df.format(raOffset)+"\n");
 		if(dec != null)
 			sb.append(prefix+"\tDec:"+dec+"\n");
+		sb.append(prefix+"\tDec offset:"+df.format(decOffset)+"\n");
 		if(equinox != null)
 			sb.append(prefix+"\tEquinox:"+equinox+"\n");
 		return sb.toString();
@@ -293,6 +348,9 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.8  2008/05/27 15:01:06  cjm
+** Added serialVersionUID.
+**
 ** Revision 1.7  2008/05/23 17:09:42  cjm
 ** Now extends RTMLAttributes.
 **
