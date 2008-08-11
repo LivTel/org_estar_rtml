@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML31Create.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.2 2008-06-05 14:19:51 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.3 2008-08-11 13:54:54 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -59,14 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class RTML31Create
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Create.java,v 1.2 2008-06-05 14:19:51 cjm Exp $";
+	public final static String RCSID = "$Id: RTML31Create.java,v 1.3 2008-08-11 13:54:54 cjm Exp $";
 	/**
 	 * Default Schema location (URL).
 	 */
@@ -723,6 +723,11 @@ public class RTML31Create
 			subElement = (Element)document.createElement("Seconds");
 			subElement.appendChild(document.createTextNode(df.format(target.getRA().getSeconds())));
 			raElement.appendChild(subElement);
+			// offset
+			subElement = (Element)document.createElement("Offset");
+			subElement.setAttribute("units","arcseconds");
+			subElement.appendChild(document.createTextNode(df.format(target.getRAOffset())));
+			raElement.appendChild(subElement);
 			// add ra element to coordElement.
 			coordElement.appendChild(raElement);
 		}
@@ -747,6 +752,11 @@ public class RTML31Create
 			// seconds
 			subElement = (Element)document.createElement("Arcseconds");
 			subElement.appendChild(document.createTextNode(df.format(target.getDec().getSeconds())));
+			decElement.appendChild(subElement);
+			// offset
+			subElement = (Element)document.createElement("Offset");
+			subElement.setAttribute("units","arcseconds");
+			subElement.appendChild(document.createTextNode(df.format(target.getDecOffset())));
 			decElement.appendChild(subElement);
 			// add dec element to coordElement.
 			coordElement.appendChild(decElement);
@@ -1090,7 +1100,7 @@ public class RTML31Create
 		Element scoreElement = null;
 		DecimalFormat df = null;
 
-		df = new DecimalFormat("#####0.0#");
+		df = new DecimalFormat("#####0.0#####");
 		// Create Scores element
 		scoringElement = (Element)document.createElement("Scoring");
 		// loop on Score list
@@ -1119,6 +1129,9 @@ public class RTML31Create
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2008/06/05 14:19:51  cjm
+** Added Telescope and Telescope Location support.
+**
 ** Revision 1.1  2008/05/23 14:08:50  cjm
 ** Initial revision
 **
