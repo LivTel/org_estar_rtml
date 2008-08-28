@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.23 2008-08-11 14:55:49 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.24 2008-08-28 18:23:48 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -37,14 +37,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.23 $
+ * @version $Revision: 1.24 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.23 2008-08-11 14:55:49 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.24 2008-08-28 18:23:48 cjm Exp $";
 	/**
 	 * Create to use for creating the RTML XML from the document object model tree.
 	 */
@@ -455,38 +455,109 @@ public class TestCreate
 			}
 			else if(args[i].equals("-device"))
 			{
-				if((i+3) < args.length)
-				{
-					device = new RTMLDevice();
-					device.setName(args[i+1]);
-					device.setType(args[i+2]);
-					device.setSpectralRegion(args[i+3]);
-					// add device to observation if it exists,
-					// otherwise make it the generic document device
-					if(observation != null)
-						observation.setDevice(device);
-					else
-						document.setDevice(device);
-					i+= 3;
-				}
+				device = new RTMLDevice();
+				// add device to observation if it exists,
+				// otherwise make it the generic document device
+				if(observation != null)
+					observation.setDevice(device);
 				else
-				{
-					System.err.println(this.getClass().getName()+
-					":parseArguments:device needs name,type and spectral region.");
-					System.exit(5);
-				}
+					document.setDevice(device);
 			}
 			else if(args[i].equals("-device_filter"))
 			{
 				if((i+1) < args.length)
 				{
-					device.setFilterType(args[i+1]);
-					i+= 1;
+					if(device != null)
+					{
+						device.setFilterType(args[i+1]);
+						i+= 1;
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:device_filter not set:"+
+								   "No device constructed (-device).");	
+						System.exit(2);
+					}
 				}
 				else
 				{
 					System.err.println(this.getClass().getName()+
 		       				   ":parseArguments:device_filter needs a filter type string.");
+					System.exit(2);
+				}
+			}
+			else if(args[i].equals("-device_name"))
+			{
+				if((i+1) < args.length)
+				{
+					if(device != null)
+					{
+						device.setName(args[i+1]);
+						i+= 1;
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:device_name not set:"+
+								   "No device constructed (-device).");	
+						System.exit(2);
+					}
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+		       				   ":parseArguments:device_name needs a string.");
+					System.exit(2);
+				}
+			}
+			else if(args[i].equals("-device_type"))
+			{
+				if((i+1) < args.length)
+				{
+					if(device != null)
+					{
+						device.setType(args[i+1]);
+						i+= 1;
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:device_type not set:"+
+								   "No device constructed (-device).");	
+						System.exit(2);
+					}
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:device_type needs a string:"+
+							   "<camera|spectrograph|polarimeter>.");
+					System.exit(2);
+				}
+			}
+			else if(args[i].equals("-device_spectral_region"))
+			{
+				if((i+1) < args.length)
+				{
+					if(device != null)
+					{
+						device.setSpectralRegion(args[i+1]);
+						i+= 1;
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:device_spectral_region not set:"+
+								   "No device constructed (-device).");	
+						System.exit(2);
+					}
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:device_spectral_region needs a string:"+
+							   "<infrared|optical>.");
 					System.exit(2);
 				}
 			}
@@ -1395,8 +1466,8 @@ public class TestCreate
 		System.err.println("\t[-contact [-contact_address <address>][-contact_email <email>]");
 		System.err.println("\t\t[-contact_fax <fax>][-contact_institution <institute>][-contact_name <name>]");
 		System.err.println("\t\t[-contact_telephone <telno>][-contact_url <URL>][-contact_user <user>]]");
-		System.err.println("\t[-device <name> <device type> <spectral region>]");
-		System.err.println("\t\t[-device_filter <filter type>]");
+		System.err.println("\t[-device -device_name <name> -device_type <device type>]");
+		System.err.println("\t\t[-device_spectral_region <spectral region> -device_filter <filter type>]");
 		System.err.println("\t\t[-binning <x> <y>]");
 		System.err.println("\t\t[-grating_wavelength <wavelength> <m|cm|mm|micron|nm|nanometer|nanometers|Angstrom|Angstroms>]");
 		System.err.println("\t-observation <-name <string> [-target_ident <string>] ");
@@ -1442,6 +1513,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.23  2008/08/11 14:55:49  cjm
+** Added -ra_offset and -dec_offset for setting RA/Dec offsets.
+**
 ** Revision 1.22  2008/07/22 10:11:23  cjm
 ** Checking -toop option.
 **
