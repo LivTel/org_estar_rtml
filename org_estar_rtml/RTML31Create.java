@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML31Create.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.3 2008-08-11 13:54:54 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.4 2009-03-16 12:00:15 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -59,18 +59,19 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RTML31Create
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Create.java,v 1.3 2008-08-11 13:54:54 cjm Exp $";
+	public final static String RCSID = "$Id: RTML31Create.java,v 1.4 2009-03-16 12:00:15 cjm Exp $";
 	/**
 	 * Default Schema location (URL).
 	 */
-	public final static String DEFAULT_SCHEMA_URL_STRING = "http://monet.uni-sw.gwdg.de/XMLSchema/RTML/schemas/RTML-nightly.xsd";
+	//public final static String DEFAULT_SCHEMA_URL_STRING = "http://monet.uni-sw.gwdg.de/XMLSchema/RTML/schemas/RTML-nightly.xsd";
+	public final static String DEFAULT_SCHEMA_URL_STRING = "http://161.72.57.3:8080/rtml/RTML-nightly.xsd";
 	/**
 	 * RTML Schema location. This is the URL of the RTML Schema.
 	 * Defaults to DEFAULT_SCHEMA_URL_STRING. It is a class-wide (not per instance) variable.
@@ -1129,6 +1130,9 @@ public class RTML31Create
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2008/08/11 13:54:54  cjm
+** Added creation of target offset "Offset" elements.
+**
 ** Revision 1.2  2008/06/05 14:19:51  cjm
 ** Added Telescope and Telescope Location support.
 **
