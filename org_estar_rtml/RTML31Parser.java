@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML31Parser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Parser.java,v 1.3 2008-08-11 13:54:54 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Parser.java,v 1.4 2009-03-27 11:38:37 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -52,14 +52,14 @@ import org.estar.astrometry.*;
  * Extends RTMLParser to make use of methods common to this and RTML22Parser (parseIntegerNode etc), even though
  * this subclass is created as part of the RTMLParser's parsing.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RTML31Parser extends RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Parser.java,v 1.3 2008-08-11 13:54:54 cjm Exp $";
+	public final static String RCSID = "$Id: RTML31Parser.java,v 1.4 2009-03-27 11:38:37 cjm Exp $";
 
 	/**
 	 * Default constructor.
@@ -2171,6 +2171,11 @@ public class RTML31Parser extends RTMLParser
 		attributeList = sourceCatalogueNode.getAttributes();
 		// type
 		attributeNode = attributeList.getNamedItem("type");
+		if(attributeNode ==null)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseSourceCatalogueNode:SourceCatalogue has no type attribute.");
+		}			
 		type = attributeNode.getNodeValue();
 		// According to RTML 3.1a schema, SourceCatalogue type can be "text" (cluster) or "other" (votable-url)
 		// imageData.setObjectListType accepts "cluster" (=text) or "votable-url" (=other)
@@ -2420,6 +2425,9 @@ public class RTML31Parser extends RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2008/08/11 13:54:54  cjm
+** Added Target RA/Dec offset parsing.
+**
 ** Revision 1.2  2008/06/05 14:25:45  cjm
 ** Added Telescope and Telescope Location support.
 **
