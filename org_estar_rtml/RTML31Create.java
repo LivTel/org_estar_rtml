@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML31Create.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.5 2009-03-16 12:12:30 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.6 2009-03-27 11:26:25 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -59,14 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class RTML31Create
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Create.java,v 1.5 2009-03-16 12:12:30 cjm Exp $";
+	public final static String RCSID = "$Id: RTML31Create.java,v 1.6 2009-03-27 11:26:25 cjm Exp $";
 	/**
 	 * Default Schema location (URL).
 	 */
@@ -1057,6 +1057,11 @@ public class RTML31Create
 	 * @param rtmlElement The Element to add the <SourceCatalogue> node to.
 	 * @param imageData The object to construct the <SourceCatalogue> node from.
 	 * @see RTMLImageData
+	 * @see RTMLImageData#getObjectListType
+	 * @see RTMLImageData#isObjectListTypeCluster
+	 * @see RTMLImageData#getObjectListCluster
+	 * @see RTMLImageData#isObjectListTypeVOTableURL
+	 * @see RTMLImageData#getObjectListVOTableURL
 	 */
 	private void createSourceCatalogue(Element rtmlElement,RTMLImageData imageData)
 	{
@@ -1064,24 +1069,30 @@ public class RTML31Create
 		Element subElement = null;
 		String s = null;
 
-		// SourceCatalogue
-		sourceCatalogueElement = (Element)document.createElement("SourceCatalogue");
-		// Cluster
-		if(imageData.isObjectListTypeCluster())
+		// Only create SourceCatalogue if the object list type is set,
+		// otherwise you get a blank SourceCatalogue which fails to parse.
+		if(imageData.getObjectListType() != null)
 		{
-			sourceCatalogueElement.appendChild(document.createTextNode(imageData.getObjectListCluster()));
-			sourceCatalogueElement.setAttribute("type","text");// imageData.getObjectListType()
-			// Cluster format: " fn sn rah ram ras decd decm decs xpos ypos mag magerror magflag"
-		}
-		// VOTableURL
-		if(imageData.isObjectListTypeVOTableURL())
-		{
-			sourceCatalogueElement.appendChild(document.createTextNode(imageData.getObjectListVOTableURL().
-									      toString()));
-			sourceCatalogueElement.setAttribute("type","other");
-		}
-		// add SourceCatalogue to parent (Observation?)
-		rtmlElement.appendChild(sourceCatalogueElement);
+			// SourceCatalogue
+			sourceCatalogueElement = (Element)document.createElement("SourceCatalogue");
+			// Cluster
+			if(imageData.isObjectListTypeCluster())
+			{
+				sourceCatalogueElement.appendChild(document.createTextNode(imageData.
+											   getObjectListCluster()));
+				sourceCatalogueElement.setAttribute("type","text");// imageData.getObjectListType()
+				// Cluster format: " fn sn rah ram ras decd decm decs xpos ypos mag magerror magflag"
+			}
+			// VOTableURL
+			if(imageData.isObjectListTypeVOTableURL())
+			{
+				sourceCatalogueElement.appendChild(document.createTextNode(imageData.
+								   getObjectListVOTableURL().toString()));
+				sourceCatalogueElement.setAttribute("type","other");
+			}
+			// add SourceCatalogue to parent (Observation?)
+			rtmlElement.appendChild(sourceCatalogueElement);
+		}// end if getObjectListType != null
 	}
 
 	/**
@@ -1130,6 +1141,10 @@ public class RTML31Create
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.5  2009/03/16 12:12:30  cjm
+** Changed default schema to telescope.livjm.ac.uk hosted. ltproxy
+** hosted does not work as ltproxy cannot see itself via external ip/8080.
+**
 ** Revision 1.4  2009/03/16 12:00:15  cjm
 ** Changed default URL schema from monet hosted to ltproxy hosted copy.
 **
