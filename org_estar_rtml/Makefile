@@ -11,7 +11,7 @@ JAVACFLAGS 	= -d $(LIBDIR) -sourcepath ../../../ -classpath $(LIBDIR):$(CLASSPAT
 DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 
 SRCS = RTMLException.java RTMLErrorHandler.java RTMLDateFormat.java RTMLPeriodFormat.java RTMLAttributes.java \
-	RTMLIntelligentAgent.java RTMLTarget.java \
+	RTMLDeviceHolder.java RTMLTargetHolder.java RTMLIntelligentAgent.java RTMLTarget.java \
 	RTMLSeeingConstraint.java RTMLSeriesConstraint.java RTMLMoonConstraint.java RTMLSkyConstraint.java \
 	RTMLSchedule.java RTMLGrating.java RTMLDevice.java RTMLDetector.java RTMLObservation.java \
 	RTMLTelescope.java RTMLTelescopeLocation.java \
