@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.24 2008-08-28 18:23:48 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.25 2009-08-12 17:56:06 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -37,14 +37,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.24 $
+ * @version $Revision: 1.25 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.24 2008-08-28 18:23:48 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.25 2009-08-12 17:56:06 cjm Exp $";
 	/**
 	 * Create to use for creating the RTML XML from the document object model tree.
 	 */
@@ -657,6 +657,31 @@ public class TestCreate
 				document.setType("fail");// RTML 2.2
 				document.setMode("fail");// RTML 3.1a
 			}
+			else if(args[i].equals("-grating_name"))
+			{
+				if (device != null)
+				{
+					if((i+1) < args.length)
+					{
+						grating = new RTMLGrating();
+						device.setGrating(grating);
+						grating.setName(args[i+1]);
+						i+= 1;
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:Grating needs a name.");
+						System.exit(3);
+					}
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Binning:Device was null.");
+					System.exit(4);
+				}
+			}
 			else if(args[i].equals("-grating_wavelength"))
 			{
 				if (device != null)
@@ -878,7 +903,7 @@ public class TestCreate
 					System.exit(2);
 				}
 			}
-			else if(args[i].equals("-name"))
+			else if(args[i].equals("-target_name"))
 			{
 				if((i+1) < args.length)
 				{
@@ -903,17 +928,10 @@ public class TestCreate
 			}
 			else if(args[i].equals("-observation"))
 			{
-				if(observation != null)
-				{
-					observation.setTarget(target);
-					observation.setSchedule(schedule);
-					document.addObservation(observation);
-				}
 				observation = new RTMLObservation();
-				target = new RTMLTarget();
-				//target.setEquinox("J2000"); RTML 2.2?
-				target.setEquinox("2000");
+				document.addObservation(observation);
 				schedule = new RTMLSchedule();
+				observation.setSchedule(schedule);
 				seriesConstraint = null; // reset to blank for next schedule
 				imageData = null; // reset to blank for next image data
 			}
@@ -1222,6 +1240,17 @@ public class TestCreate
 					System.exit(2);
 				}
 			}
+			else if(args[i].equals("-target"))
+			{
+				target = new RTMLTarget();
+				target.setEquinox("2000");
+				// add to observation if it exists,
+				// otherwise make it the generic document target
+				if(observation != null)
+					observation.setTarget(target);
+				else
+					document.setTarget(target);
+			}
 			else if(args[i].equals("-target_ident"))
 			{
 				if((i+1) < args.length)
@@ -1242,6 +1271,35 @@ public class TestCreate
 				{
 					System.err.println(this.getClass().getName()+
 							   ":parseArguments:Target ident needs an ident.");
+					System.exit(2);
+				}
+			}
+			else if(args[i].equals("-target_magnitude"))
+			{
+				double dvalue;
+
+				if((i+3) < args.length)
+				{
+					if(target != null)
+					{
+						dvalue = Double.parseDouble(args[i+1]);
+						target.setMagnitude(dvalue);
+						target.setMagnitudeFilterType(args[i+2]);
+						dvalue = Double.parseDouble(args[i+3]);
+						target.setMagnitudeError(dvalue);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:Target Magnitude:Target was null.");
+						System.exit(4);
+					}
+					i+= 3;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Target magnitude requires <magnitude> <filter> <error>.");
 					System.exit(2);
 				}
 			}
@@ -1417,13 +1475,6 @@ public class TestCreate
 				System.exit(1);
 			}
 		}
-		// add any observation not already added yet.
-		if(observation != null)
-		{
-			observation.setTarget(target);
-			observation.setSchedule(schedule);
-			document.addObservation(observation);
-		}
 	}
 
 	/**
@@ -1470,8 +1521,11 @@ public class TestCreate
 		System.err.println("\t\t[-device_spectral_region <spectral region> -device_filter <filter type>]");
 		System.err.println("\t\t[-binning <x> <y>]");
 		System.err.println("\t\t[-grating_wavelength <wavelength> <m|cm|mm|micron|nm|nanometer|nanometers|Angstrom|Angstroms>]");
-		System.err.println("\t-observation <-name <string> [-target_ident <string>] ");
+		System.err.println("\t\t[-grating_name <name:low|high>");
+		System.err.println("\t-observation -target_name <string>"); 
+		System.err.println("\t\t[-target][-target_ident <string>] ");
 		System.err.println("\t\t-ra <HH:MM:SS> -ra_offset <arcsec> -dec <[+|-]DD:MM:SS> -dec_offset <arcsec>"); 
+		System.err.println("\t\t[-target_magnitude <magnitude> <filter> <error>]");
 		System.err.println("\t\t[-toop][-priority <0-3>]");
 		System.err.println("\t\t-exposure <length> <units> <count>");
 		System.err.println("\t\t[-series_constraint_count <number>]");
@@ -1487,6 +1541,9 @@ public class TestCreate
 		System.err.println("\t[-document_score <double>]");
 		System.err.println("\t[-document_score_list <P{(y)Y{(m)M}{(d)D}{T{(h)H}{(m}M}{(s.s..)S}> <double> <double>]");
 		System.err.println("\t[-completion_time <yyyy-MM-dd'T'HH:mm:ss>]");
+		System.err.println("");
+		System.err.println("-device and -target can be specified before -observation to add a document default,");
+		System.err.println("or after an -observation to add a per observation device/target");
 	}
 
 	/**
@@ -1513,6 +1570,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.24  2008/08/28 18:23:48  cjm
+** Changed device handling: device name/spectral_region no longer has to be specified.
+**
 ** Revision 1.23  2008/08/11 14:55:49  cjm
 ** Added -ra_offset and -dec_offset for setting RA/Dec offsets.
 **
