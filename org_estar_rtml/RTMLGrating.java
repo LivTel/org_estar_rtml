@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLGrating.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLGrating.java,v 1.4 2008-08-11 13:54:54 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLGrating.java,v 1.5 2009-08-12 17:50:25 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -27,14 +27,14 @@ import java.text.*;
 /**
  * This class is a data container for information contained in the Grating nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class RTMLGrating implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLGrating.java,v 1.4 2008-08-11 13:54:54 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLGrating.java,v 1.5 2009-08-12 17:50:25 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -355,7 +355,8 @@ public class RTMLGrating implements Serializable
 		sb.append(prefix+"Grating\n");
 		if(name != null)
 			sb.append(prefix+"\tName: "+name+"\n");
-		sb.append(prefix+"\tWavelength: "+df.format(wavelength)+" "+wavelengthUnits+"\n");
+		if(wavelength != 0.0)
+			sb.append(prefix+"\tWavelength: "+df.format(wavelength)+" "+wavelengthUnits+"\n");
 		if(resolution != 0.0)
 			sb.append(prefix+"\tResolution: "+df.format(resolution)+"\n");
 		if(angle != 0.0)
@@ -365,6 +366,9 @@ public class RTMLGrating implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2008/08/11 13:54:54  cjm
+** Added micrometers as possible units from RTML 3.1a schema.
+**
 ** Revision 1.3  2008/05/27 14:12:47  cjm
 ** Added serialVersionUID.
 **
