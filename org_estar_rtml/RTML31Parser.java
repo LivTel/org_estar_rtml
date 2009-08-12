@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML31Parser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Parser.java,v 1.4 2009-03-27 11:38:37 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Parser.java,v 1.5 2009-08-12 17:52:57 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -52,14 +52,14 @@ import org.estar.astrometry.*;
  * Extends RTMLParser to make use of methods common to this and RTML22Parser (parseIntegerNode etc), even though
  * this subclass is created as part of the RTMLParser's parsing.
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class RTML31Parser extends RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Parser.java,v 1.4 2009-03-27 11:38:37 cjm Exp $";
+	public final static String RCSID = "$Id: RTML31Parser.java,v 1.5 2009-08-12 17:52:57 cjm Exp $";
 
 	/**
 	 * Default constructor.
@@ -158,6 +158,8 @@ public class RTML31Parser extends RTMLParser
 					parseScheduleNode(rtmlDocument,childNode);
 				else if(childNode.getNodeName() == "Scoring")
 					parseScoringNode(rtmlDocument,childNode);
+				else if(childNode.getNodeName() == "Target")
+					parseTargetNode(rtmlDocument,childNode);
 				else if(childNode.getNodeName() == "Telescope")
 					parseTelescopeNode(rtmlDocument,childNode);
 				else
@@ -808,9 +810,7 @@ public class RTML31Parser extends RTMLParser
 	 *                         RTMLObservation.
 	 * @param deviceNode The XML DOM node for the Device tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node.
-	 * @see #parseFilterNode
-	 * @see #parseDetectorNode
-	 * @see #parseGratingNode
+	 * @see #parseSetupNode
 	 * @see #parseRTMLAttributes
 	 * @see #parseStringNode
 	 */
@@ -875,6 +875,7 @@ public class RTML31Parser extends RTMLParser
 	 * @exception RTMLException Thrown if a strange child is in the node.
 	 * @see #parseFilterNode
 	 * @see #parseDetectorNode
+	 * @see #parseGratingNode
 	 */
 	private void parseSetupNode(RTMLDevice device,Node setupNode) 
 		throws RTMLException
@@ -903,10 +904,12 @@ public class RTML31Parser extends RTMLParser
 
 			if(childNode.getNodeType() == Node.ELEMENT_NODE)
 			{
-				if(childNode.getNodeName() == "Filter")
-					parseFilterNode(device,childNode);
-				else if(childNode.getNodeName() == "Detector")
+				if(childNode.getNodeName() == "Detector")
 					parseDetectorNode(device,childNode);
+				else if(childNode.getNodeName() == "Filter")
+					parseFilterNode(device,childNode);
+				else if(childNode.getNodeName() == "Grating")
+					parseGratingNode(device,childNode);
 				else
 					System.err.println("parseSetupNode:ELEMENT:"+childNode);
 			}
@@ -958,7 +961,10 @@ public class RTML31Parser extends RTMLParser
 					centerNode = childNode;
 					// currently used to respresent central wavelength of spectrograph.
 					// This is wrong!
-					grating = new RTMLGrating();
+					if(device.getGrating() != null)
+						grating = device.getGrating();
+					else
+						grating = new RTMLGrating();
 					// go through attribute list
 					attributeList = centerNode.getAttributes();
 					// wavelengthUnits
@@ -1101,6 +1107,58 @@ public class RTML31Parser extends RTMLParser
 	}
 
 	/**
+	 * Internal method to parse a Grating node.
+	 * @param device The device to add the grating data to.
+	 * @param gratingNode The XML DOM node for the Grating tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node.
+	 */
+	private void parseGratingNode(RTMLDevice device,Node gratingNode) 
+		throws RTMLException
+	{
+		RTMLGrating grating = null;
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode,centerNode;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(gratingNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseGratingNode:Illegal Node:"+
+						gratingNode);
+		}
+		if(gratingNode.getNodeName() != "Grating")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseGratingNode:Illegal Node Name:"+
+						gratingNode.getNodeName());
+		}
+		if(device.getGrating() != null)
+			grating = device.getGrating();
+		else
+			grating = new RTMLGrating();
+		// go through attribute list
+		attributeList = gratingNode.getAttributes();
+
+		// name
+		attributeNode = attributeList.getNamedItem("name");
+		if(attributeNode != null)
+			grating.setName(attributeNode.getNodeValue());
+		// go through child nodes
+		childList = gratingNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				System.err.println("parseGratingNode:ELEMENT:"+childNode);
+			}
+		}
+		// set grating in device.
+		device.setGrating(grating);
+	}
+
+	/**
 	 * Internal method to parse an Observation node.
 	 * @param observation The observation data to add ImageData sub-elements to. The observation
 	 *        itself is created in parseSchedule, as the document object model has schedule in observation,
@@ -1199,12 +1257,14 @@ public class RTML31Parser extends RTMLParser
 
 	/**
 	 * Internal method to parse an Target node.
-	 * @param observation The instance of RTMLObservation to set the target for.
+	 * @param parent The instance of RTMLObservation/RTMLDocument (RTMLTargetHolder) to set the target for.
 	 * @param targetNode The XML DOM node for the Target tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @see org.estar.rtml.RTMLTargetHolder
 	 * @see #parseCoordinatesNode
+	 * @see #parseTargetBrightnessNode
 	 */
-	private void parseTargetNode(RTMLObservation observation,Node targetNode) throws RTMLException
+	private void parseTargetNode(RTMLTargetHolder parent,Node targetNode) throws RTMLException
 	{
 		RTMLTarget target = null;
 		NamedNodeMap attributeList = null;
@@ -1251,12 +1311,14 @@ public class RTML31Parser extends RTMLParser
 			{
 				if(childNode.getNodeName() == "Coordinates")
 					parseCoordinatesNode(target,childNode);
+				else if(childNode.getNodeName() == "TargetBrightness")
+					parseTargetBrightnessNode(target,childNode);
 				else
 					System.err.println("parseTargetNode:ELEMENT:"+childNode);
 			}
 		}
-		// add target to observation.
-		observation.setTarget(target);
+		// add target to parent document/observation.
+		parent.setTarget(target);
 	}
 
 	/**
@@ -1520,6 +1582,62 @@ public class RTML31Parser extends RTMLParser
 						target.setEquinox(childNode.getNodeValue().trim());
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * Internal method to parse an TargetBrightness node.
+	 * @param target The instance of RTMLTarget to set the target brightness.
+	 * @param targetBrightnessNode The XML DOM node for the TargetBrightness tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @see #parseDoubleNode
+	 */
+	private void parseTargetBrightnessNode(RTMLTarget target,Node targetBrightnessNode) throws RTMLException
+	{
+		RA ra = null;
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+		double dvalue;
+
+		// check current XML node is correct
+		if(targetBrightnessNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseTargetBrightnessNode:Illegal Node:"+
+						targetBrightnessNode);
+		}
+		if(targetBrightnessNode.getNodeName() != "TargetBrightness")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseTargetBrightnessNode:Illegal Node Name:"+
+						targetBrightnessNode.getNodeName());
+		}
+		// go through attribute list
+		attributeList = targetBrightnessNode.getAttributes();
+		// go through child nodes
+		childList = targetBrightnessNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "Magnitude")
+				{
+					target.setMagnitude(parseDoubleNode(childNode));
+				}
+				else if(childNode.getNodeName() == "Type")
+				{
+					target.setMagnitudeFilterType(parseStringNode("Type",childNode));
+				}
+				else if(childNode.getNodeName() == "Error")
+				{
+					target.setMagnitudeError(parseDoubleNode(childNode));
+				}
+			}
+			else if(childNode.getNodeType() == Node.TEXT_NODE)
+			{
 			}
 		}
 	}
@@ -2425,6 +2543,9 @@ public class RTML31Parser extends RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2009/03/27 11:38:37  cjm
+** Added extra check to parseSourceCatalogueNode if type attribute does not exist (is null).
+**
 ** Revision 1.3  2008/08/11 13:54:54  cjm
 ** Added Target RA/Dec offset parsing.
 **
