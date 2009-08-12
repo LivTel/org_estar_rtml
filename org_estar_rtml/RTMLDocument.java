@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.19 2008-07-16 13:32:38 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.20 2009-08-12 17:49:50 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -28,14 +28,16 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.20 $
+ * @see org.estar.rtml.RTMLDeviceHolder
+ * @see org.estar.rtml.RTMLTargetHolder
  */
-public class RTMLDocument implements Serializable, RTMLDeviceHolder
+public class RTMLDocument implements Serializable, RTMLDeviceHolder, RTMLTargetHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.19 2008-07-16 13:32:38 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.20 2009-08-12 17:49:50 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -97,8 +99,14 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	protected RTMLTelescope telescope = null;
 	/**
 	 * The instrument device this document wants to use.
+	 * This can be null, with each Observation in the document having it's own Device.
 	 */
 	public RTMLDevice device = null;
+	/**
+	 * The target of this document.
+	 * This can be null, with each Observation in the document having it's own Target.
+	 */
+	private RTMLTarget target = null;
 	/**
 	 * List containing observations.
 	 */
@@ -1146,7 +1154,7 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	}
 
 	/**
-	 * Set the device.
+	 * Set the default device for the document.
 	 * @param d The device to set.
 	 * @see #device
 	 * @see org.estar.rtml.RTMLDevice
@@ -1157,14 +1165,36 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	}
 
 	/**
-	 * Get the device.
-	 * @return The device.
+	 * Get the default device for the document.
+	 * @return The device. This can be null if each observation in the document has it's own device.
 	 * @see #device
 	 * @see org.estar.rtml.RTMLDevice
 	 */
 	public RTMLDevice getDevice()
 	{
 		return device;
+	}
+
+	/**
+	 * Set the default document target.
+	 * @param t The target to set.
+	 * @see #target
+	 * @see org.estar.rtml.RTMLTarget
+	 */
+	public void setTarget(RTMLTarget t)
+	{
+		target = t;
+	}
+
+	/**
+	 * Get the default document target.
+	 * @return The target. This can be null if each observation in the document has it's own target.
+	 * @see #target
+	 * @see org.estar.rtml.RTMLTarget
+	 */
+	public RTMLTarget getTarget()
+	{
+		return target;
 	}
 
 	/**
@@ -1474,6 +1504,7 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 	 * @see #getType
 	 * @see #getIntelligentAgent
 	 * @see #getDevice
+	 * @see #getTarget
 	 * @see #getObservationListCount
 	 * @see #getObservation
 	 * @see #getScore
@@ -1511,6 +1542,8 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 			sb.append(prefix+getIntelligentAgent().toString("\t")+"\n");
 		if(getDevice() != null)
 			sb.append(prefix+getDevice().toString("\t")+"\n");
+		if(getTarget() != null)
+			sb.append(prefix+getTarget().toString("\t")+"\n");
 		for(int i = 0; i < getObservationListCount();i++)
 		{
 			ob = getObservation(i);
@@ -1534,6 +1567,9 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.19  2008/07/16 13:32:38  cjm
+** Attempt to bodge setErrorString for RTML 3.1a, rather than getting a NullPointerException on type.
+**
 ** Revision 1.18  2008/06/06 12:00:31  cjm
 ** Added setTOOP method.
 **
