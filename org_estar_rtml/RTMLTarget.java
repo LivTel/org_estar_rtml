@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLTarget.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLTarget.java,v 1.9 2008-08-11 13:54:54 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLTarget.java,v 1.10 2009-08-12 17:48:46 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -28,7 +28,7 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the target nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLTarget extends RTMLAttributes implements Serializable
@@ -36,7 +36,7 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLTarget.java,v 1.9 2008-08-11 13:54:54 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLTarget.java,v 1.10 2009-08-12 17:48:46 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -74,6 +74,18 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	 * An offset to be applied to the Declination.
 	 */
 	private double decOffset = 0.0;
+	/**
+	 * The magnitude of the target.
+	 */
+	private double magnitude = 0.0;
+	/**
+	 * The filter type the magnitude of the target is quoted in (i.e. Mag 10 in R).
+	 */
+	private String magnitudeFilterType = null;
+	/**
+	 * The error of the magnitude.
+	 */
+	private double magnitudeError = 0.0;
 
 	/**
 	 * Default constructor.
@@ -302,6 +314,94 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	}
 
 	/**
+	 * Set target magnitude.
+	 * @param d The magnitude.
+	 * @see #magnitude
+	 */
+	public void setMagnitude(double d)
+	{
+		magnitude = d;
+	}
+
+	/**
+	 * Return an target magnitude.
+	 * @return The magnitude.
+	 * @see #magnitude
+	 */
+	public double getMagnitude()
+	{
+		return magnitude;
+	}
+
+	/**
+	 * Set the magnitude filter type.
+	 * @param s The magnitude filter type. See schema for valid values e.g.:
+	 *          U|B|V|R|I etc.
+	 * @see #magnitudeFilterType
+	 * @exception IllegalArgumentException Thrown if the filter type is illegal.
+	 */
+	public void setMagnitudeFilterType(String s) throws IllegalArgumentException
+	{
+		if((s != null)&&(s.equals("none")||s.equals("clear")||s.equals("neutral_density")||
+				 s.equals("blue")||s.equals("green")||s.equals("red")||s.equals("U")||
+				 s.equals("B")||s.equals("V")||s.equals("R")||s.equals("I")||s.equals("H")||
+				 s.equals("J")||s.equals("K")||s.equals("L")||s.equals("M")||s.equals("N")||
+				 s.equals("Johnson_U")||s.equals("Johnson_B")||s.equals("Johnson_V")||
+				 s.equals("Johnson_R")||s.equals("Johnson_I")||s.equals("Johnson_J")||
+				 s.equals("Johnson_H")||s.equals("Johnson_K")||s.equals("Johnson_L")||
+				 s.equals("Johnson_M")||s.equals("Johnson_N")||
+				 s.equals("Bessel_U")||s.equals("Bessel_B")||s.equals("Bessel_V")||
+				 s.equals("Bessel_R")||s.equals("Bessel_I")||
+				 s.equals("Cousins_R")||s.equals("Cousins_I")||
+				 s.equals("Sloan_u")||s.equals("Sloan_g")||s.equals("Sloan_r")||
+				 s.equals("Sloan_i")||s.equals("Sloan_z")||
+				 s.equals("Stroemgren_u")||s.equals("Stroemgren_b")||s.equals("Stroemgren_v")||
+				 s.equals("Stroemgren_beta")||s.equals("Stroemgren_y")||
+				 s.equals("Gunn_g")||s.equals("Gunn_r")||s.equals("Gunn_i")||s.equals("Gunn_z")||
+				 s.equals("narrowband")||s.equals("Halpha")||s.equals("Hbeta")||
+				 s.equals("forbidden_OI")||s.equals("forbidden_OII")||s.equals("forbidden_OIII")||
+				 s.equals("forbidden_NII")||s.equals("forbidden_SII")||s.equals("other")))
+		{
+			magnitudeFilterType = s;
+		}
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setMagnitudeFilterType:Illegal filter type:"+s);
+		}
+	}
+
+	/**
+	 * Get the magnitude filter type.
+	 * @return The magnitude filter type.
+	 * @see #magnitudeFilterType
+	 */
+	public String getMagnitudeFilterType()
+	{
+		return magnitudeFilterType;
+	}
+
+	/**
+	 * Set target magnitude error.
+	 * @param d The magnitude error.
+	 * @see #magnitudeError
+	 */
+	public void setMagnitudeError(double d)
+	{
+		magnitudeError = d;
+	}
+
+	/**
+	 * Return the target magnitude error.
+	 * @return The magnitude error.
+	 * @see #magnitudeError
+	 */
+	public double getMagnitudeError()
+	{
+		return magnitudeError;
+	}
+
+	/**
 	 * Method to print out a string representation of this node.
 	 */
 	public String toString()
@@ -320,6 +420,9 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	 * @see #equinox
 	 * @see #raOffset
 	 * @see #decOffset
+	 * @see #magnitude
+	 * @see #magnitudeFilterType
+	 * @see #magnitudeError
 	 * @see org.estar.rtml.RTMLAttributes#toString(java.lang.String)
 	 */
 	public String toString(String prefix)
@@ -343,11 +446,19 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 		sb.append(prefix+"\tDec offset:"+df.format(decOffset)+"\n");
 		if(equinox != null)
 			sb.append(prefix+"\tEquinox:"+equinox+"\n");
+		if(magnitudeFilterType != null)
+		{
+			sb.append(prefix+"\tMagtitude:"+df.format(magnitude)+" in "+magnitudeFilterType+
+				  " (+/- "+df.format(magnitudeError)+")\n");
+		}
 		return sb.toString();
 	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.9  2008/08/11 13:54:54  cjm
+** Added RA and Dec offsets.
+**
 ** Revision 1.8  2008/05/27 15:01:06  cjm
 ** Added serialVersionUID.
 **
