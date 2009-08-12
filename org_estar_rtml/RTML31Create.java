@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML31Create.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.6 2009-03-27 11:26:25 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.7 2009-08-12 17:54:19 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -59,14 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class RTML31Create
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Create.java,v 1.6 2009-03-27 11:26:25 cjm Exp $";
+	public final static String RCSID = "$Id: RTML31Create.java,v 1.7 2009-08-12 17:54:19 cjm Exp $";
 	/**
 	 * Default Schema location (URL).
 	 */
@@ -127,6 +127,7 @@ public class RTML31Create
 	 * @see #createTelescope
 	 * @see #createIntelligentAgent
 	 * @see #createDevice
+	 * @see #createTarget
 	 * @see #createObservation
 	 * @see #createScoring
 	 */
@@ -154,6 +155,8 @@ public class RTML31Create
 		createHistory(rtmlElement,d.getHistory());
 		if(d.getDevice() != null)
 			createDevice(rtmlElement,d.getDevice());
+		if(d.getTarget() != null)
+			createTarget(rtmlElement,d.getTarget());
 		if(d.getTelescope() != null)
 			createTelescope(rtmlElement,d.getTelescope());
 		// Project (which contains Contact in RTML 3.1a
@@ -543,18 +546,24 @@ public class RTML31Create
 		// grating
 		if(device.getGrating() != null)
 		{
-			// RTML 3.1a Grating seems to do nothing useful
-			// We want to encapsulate the central wavelength data here
+			// For FrodoSpec we can use the Grating name.
+			if(device.getGrating().getName() != null)
+			{
+				createGrating(setupElement,device.getGrating());
+			}
+			// for Meaburn we want to encapsulate the central wavelength data here
 			// RTML 3.1a Filter has a Central wavelength mode.
-			// filter node/tag
-			filterElement = (Element)document.createElement("Filter");
-			centerElement = (Element)document.createElement("Center");
-			centerElement.setAttribute("units",device.getGrating().getWavelengthUnits());
-			centerElement.appendChild(document.createTextNode(""+
-									  device.getGrating().getWavelengthString()));
-			filterElement.appendChild(centerElement);
-			setupElement.appendChild(filterElement);
-			// name/resolution/angle not used atm
+			if(device.getGrating().getWavelength() != 0.0f)
+			{
+				// filter node/tag
+				filterElement = (Element)document.createElement("Filter");
+				centerElement = (Element)document.createElement("Center");
+				centerElement.setAttribute("units",device.getGrating().getWavelengthUnits());
+				centerElement.appendChild(document.createTextNode(""+
+							  device.getGrating().getWavelengthString()));
+				filterElement.appendChild(centerElement);
+				setupElement.appendChild(filterElement);
+			}
 		}
 		// add Setup to Device
 		deviceElement.appendChild(setupElement);
@@ -676,7 +685,7 @@ public class RTML31Create
 	}
 
 	/**
-	 * Create a Target element and append it to the specified Observation element.
+	 * Create a Target element and append it to the specified Observation Schedule/RTML element.
 	 * @param parentElement The parent element to append the new Target element to, probably a Schedule
 	 *        or could be an RTML element.
 	 * @param target The RTMLTarget object containing target information.
@@ -689,6 +698,7 @@ public class RTML31Create
 		Element raElement = null;
 		Element decElement = null;
 		Element equinoxElement = null;
+		Element brightnessElement = null;
 		Element subElement = null;
 		String s = null;
 		DecimalFormat df = null;
@@ -772,6 +782,30 @@ public class RTML31Create
 		// System  = FK5 or ICRS
 		subElement = (Element)document.createElement("System");
 		subElement.appendChild(document.createTextNode("FK5"));
+		// diddly subElement never added here!
+		// target magnitude
+		if(target.getMagnitudeFilterType() != null)
+		{
+			// TargetBrightness
+			brightnessElement = (Element)document.createElement("TargetBrightness");
+			// Magnitude
+			subElement = (Element)document.createElement("Magnitude");
+			subElement.appendChild(document.createTextNode(df.format(target.getMagnitude())));
+			brightnessElement.appendChild(subElement);
+			// Type (filter)
+			subElement = (Element)document.createElement("Type");
+			subElement.appendChild(document.createTextNode(target.getMagnitudeFilterType()));
+			brightnessElement.appendChild(subElement);
+			// Error
+			if(target.getMagnitudeError() != 0.0)
+			{
+				subElement = (Element)document.createElement("Error");
+				subElement.appendChild(document.createTextNode(df.format(target.getMagnitudeError())));
+				brightnessElement.appendChild(subElement);
+			}
+			// append TargetBrightness to Target
+			targetElement.appendChild(brightnessElement);
+		}
 		// add target to the parent
 		parentElement.appendChild(targetElement);
 		
@@ -1141,6 +1175,10 @@ public class RTML31Create
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.6  2009/03/27 11:26:25  cjm
+** Changed createSourceCatalogue so SourceCatalogue is not created if the objectListType is not set.
+** This stops the parser failing.
+**
 ** Revision 1.5  2009/03/16 12:12:30  cjm
 ** Changed default schema to telescope.livjm.ac.uk hosted. ltproxy
 ** hosted does not work as ltproxy cannot see itself via external ip/8080.
