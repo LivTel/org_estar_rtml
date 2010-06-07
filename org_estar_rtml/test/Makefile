@@ -12,7 +12,7 @@ JAVACFLAGS 	= -d $(LIBDIR) -sourcepath ../../../../ -classpath $(LIBDIR):$(CLASS
 DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 
 SRCS = TestParser.java TestCreate.java TestPeriodFormatParser.java TestSimpleDateFormat.java RTMLConverter.java \
-	TestPeriodFormatEquals.java
+	TestPeriodFormatEquals.java ExtractScore.java
 OBJS = $(SRCS:%.java=$(LIBDIR)/$(PACKAGEDIR)/%.class)
 DOCS = $(SRCS:%.java=$(DOCSDIR)/$(PACKAGEDIR)/%.html)
 CONFIGS = test_create.csh create_example_rtml.csh
