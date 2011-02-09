@@ -13,6 +13,7 @@ DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 SRCS = RTMLException.java RTMLErrorHandler.java RTMLDateFormat.java RTMLPeriodFormat.java RTMLAttributes.java \
 	RTMLDeviceHolder.java RTMLTargetHolder.java RTMLIntelligentAgent.java RTMLTarget.java \
 	RTMLSeeingConstraint.java RTMLSeriesConstraint.java RTMLMoonConstraint.java RTMLSkyConstraint.java \
+	RTMLExtinctionConstraint.java RTMLAirmassConstraint.java \
 	RTMLSchedule.java RTMLGrating.java RTMLDevice.java RTMLDetector.java RTMLObservation.java \
 	RTMLTelescope.java RTMLTelescopeLocation.java \
 	RTMLDocument.java RTMLParser.java RTMLCreate.java RTMLContact.java RTMLProject.java RTMLScore.java \
