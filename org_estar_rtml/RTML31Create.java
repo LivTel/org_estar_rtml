@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML31Create.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.7 2009-08-12 17:54:19 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.8 2011-02-09 18:42:04 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -59,14 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class RTML31Create
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Create.java,v 1.7 2009-08-12 17:54:19 cjm Exp $";
+	public final static String RCSID = "$Id: RTML31Create.java,v 1.8 2011-02-09 18:42:04 cjm Exp $";
 	/**
 	 * Default Schema location (URL).
 	 */
@@ -822,6 +822,8 @@ public class RTML31Create
 	 * @see #createSeeingConstraint
 	 * @see #createMoonConstraint
 	 * @see #createSkyConstraint
+	 * @see #createExtinctionConstraint
+	 * @see #createAirmassConstraint
 	 * @see RTMLSchedule
 	 */
 	private void createSchedule(Element scheduleElement,RTMLSchedule schedule)
@@ -891,6 +893,12 @@ public class RTML31Create
 		// SkyConstraint
 		if(schedule.getSkyConstraint() != null)
 			createSkyConstraint(scheduleElement,schedule.getSkyConstraint());
+		// ExtinctionConstraint
+		if(schedule.getExtinctionConstraint() != null)
+			createExtinctionConstraint(scheduleElement,schedule.getExtinctionConstraint());
+		// AirmassConstraint
+		if(schedule.getAirmassConstraint() != null)
+			createAirmassConstraint(scheduleElement,schedule.getAirmassConstraint());
 	}
 
 	/**
@@ -980,6 +988,26 @@ public class RTML31Create
 	}
 
 	/**
+	 * Create a AirmassConstraint tag.
+	 * @param scheduleElement The schedule XML node to add the airmass constraint to.
+	 * @param airmassConstraint The RTML seeing constraint data.
+	 * @see RTMLAirmassConstraint
+	 */
+	private void createAirmassConstraint(Element scheduleElement,RTMLAirmassConstraint airmassConstraint)
+	{
+		Element airmassConstraintElement = null;
+		DecimalFormat nf = null;
+
+		nf = new DecimalFormat("#####0.0#");
+		// airmass constraint element
+		airmassConstraintElement = (Element)document.createElement("AirmassConstraint");
+		airmassConstraintElement.setAttribute("minimum",nf.format(airmassConstraint.getMinimum()));
+		airmassConstraintElement.setAttribute("maximum",nf.format(airmassConstraint.getMaximum()));
+		// add airmassConstraintElement to a scheduleElement
+		scheduleElement.appendChild(airmassConstraintElement);		
+	}
+
+	/**
 	 * Create a SeeingConstraint tag.
 	 * @param scheduleElement The schedule XML node to add the seeing constraint to.
 	 * @param seeingConstraint The RTML seeing constraint data.
@@ -1043,6 +1071,40 @@ public class RTML31Create
 		skyConstraintElement.appendChild(brightnessElement);
 		// add skyConstraintElement to a scheduleElement
 		scheduleElement.appendChild(skyConstraintElement);		
+	}
+
+	/**
+	 * Create a ExtinctionConstraint tag.
+	 * @param scheduleElement The schedule XML node to add the sky constraint to.
+	 * @param extinctionConstraint The RTML extinction constraint data.
+	 * @see RTMLExtinctionConstraint
+	 */
+	private void createExtinctionConstraint(Element scheduleElement,RTMLExtinctionConstraint extinctionConstraint)
+	{
+		Element extinctionConstraintElement = null;
+		Element cloudsElement = null;
+		String cloudsString = null;
+		Element magnitudesElement = null;
+
+		// extinction constraint element
+		extinctionConstraintElement = (Element)document.createElement("ExtinctionConstraint");
+		// clouds
+		cloudsString = extinctionConstraint.getClouds();
+		if(cloudsString != null)
+		{
+			cloudsElement = (Element)document.createElement("Clouds");
+			cloudsElement.appendChild(document.createTextNode(cloudsString));
+			extinctionConstraintElement.appendChild(cloudsElement);
+		}
+		// magnitudes
+		if(extinctionConstraint.getValue() != 0.0)
+		{
+			magnitudesElement = (Element)document.createElement("Magnitudes");
+			magnitudesElement.appendChild(document.createTextNode(""+extinctionConstraint.getValue()));
+			extinctionConstraintElement.appendChild(magnitudesElement);
+		}
+		// add extinctionConstraintElement to a scheduleElement
+		scheduleElement.appendChild(extinctionConstraintElement);		
 	}
 
 	/**
@@ -1175,6 +1237,11 @@ public class RTML31Create
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.7  2009/08/12 17:54:19  cjm
+** Now creates document-wide target if present.
+** Now creates Grating, for Frodospec.
+** Now creates TargetBrightness if present.
+**
 ** Revision 1.6  2009/03/27 11:26:25  cjm
 ** Changed createSourceCatalogue so SourceCatalogue is not created if the objectListType is not set.
 ** This stops the parser failing.
