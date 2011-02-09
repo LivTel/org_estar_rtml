@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.25 2009-08-12 17:56:06 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.26 2011-02-09 18:43:19 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -37,14 +37,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.25 $
+ * @version $Revision: 1.26 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.25 2009-08-12 17:56:06 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.26 2011-02-09 18:43:19 cjm Exp $";
 	/**
 	 * Create to use for creating the RTML XML from the document object model tree.
 	 */
@@ -94,6 +94,10 @@ public class TestCreate
 	 */
 	protected RTMLSchedule schedule = null;
 	/**
+	 * RTML schedule airmass constraint data.
+	 */
+	protected RTMLAirmassConstraint airmassConstraint = null;
+	/**
 	 * RTML schedule series constraint data.
 	 */
 	protected RTMLSeriesConstraint seriesConstraint = null;
@@ -109,6 +113,10 @@ public class TestCreate
 	 * RTML schedule sky constraint data.
 	 */
 	protected RTMLSkyConstraint skyConstraint = null;
+	/**
+	 * RTML schedule extinction constraint data.
+	 */
+	protected RTMLExtinctionConstraint extinctionConstraint = null;
 	/**
 	 * RTML observation image data.
 	 */
@@ -165,7 +173,33 @@ public class TestCreate
 		}
 		for(int i = 0; i < args.length; i++)
 		{
-			if(args[i].equals("-binning"))
+			if(args[i].equals("-airmass_constraint"))
+			{
+				if((i+2) < args.length)
+				{
+					if(schedule != null)
+					{
+						airmassConstraint = new RTMLAirmassConstraint();
+						schedule.setAirmassConstraint(airmassConstraint);
+						airmassConstraint.setMinimum(args[i+1]);
+						airmassConstraint.setMaximum(args[i+2]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+						     ":parseArguments:airmass_constraint:schedule was null.");
+						System.exit(2);
+					}
+					i+= 2;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+						 ":parseArguments:seeing_constraint needs a <minimum> and <maximum>.");
+					System.exit(2);
+				}
+			}
+			else if(args[i].equals("-binning"))
 			{
 				if (device != null)
 				{
@@ -649,6 +683,31 @@ public class TestCreate
 				{
 					System.err.println(this.getClass().getName()+
 							   ":parseArguments:exposure needs a length and units.");
+					System.exit(2);
+				}
+			}
+			else if(args[i].equals("-extinction_constraint"))
+			{
+				if((i+1) < args.length)
+				{
+					if(schedule != null)
+					{
+						extinctionConstraint = new RTMLExtinctionConstraint();
+						schedule.setExtinctionConstraint(extinctionConstraint);
+						extinctionConstraint.setClouds(args[i+1]);
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+						     ":parseArguments:extinction_constraint:clouds was null.");
+						System.exit(2);
+					}
+					i+= 1;
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+						 ":parseArguments:extinction_constraint needs clouds <clear|light|scattered|heavy>.");
 					System.exit(2);
 				}
 			}
@@ -1536,6 +1595,7 @@ public class TestCreate
 		System.err.println("\t\t[-moon_constraint <distance> <units(degs|rads)>]");
 		System.err.println("\t\t[-seeing_constraint <min arcsec> <max arcsec>]");
 		System.err.println("\t\t[-sky_constraint <dark|bright>]");
+		System.err.println("\t\t[-extinction_constraint <clear|light|scattered|heavy>]");
 		System.err.println("\t\t[-image_data_url <url> [-image_data_fits_header <string>]");
 		System.err.println("\t\t\t[-image_data_object_list <cluster|votable-url> <filename/url>]]");
 		System.err.println("\t[-document_score <double>]");
@@ -1570,6 +1630,12 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.25  2009/08/12 17:56:06  cjm
+** Changed target handling, per-observation and per-document targets can now be created.
+** Observation sub-elements now linked at creation.
+** Added -target,-grating_name,-target_magnitude.
+** Changed -name to -target_name.
+**
 ** Revision 1.24  2008/08/28 18:23:48  cjm
 ** Changed device handling: device name/spectral_region no longer has to be specified.
 **
