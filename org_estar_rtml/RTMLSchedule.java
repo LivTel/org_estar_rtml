@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLSchedule.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.18 2008-06-24 16:53:26 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSchedule.java,v 1.19 2011-02-09 18:41:22 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -30,7 +30,7 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.19 $
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLSchedule extends RTMLAttributes implements Serializable
@@ -38,7 +38,7 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.18 2008-06-24 16:53:26 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.19 2011-02-09 18:41:22 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -118,6 +118,16 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 	 * the observation should be started BEFORE this time.
 	 */
 	private Date endDate = null;
+	/**
+	 * Object containing details of any specified airmass constraint.
+	 * This reference can be null, if no extinction constraint was specified.
+	 */
+	private RTMLAirmassConstraint airmassConstraint = null;
+	/**
+	 * Object containing details of any specified extinction constraint.
+	 * This reference can be null, if no extinction constraint was specified.
+	 */
+	private RTMLExtinctionConstraint extinctionConstraint = null;
 	/**
 	 * Object containing details of any specified series constraint.
 	 * This reference can be null, if no series constraint was specified.
@@ -541,6 +551,26 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 		return endDate;
 	}
 
+	/**
+	 * Set the airmass constraint data. This constrains the observation to be done when the airmass
+	 * match the specified criteria.
+	 * @param ac A airmass constraint. This can be null.
+	 * @see #airmassConstraint
+	 */
+	public void setAirmassConstraint(RTMLAirmassConstraint ac)
+	{
+		airmassConstraint = ac;
+	}
+
+	/**
+	 * Get the airmass constraint data.
+	 * @return A airmass constraint. This can be null.
+	 * @see #airmassConstraint
+	 */
+	public RTMLAirmassConstraint getAirmassConstraint()
+	{
+		return airmassConstraint;
+	}
 
 	/**
 	 * Set the series constraint data. This data contains information on how to repeat
@@ -628,6 +658,27 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 	}
 
 	/**
+	 * Set the extinction constraint data. This constrains the observation to be done when the extinction
+	 * conditions match the specified criteria.
+	 * @param c A extinction constraint. This can be null.
+	 * @see #extinctionConstraint
+	 */
+	public void setExtinctionConstraint(RTMLExtinctionConstraint c)
+	{
+		extinctionConstraint = c;
+	}
+
+	/**
+	 * Get the extinction constraint data.
+	 * @return A extinction constraint. This can be null.
+	 * @see #extinctionConstraint
+	 */
+	public RTMLExtinctionConstraint getExtinctionConstraint()
+	{
+		return extinctionConstraint;
+	}
+
+	/**
 	 * Determine whether this schedule specifies a flexibly scheduled one off observation,
 	 * or a regularily spaced monitor group observation.
 	 * Currently a schedule containing a series constraint with a count > 1 is counted as a monitor group.
@@ -662,10 +713,12 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 	 * @see #exposureCount
 	 * @see #startDate
 	 * @see #endDate
+	 * @see #airmassConstraint
 	 * @see #seriesConstraint
 	 * @see #seeingConstraint
 	 * @see #moonConstraint
 	 * @see #skyConstraint
+	 * @see #extinctionConstraint
 	 * @see #isMonitorGroup
 	 * @see org.estar.rtml.RTMLAttributes#toString(java.lang.String)
 	 */
@@ -680,6 +733,8 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 		sb.append(prefix+"\tExposure: type = "+exposureType+": units = "+exposureUnits+"\n");
 		sb.append(prefix+"\t\tLength:"+exposureLength+"\n");
 		sb.append(prefix+"\t\tCount:"+exposureCount+"\n");
+		if(getAirmassConstraint() != null)
+			sb.append(getAirmassConstraint().toString(prefix+"\t"));
 		if(getSeriesConstraint() != null)
 			sb.append(getSeriesConstraint().toString(prefix+"\t"));
 		if(getSeeingConstraint() != null)
@@ -688,12 +743,17 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 			sb.append(getMoonConstraint().toString(prefix+"\t"));
 		if(getSkyConstraint() != null)
 			sb.append(getSkyConstraint().toString(prefix+"\t"));
+		if(getExtinctionConstraint() != null)
+			sb.append(getExtinctionConstraint().toString(prefix+"\t"));
 		sb.append(prefix+"\tBetween:"+startDate+" and "+endDate+"\n");
 		return sb.toString();
 	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.18  2008/06/24 16:53:26  cjm
+** And more documentation.
+**
 ** Revision 1.17  2008/06/24 16:51:48  cjm
 ** Added exposure units documentation.
 **
