@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML31Parser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Parser.java,v 1.5 2009-08-12 17:52:57 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Parser.java,v 1.6 2011-02-09 18:42:38 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -52,14 +52,14 @@ import org.estar.astrometry.*;
  * Extends RTMLParser to make use of methods common to this and RTML22Parser (parseIntegerNode etc), even though
  * this subclass is created as part of the RTMLParser's parsing.
  * @author Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class RTML31Parser extends RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Parser.java,v 1.5 2009-08-12 17:52:57 cjm Exp $";
+	public final static String RCSID = "$Id: RTML31Parser.java,v 1.6 2011-02-09 18:42:38 cjm Exp $";
 
 	/**
 	 * Default constructor.
@@ -1657,6 +1657,8 @@ public class RTML31Parser extends RTMLParser
 	 * @see #parseSeeingConstraintNode
 	 * @see #parseMoonConstraintNode
 	 * @see #parseSkyConstraintNode
+	 * @see #parseExtinctionConstraintNode
+	 * @see #parseAirmassConstraintNode
 	 * @see #parseTargetNode
 	 * @see #parseObservationNode
 	 * @see #parseIntegerNode
@@ -1707,14 +1709,20 @@ public class RTML31Parser extends RTMLParser
 			
 			if(childNode.getNodeType() == Node.ELEMENT_NODE)
 			{
-				if(childNode.getNodeName() == "Exposure")
-					parseExposureNode(schedule,childNode);
+				if(childNode.getNodeName() == "AirmassConstraint")
+					parseAirmassConstraintNode(schedule,childNode);
 				else if(childNode.getNodeName() == "Calibaration")
 					parseCalibrationNode(schedule,childNode);
 				else if(childNode.getNodeName() == "DateTimeConstraint")
 					parseDateTimeConstraintNode(schedule,childNode);
 				else if(childNode.getNodeName() == "Device")
 					parseDeviceNode(observation,childNode);
+				else if(childNode.getNodeName() == "Exposure")
+					parseExposureNode(schedule,childNode);
+				else if(childNode.getNodeName() == "ExtinctionConstraint")
+					parseExtinctionConstraintNode(schedule,childNode);
+				else if(childNode.getNodeName() == "MoonConstraint")
+					parseMoonConstraintNode(schedule,childNode);
 				else if(childNode.getNodeName() == "Observation")
 					parseObservationNode(observation,childNode);
 				else if(childNode.getNodeName() == "Priority")
@@ -1726,8 +1734,6 @@ public class RTML31Parser extends RTMLParser
 					parseSeriesConstraintNode(schedule,childNode);
 				else if(childNode.getNodeName() == "SeeingConstraint")
 					parseSeeingConstraintNode(schedule,childNode);
-				else if(childNode.getNodeName() == "MoonConstraint")
-					parseMoonConstraintNode(schedule,childNode);
 				else if(childNode.getNodeName() == "SkyConstraint")
 					parseSkyConstraintNode(schedule,childNode);
 				else if(childNode.getNodeName() == "Target")
@@ -1955,6 +1961,60 @@ public class RTML31Parser extends RTMLParser
 			}
 		}
 		return date;
+	}
+
+	/**
+	 * Internal method to parse a AirmassConstraint node.
+	 * @param schedule The instance of RTMLSchedule to set the airmass constrints for.
+	 * @param seeingConstraintNode The XML DOM node for the AirmassConstraint tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @exception NumberFormatException Thrown if a parse error occurs when parsing the numeric attributes.
+	 * @see RTMLSchedule
+	 * @see RTMLAirmassConstraint
+	 */
+	private void parseAirmassConstraintNode(RTMLSchedule schedule,Node airmassConstraintNode) throws 
+		RTMLException, NumberFormatException
+	{
+		RTMLAirmassConstraint airmassConstraint = null;
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+		String s = null;
+
+		// check current XML node is correct
+		if(airmassConstraintNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseAirmassConstraintNode:Illegal Node:"+
+						airmassConstraintNode);
+		}
+		if(airmassConstraintNode.getNodeName() != "AirmassConstraint")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseAirmassConstraintNode:Illegal Node Name:"+
+						airmassConstraintNode.getNodeName());
+		}
+		// add airmass constraint object
+		airmassConstraint = new RTMLAirmassConstraint();
+		// go through attribute list
+		attributeList = airmassConstraintNode.getAttributes();
+		// minimum
+		attributeNode = attributeList.getNamedItem("minimum");
+		if(attributeNode != null)
+		{
+			s = attributeNode.getNodeValue();
+			if(s != null)
+				airmassConstraint.setMinimum(s);
+		}
+		// maximum
+		attributeNode = attributeList.getNamedItem("maximum");
+		if(attributeNode != null)
+		{
+			s = attributeNode.getNodeValue();
+			if(s != null)
+				airmassConstraint.setMaximum(s);
+		}
+		// add airmass constraint to schedule
+		schedule.setAirmassConstraint(airmassConstraint);
 	}
 
 	/**
@@ -2204,6 +2264,61 @@ public class RTML31Parser extends RTMLParser
 		}// end for
 		// add sky constraint to schedule
 		schedule.setSkyConstraint(skyConstraint);
+	}
+
+	/**
+	 * Internal method to parse a ExtinctionConstraint node.
+	 * @param schedule The instance of RTMLSchedule to set the sky constrints for.
+	 * @param extinctionConstraintNode The XML DOM node for the ExtinctionConstrint tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @exception NumberFormatException Thrown if a parse error occurs when parsing the numeric attributes.
+	 * @see RTMLSchedule
+	 * @see RTMLExtinctionConstraint
+	 */
+	private void parseExtinctionConstraintNode(RTMLSchedule schedule,Node extinctionConstraintNode) throws 
+		RTMLException, NumberFormatException
+	{
+		RTMLExtinctionConstraint extinctionConstraint = null;
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+		String s = null;
+
+		// check current XML node is correct
+		if(extinctionConstraintNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseExtinctionConstraintNode:Illegal Node:"+
+						extinctionConstraintNode);
+		}
+		if(extinctionConstraintNode.getNodeName() != "ExtinctionConstraint")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseExtinctionConstraintNode:Illegal Node Name:"+
+						extinctionConstraintNode.getNodeName());
+		}
+		// add sky constraint object
+		extinctionConstraint = new RTMLExtinctionConstraint();
+		// go through child nodes
+		childList = extinctionConstraintNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "Clouds")
+				{
+					extinctionConstraint.setClouds(parseStringNode("Clouds",childNode));
+				}
+				if(childNode.getNodeName() == "Magnitudes")
+				{
+					extinctionConstraint.setValue(parseDoubleNode(childNode));
+				}
+			}
+		}// end for
+		// add extinction constraint to schedule
+		schedule.setExtinctionConstraint(extinctionConstraint);
 	}
 
 	/**
@@ -2543,6 +2658,11 @@ public class RTML31Parser extends RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.5  2009/08/12 17:52:57  cjm
+** Now parses default document-wide target.
+** Now parses Grating in Setup, for FrodoSpec grating names.
+** Now parses TargetBrightness in Target, for giving a hint as to what acquisition mode to use.
+**
 ** Revision 1.4  2009/03/27 11:38:37  cjm
 ** Added extra check to parseSourceCatalogueNode if type attribute does not exist (is null).
 **
