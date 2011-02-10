@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLAirmassConstraint.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLAirmassConstraint.java,v 1.2 2011-02-10 14:09:43 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLAirmassConstraint.java,v 1.3 2011-02-10 14:49:45 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -33,14 +33,14 @@ import java.text.*;
  * </ul>
  * Only the <i>maximum</i> value is used by the TEA at the moment. 
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class RTMLAirmassConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLAirmassConstraint.java,v 1.2 2011-02-10 14:09:43 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLAirmassConstraint.java,v 1.3 2011-02-10 14:49:45 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -166,13 +166,16 @@ public class RTMLAirmassConstraint implements Serializable
 		
 		sb = new StringBuffer();
 		sb.append(prefix+"Airmass Constraint:\n");
-		sb.append(prefix+"\tMiniumu:"+minimum+".\n");
+		sb.append(prefix+"\tMinimum:"+minimum+".\n");
 		sb.append(prefix+"\tMaximum:"+maximum+".\n");
 		return sb.toString();
 	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2011/02/10 14:09:43  cjm
+** Added serialVersionUID.
+**
 ** Revision 1.1  2011/02/09 18:40:24  cjm
 ** Initial revision
 **
