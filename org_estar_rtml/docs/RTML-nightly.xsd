@@ -1504,7 +1504,7 @@ A non-negative integer indicating the relative priority of a &lt;Project&gt;, &l
 		</xs:annotation>
 		<xs:complexType>
 			<xs:simpleContent>
-				<xs:extension base="xs:positiveInteger"/>
+				<xs:extension base="xs:nonNegativeInteger"/>
 			</xs:simpleContent>
 		</xs:complexType>
 	</xs:element>
@@ -1584,8 +1584,8 @@ e.g. in a focus series).
 			<xs:sequence>
 				<xs:choice>
 					<xs:sequence>
-						<xs:element name="Hours" type="xs:positiveInteger"/>
-						<xs:element name="Minutes" type="xs:positiveInteger"/>
+						<xs:element name="Hours" type="xs:nonNegativeInteger"/>
+						<xs:element name="Minutes" type="xs:nonNegativeInteger"/>
 						<xs:element name="Seconds" type="xs:double"/>
 					</xs:sequence>
 					<xs:element name="Value">
