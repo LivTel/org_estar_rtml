@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML31Create.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.8 2011-02-09 18:42:04 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.9 2012-05-24 14:08:22 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -59,14 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class RTML31Create
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Create.java,v 1.8 2011-02-09 18:42:04 cjm Exp $";
+	public final static String RCSID = "$Id: RTML31Create.java,v 1.9 2012-05-24 14:08:22 cjm Exp $";
 	/**
 	 * Default Schema location (URL).
 	 */
@@ -1058,17 +1058,37 @@ public class RTML31Create
 	 * @param scheduleElement The schedule XML node to add the sky constraint to.
 	 * @param skyConstraint The RTML sky constraint data.
 	 * @see RTMLSkyConstraint
+	 * @see RTMLSkyConstraint#getSky
+	 * @see RTMLSkyConstraint#getUseValue
+	 * @see RTMLSkyConstraint#getValue
+	 * @see RTMLSkyConstraint#getUnits
 	 */
 	private void createSkyConstraint(Element scheduleElement,RTMLSkyConstraint skyConstraint)
 	{
 		Element skyConstraintElement = null;
-		Element brightnessElement = null;
+		Element subElement = null;
+		DecimalFormat df = null;
 
 		// sky constraint element
 		skyConstraintElement = (Element)document.createElement("SkyConstraint");
-		brightnessElement = (Element)document.createElement("Brightness");
-		brightnessElement.appendChild(document.createTextNode(skyConstraint.getSky()));
-		skyConstraintElement.appendChild(brightnessElement);
+		if(skyConstraint.getSky() != null)
+		{
+			subElement = (Element)document.createElement("Brightness");
+			subElement.appendChild(document.createTextNode(skyConstraint.getSky()));
+			skyConstraintElement.appendChild(subElement);
+		}
+		if(skyConstraint.getUseValue())
+		{
+			// flux
+			df = new DecimalFormat("#0.0##");
+			subElement = (Element)document.createElement("Flux");
+			subElement.appendChild(document.createTextNode(df.format(skyConstraint.getValue())));
+			skyConstraintElement.appendChild(subElement);
+			// units
+			subElement = (Element)document.createElement("Units");
+			subElement.appendChild(document.createTextNode(skyConstraint.getUnits()));
+			skyConstraintElement.appendChild(subElement);
+		}
 		// add skyConstraintElement to a scheduleElement
 		scheduleElement.appendChild(skyConstraintElement);		
 	}
@@ -1237,6 +1257,9 @@ public class RTML31Create
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.8  2011/02/09 18:42:04  cjm
+** Added airmass and extinction constraint creation.
+**
 ** Revision 1.7  2009/08/12 17:54:19  cjm
 ** Now creates document-wide target if present.
 ** Now creates Grating, for Frodospec.
