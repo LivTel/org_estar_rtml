@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLSkyConstraint.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSkyConstraint.java,v 1.3 2008-08-11 13:54:54 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSkyConstraint.java,v 1.4 2012-05-24 14:06:22 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -30,19 +30,23 @@ import java.text.*;
  * <ul>
  * <li><b>sky</b> A simple description of what sky we are constrained to, of type %simpleSkyTypes: 
  *     (dark|gray|grey|bright).
- * <li><b>value</b> A measure of how much sky brightness is acceptable, <i>units</i>.
- * <li><b>units</b> The units of <i>value</i>.
+ * <li><b>value</b> A measure of how much sky brightness is acceptable, a flux measured in <i>units</i>.
+ * <li><b>units</b> The units of flux <i>value</i>.
  * </ul>
  * Only the <i>sky</i> value is used by the TEA at the moment. 
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RTMLSkyConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSkyConstraint.java,v 1.3 2008-08-11 13:54:54 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSkyConstraint.java,v 1.4 2012-05-24 14:06:22 cjm Exp $";
+	/**
+	 * Constant for describing the units of sky constraint. This one as defined in the RTML3.1 schema.
+	 */
+	public final static String UNITS_MAGS_PER_SQUARE_ARCSEC = "magnitudes/square-arcsecond";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -52,22 +56,32 @@ public class RTMLSkyConstraint implements Serializable
 	 */
 	private String sky = null;
 	/**
-	 * The sky brightness expressed as a number with <i>units</i> units.
+	 * This boolean is used to indicate the value has been set.
+	 */
+	private boolean useValue = false;
+	/**
+	 * The sky brightness expressed as a flux with <i>units</i> units.
 	 * @see #units
+	 * @see #useValue
 	 */
 	private double value = 0.0;
 	/**
-	 * The units of value.
+	 * The units of value. According to the RTML3.1 schema, this must be "magnitudes/square-arcsecond".
+	 * According to the RTML 2.2 schema this can be any value from the entity %fluxUnits:
+	 * U-mag|B-mag|V-mag|R-mag|I-mag|Jansky|Jaskies|Jy|Jys|milli-Jansky|mJy|mJys|ergs-per-cm2-per-s|
+	 * ergs-per-cm2-per-s-per-A|ergs-per-cm2-per-s-per-Hz|ergs-per-cm2-per-s-per-micron|Watts-per-m2|other.
 	 * @see #value
 	 */
 	private String units = null;
 
 	/**
 	 * Default constructor.
+	 * @see #useValue
 	 */
 	public RTMLSkyConstraint()
 	{
 		super();
+		useValue = false;
 	}
 
 	/**
@@ -75,20 +89,24 @@ public class RTMLSkyConstraint implements Serializable
 	 * @param s The value specified as a string representation of a double.
 	 * @exception NumberFormatException Thrown if the string parsing fails.
 	 * @see #value
+	 * @see #useValue
 	 */
 	public void setValue(String s) throws NumberFormatException
 	{
 		value = Double.parseDouble(s);
+		useValue = true;
 	}
 
 	/**
 	 * Set the value.
 	 * @param d The value, specified as a double.
 	 * @see #value
+	 * @see #useValue
 	 */
 	public void setValue(double d)
 	{
 		value = d;
+		useValue = true;
 	}
 
 	/**
@@ -102,14 +120,30 @@ public class RTMLSkyConstraint implements Serializable
 	}
 
 	/**
+	 * Get whether the value has been set.
+	 * @return A boolean, true if the value has been set.
+	 * @see #useValue
+	 */
+	public boolean getUseValue()
+	{
+		return useValue;
+	}
+
+	/**
 	 * Set the units of value.
 	 * @param s The units.
 	 * @exception IllegalArgumentException Thrown if the units are not valid.
 	 * @see #units
 	 * @see #value
+	 * @see #UNITS_MAGS_PER_SQUARE_ARCSEC
 	 */
 	public void setUnits(String s) throws IllegalArgumentException
 	{
+		if(!(s.equals(UNITS_MAGS_PER_SQUARE_ARCSEC)))
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+":setUnits:Illegal units:"
+							   +s+", should be "+UNITS_MAGS_PER_SQUARE_ARCSEC+".");
+		}
 		units = s;
 	}
 
@@ -161,7 +195,10 @@ public class RTMLSkyConstraint implements Serializable
 	 */
 	public boolean isDark()
 	{
-		return isDark(sky);
+		if(sky != null)
+			return isDark(sky);
+		else
+			return false;
 	}
 
 	/**
@@ -183,7 +220,10 @@ public class RTMLSkyConstraint implements Serializable
 	 */
 	public boolean isGrey()
 	{
-		return isGrey(sky);
+		if(sky != null)
+			return isGrey(sky);
+		else
+			return false;
 	}
 
 	/**
@@ -205,7 +245,10 @@ public class RTMLSkyConstraint implements Serializable
 	 */
 	public boolean isBright()
 	{
-		return isBright(sky);
+		if(sky != null)
+			return isBright(sky);
+		else
+			return false;
 	}
 
 	/**
@@ -232,7 +275,27 @@ public class RTMLSkyConstraint implements Serializable
 		if((obj instanceof RTMLSkyConstraint) == false)
 			return false;
 		other = (RTMLSkyConstraint)obj;
-		if(other.getSky().equals(sky) == false)
+		// if both have a sky string compare them
+		if((sky != null)&&(other.getSky() != null))
+		{
+			if(other.getSky().equals(sky) == false)
+				return false;
+		}
+		// if one has a sky string and the other doesn't they must be different
+		if(((sky == null)&&(other.getSky() != null))||((sky != null)&&(other.getSky() == null)))
+			return false;
+		// if both have a value check it
+		if(useValue && other.getUseValue())
+		{
+			// check units are identical
+			if(other.getUnits().equals(units) == false)
+				return false;
+			// check values are very close to each other
+			if(Math.abs(value - other.getValue()) > 0.0001)
+				return false;
+		}
+		// if only one has a value set, the two objects are different
+		if((useValue && (other.getUseValue() == false))||((useValue == false) && other.getUseValue()))
 			return false;
 		return true;
 	}
@@ -249,19 +312,30 @@ public class RTMLSkyConstraint implements Serializable
 	 * Method to print out a string representation of this node, with a prefix.
 	 * @param prefix A string to prefix to each line of data we print out.
 	 * @see #sky
+	 * @see #useValue
+	 * @see #value
+	 * @see #units
 	 */
 	public String toString(String prefix)
 	{
 		StringBuffer sb = null;
-		
+		DecimalFormat df = null;
+
+		df = new DecimalFormat("#0.0##");		
 		sb = new StringBuffer();
 		sb.append(prefix+"Sky Constraint:\n");
-		sb.append(prefix+"\tSky description:"+sky+".\n");
+		if(sky != null)
+			sb.append(prefix+"\tSky Description:"+sky+".\n");
+		if(useValue)
+			sb.append(prefix+"\tSky Brightness:"+df.format(value)+" "+units+".\n");
 		return sb.toString();
 	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2008/08/11 13:54:54  cjm
+** Added equals method for constraint equality checking.
+**
 ** Revision 1.2  2008/05/27 15:00:09  cjm
 ** Added serialVersionUID.
 **
