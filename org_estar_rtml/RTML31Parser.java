@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML31Parser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Parser.java,v 1.6 2011-02-09 18:42:38 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Parser.java,v 1.7 2012-05-24 14:09:01 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -52,14 +52,14 @@ import org.estar.astrometry.*;
  * Extends RTMLParser to make use of methods common to this and RTML22Parser (parseIntegerNode etc), even though
  * this subclass is created as part of the RTMLParser's parsing.
  * @author Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class RTML31Parser extends RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Parser.java,v 1.6 2011-02-09 18:42:38 cjm Exp $";
+	public final static String RCSID = "$Id: RTML31Parser.java,v 1.7 2012-05-24 14:09:01 cjm Exp $";
 
 	/**
 	 * Default constructor.
@@ -2260,6 +2260,14 @@ public class RTML31Parser extends RTMLParser
 				{
 					skyConstraint.setSky(parseStringNode("Brightness",childNode));
 				}
+				if(childNode.getNodeName() == "Flux")
+				{
+					skyConstraint.setValue(parseDoubleNode(childNode));
+				}
+				if(childNode.getNodeName() == "Units")
+				{
+					skyConstraint.setUnits(parseStringNode("Units",childNode));
+				}
 			}
 		}// end for
 		// add sky constraint to schedule
@@ -2658,6 +2666,9 @@ public class RTML31Parser extends RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.6  2011/02/09 18:42:38  cjm
+** Added airmass and extinction constraint parsing.
+**
 ** Revision 1.5  2009/08/12 17:52:57  cjm
 ** Now parses default document-wide target.
 ** Now parses Grating in Setup, for FrodoSpec grating names.
