@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML22Create.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.43 2008-08-11 13:54:54 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Create.java,v 1.44 2012-05-24 14:07:38 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -60,14 +60,14 @@ import org.estar.astrometry.*;
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * The resultant XML document is in RTML 2.2.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.43 $
+ * @version $Revision: 1.44 $
  */
 public class RTML22Create
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Create.java,v 1.43 2008-08-11 13:54:54 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Create.java,v 1.44 2012-05-24 14:07:38 cjm Exp $";
 	/**
 	 * Private reference to org.w3c.dom.Document, the head of the DOM tree.
 	 */
@@ -743,12 +743,21 @@ public class RTML22Create
 	private void createSkyConstraint(Element scheduleElement,RTMLSkyConstraint skyConstraint)
 	{
 		Element skyConstraintElement = null;
+		DecimalFormat df = null;
 
 		// sky constraint element
 		skyConstraintElement = (Element)document.createElement("SkyConstraint");
-		skyConstraintElement.setAttribute("sky",skyConstraint.getSky());
+		if(skyConstraint.getSky() != null)
+			skyConstraintElement.setAttribute("sky",skyConstraint.getSky());
 		// value
-		// units
+		if(skyConstraint.getUseValue())
+		{
+			df = new DecimalFormat("#0.0##");
+			skyConstraintElement.setAttribute("flux",df.format(skyConstraint.getValue()));
+			// units
+			skyConstraintElement.setAttribute("units",skyConstraint.getUnits());
+
+		}
 		// add skyConstraintElement to a scheduleElement
 		scheduleElement.appendChild(skyConstraintElement);		
 	}
@@ -900,6 +909,9 @@ public class RTML22Create
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.43  2008/08/11 13:54:54  cjm
+** Added creation of target offset "AngleOffset" elements.
+**
 ** Revision 1.42  2008/06/05 14:20:39  cjm
 ** Added Telescope and Telescope Location support.
 **
