@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML22Parser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.31 2008-08-11 13:54:54 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML22Parser.java,v 1.32 2012-05-24 14:06:57 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -52,14 +52,14 @@ import org.estar.astrometry.*;
  * Extends RTMLParser to make use of methods common to this and RTML31Parser (parseIntegerNode etc), even though
  * this subclass is created as part of the RTMLParser's parsing.
  * @author Chris Mottram
- * @version $Revision: 1.31 $
+ * @version $Revision: 1.32 $
  */
 public class RTML22Parser extends RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML22Parser.java,v 1.31 2008-08-11 13:54:54 cjm Exp $";
+	public final static String RCSID = "$Id: RTML22Parser.java,v 1.32 2012-05-24 14:06:57 cjm Exp $";
 
 	/**
 	 * Default constructor.
@@ -2121,13 +2121,29 @@ public class RTML22Parser extends RTMLParser
 		skyConstraint = new RTMLSkyConstraint();
 		// go through attribute list
 		attributeList = skyConstraintNode.getAttributes();
-		// distance
+		// sky 
 		attributeNode = attributeList.getNamedItem("sky");
 		if(attributeNode != null)
 		{
 			s = attributeNode.getNodeValue();
 			if(s != null)
 				skyConstraint.setSky(s);
+		}
+		// value flux
+		attributeNode = attributeList.getNamedItem("flux");
+		if(attributeNode != null)
+		{
+			s = attributeNode.getNodeValue();
+			if(s != null)
+				skyConstraint.setValue(s);
+		}
+		// value units
+		attributeNode = attributeList.getNamedItem("units");
+		if(attributeNode != null)
+		{
+			s = attributeNode.getNodeValue();
+			if(s != null)
+				skyConstraint.setUnits(s);
 		}
 		// add sky constraint to schedule
 		schedule.setSkyConstraint(skyConstraint);
@@ -2478,6 +2494,9 @@ public class RTML22Parser extends RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.31  2008/08/11 13:54:54  cjm
+** Added Target RA/Dec offset parsing: parseAngleOffsetNode.
+**
 ** Revision 1.30  2008/06/05 14:26:08  cjm
 ** Added Telescope and Telescope Location support.
 **
