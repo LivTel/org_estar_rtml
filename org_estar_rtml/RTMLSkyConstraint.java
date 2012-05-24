@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLSkyConstraint.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSkyConstraint.java,v 1.4 2012-05-24 14:06:22 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLSkyConstraint.java,v 1.5 2012-05-24 16:27:34 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -35,14 +35,14 @@ import java.text.*;
  * </ul>
  * Only the <i>sky</i> value is used by the TEA at the moment. 
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class RTMLSkyConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSkyConstraint.java,v 1.4 2012-05-24 14:06:22 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLSkyConstraint.java,v 1.5 2012-05-24 16:27:34 cjm Exp $";
 	/**
 	 * Constant for describing the units of sky constraint. This one as defined in the RTML3.1 schema.
 	 */
@@ -206,7 +206,7 @@ public class RTMLSkyConstraint implements Serializable
 	 * @param s The string representing the sky description.
 	 * @return A boolean, true if the string description is "dark", false otherwise.
 	 */
-	protected boolean isDark(String s)
+	public boolean isDark(String s)
 	{
 		return s.equals("dark");
 	}
@@ -231,7 +231,7 @@ public class RTMLSkyConstraint implements Serializable
 	 * @param s The string representing the sky description.
 	 * @return A boolean, true if the string description is "grey/gray", false otherwise.
 	 */
-	protected boolean isGrey(String s)
+	public boolean isGrey(String s)
 	{
 		return (s.equals("grey")||s.equals("gray"));
 	}
@@ -256,7 +256,7 @@ public class RTMLSkyConstraint implements Serializable
 	 * @param s The string representing the sky description.
 	 * @return A boolean, true if the string description is "bright", false otherwise.
 	 */
-	protected boolean isBright(String s)
+	public boolean isBright(String s)
 	{
 		return s.equals("bright");
 	}
@@ -333,6 +333,9 @@ public class RTMLSkyConstraint implements Serializable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2012/05/24 14:06:22  cjm
+** Finished implementation of value and units as part of RCS sky brightness changes.
+**
 ** Revision 1.3  2008/08/11 13:54:54  cjm
 ** Added equals method for constraint equality checking.
 **
