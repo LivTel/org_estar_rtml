@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.26 2011-02-09 18:43:19 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.27 2012-05-24 16:26:42 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -37,14 +37,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.26 $
+ * @version $Revision: 1.27 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.26 2011-02-09 18:43:19 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.27 2012-05-24 16:26:42 cjm Exp $";
 	/**
 	 * Create to use for creating the RTML XML from the document object model tree.
 	 */
@@ -1259,7 +1259,17 @@ public class TestCreate
 					{
 						skyConstraint = new RTMLSkyConstraint();
 						schedule.setSkyConstraint(skyConstraint);
-						skyConstraint.setSky(args[i+1]);
+						// is the constraint a number, or dark|grey|bright
+						if((skyConstraint.isDark(args[i+1])||skyConstraint.isGrey(args[i+1])||
+						    (skyConstraint.isBright(args[i+1]))))
+						{
+							skyConstraint.setSky(args[i+1]);
+						}
+						else
+						{
+							skyConstraint.setValue(args[i+1]);
+							skyConstraint.setUnits(RTMLSkyConstraint.UNITS_MAGS_PER_SQUARE_ARCSEC);
+						}
 					}
 					else
 					{
@@ -1594,7 +1604,7 @@ public class TestCreate
 		System.err.println("\t\t[-end_date <yyyy-MM-ddTHH:mm:ss>]");
 		System.err.println("\t\t[-moon_constraint <distance> <units(degs|rads)>]");
 		System.err.println("\t\t[-seeing_constraint <min arcsec> <max arcsec>]");
-		System.err.println("\t\t[-sky_constraint <dark|bright>]");
+		System.err.println("\t\t[-sky_constraint <dark|bright|<number (mags/arcsec^2)>>]");
 		System.err.println("\t\t[-extinction_constraint <clear|light|scattered|heavy>]");
 		System.err.println("\t\t[-image_data_url <url> [-image_data_fits_header <string>]");
 		System.err.println("\t\t\t[-image_data_object_list <cluster|votable-url> <filename/url>]]");
@@ -1630,6 +1640,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.26  2011/02/09 18:43:19  cjm
+** Added airmass and extinction constraint arguments.
+**
 ** Revision 1.25  2009/08/12 17:56:06  cjm
 ** Changed target handling, per-observation and per-document targets can now be created.
 ** Observation sub-elements now linked at creation.
