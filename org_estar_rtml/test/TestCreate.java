@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.27 2012-05-24 16:26:42 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.28 2013-01-14 11:04:27 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -37,14 +37,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.28 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.27 2012-05-24 16:26:42 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.28 2013-01-14 11:04:27 cjm Exp $";
 	/**
 	 * Create to use for creating the RTML XML from the document object model tree.
 	 */
@@ -205,8 +205,13 @@ public class TestCreate
 				{
 					if((i+2) < args.length)
 					{
-						detector = new RTMLDetector();
-						device.setDetector(detector);
+						if(device.getDetector() != null)
+							detector = device.getDetector();
+						else
+						{
+							detector = new RTMLDetector();
+							device.setDetector(detector);
+						}
 						detector.setRowBinning(args[i+1]);
 						detector.setColumnBinning(args[i+2]);
 						i+= 2;
@@ -715,6 +720,36 @@ public class TestCreate
 			{
 				document.setType("fail");// RTML 2.2
 				document.setMode("fail");// RTML 3.1a
+			}
+			else if(args[i].equals("-gain"))
+			{
+				if (device != null)
+				{
+					if((i+1) < args.length)
+					{
+						if(device.getDetector() != null)
+							detector = device.getDetector();
+						else
+						{
+							detector = new RTMLDetector();
+							device.setDetector(detector);
+						}
+						detector.setGain(args[i+1]);
+						i+= 1;
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:Gain needs a value.");
+						System.exit(3);
+					}
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Gain:Device was null.");
+					System.exit(4);
+				}
 			}
 			else if(args[i].equals("-grating_name"))
 			{
@@ -1588,7 +1623,7 @@ public class TestCreate
 		System.err.println("\t\t[-contact_telephone <telno>][-contact_url <URL>][-contact_user <user>]]");
 		System.err.println("\t[-device -device_name <name> -device_type <device type>]");
 		System.err.println("\t\t[-device_spectral_region <spectral region> -device_filter <filter type>]");
-		System.err.println("\t\t[-binning <x> <y>]");
+		System.err.println("\t\t[-binning <x> <y>][-gain <n>]");
 		System.err.println("\t\t[-grating_wavelength <wavelength> <m|cm|mm|micron|nm|nanometer|nanometers|Angstrom|Angstroms>]");
 		System.err.println("\t\t[-grating_name <name:low|high>");
 		System.err.println("\t-observation -target_name <string>"); 
@@ -1640,6 +1675,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.27  2012/05/24 16:26:42  cjm
+** Changed -sky_constraint parameters to allow flux in mags/arcsec^2.
+**
 ** Revision 1.26  2011/02/09 18:43:19  cjm
 ** Added airmass and extinction constraint arguments.
 **
