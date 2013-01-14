@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML31Create.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.9 2012-05-24 14:08:22 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.10 2013-01-14 11:04:40 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -59,14 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class RTML31Create
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Create.java,v 1.9 2012-05-24 14:08:22 cjm Exp $";
+	public final static String RCSID = "$Id: RTML31Create.java,v 1.10 2013-01-14 11:04:40 cjm Exp $";
 	/**
 	 * Default Schema location (URL).
 	 */
@@ -584,7 +584,11 @@ public class RTML31Create
 		Element detectorElement = null;
 		Element binningElement = null;
 		Element xyElement = null;
+		Element gainElement = null;
+		Element descriptionElement = null;
+		DecimalFormat df = null;
 
+		df = new DecimalFormat("###0.0#");
 		detectorElement = (Element)document.createElement("Detector");
 		// binning node/tag
 		binningElement = (Element)document.createElement("Binning");
@@ -599,6 +603,21 @@ public class RTML31Create
 		xyElement.appendChild(document.createTextNode(""+detector.getRowBinning()));
 		xyElement.setAttribute("units","pixels");
 		binningElement.appendChild(xyElement);
+		// gain
+		if(detector.getUseGain())
+		{
+			gainElement = (Element)document.createElement("Gain");
+			// We should really put the gain in the 'Value' element.
+			// But the 'Value' element has a fixed 'units' attribute of 'electrons_per_adu'
+			// We want to specify the EMCCD Gain, which as far as I know, does not use these units.
+			// Therefore stuff the value into the 'Description' element instead.
+			// This is reflected in the corresponding parser code which expects the value to be hidden here
+			// (RTML31Parser.java:parseGainNode)
+			descriptionElement = (Element)document.createElement("Description");
+			descriptionElement.appendChild(document.createTextNode(""+df.format(detector.getGain())));
+			gainElement.appendChild(descriptionElement);
+			detectorElement.appendChild(gainElement);
+		}
 		// append Detector to parent Device element
 		rtmlElement.appendChild(detectorElement);
 	}
@@ -1257,6 +1276,10 @@ public class RTML31Create
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.9  2012/05/24 14:08:22  cjm
+** Changed createSkyConstraint so it creates Flux and Unuts subElements as appropriate, as part of RCS
+** sky brightness changes.
+**
 ** Revision 1.8  2011/02/09 18:42:04  cjm
 ** Added airmass and extinction constraint creation.
 **

@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLDetector.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDetector.java,v 1.5 2008-05-27 14:07:55 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDetector.java,v 1.6 2013-01-14 11:04:42 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -26,7 +26,7 @@ import java.io.*;
 /**
  * This class is a data container for information contained in the Detector nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLDetector extends RTMLAttributes implements Serializable
@@ -34,7 +34,7 @@ public class RTMLDetector extends RTMLAttributes implements Serializable
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDetector.java,v 1.5 2008-05-27 14:07:55 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDetector.java,v 1.6 2013-01-14 11:04:42 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -47,13 +47,24 @@ public class RTMLDetector extends RTMLAttributes implements Serializable
 	 * The Detector Binning column number.
 	 */
 	private int columnBinning = 2;
+	/**
+	 * The gain to be used by the detector. Only really used for EMCCDs, where we take it to mean
+	 * EMGain, which is not quite the same thing, but close enough.
+	 */
+	private double gain = 1.0;
+	/**
+	 * This boolean is used to indicate the gain value has been set.
+	 */
+	private boolean useGain = false;
 
 	/**
 	 * Default constructor.
+	 * @see #useGain
 	 */
 	public RTMLDetector()
 	{
 		super();
+		useGain = false;
 	}
 
 	/**
@@ -134,6 +145,60 @@ public class RTMLDetector extends RTMLAttributes implements Serializable
 	}
 
 	/**
+	 * Method to set the gain.
+	 * @param d The gain.
+	 * @see #gain
+	 * @see #useGain
+	 */
+	public void setGain(double d)
+	{
+		gain = d;
+		useGain = true;
+	}
+
+	/**
+	 * Method to set the gain.
+	 * @param s The gain as a double string.
+	 * @exception RTMLException Thrown if the string is not a valid double.
+	 * @see #gain
+	 * @see #useGain
+	 */
+	public void setGain(String s) throws RTMLException
+	{
+		try
+		{
+			gain = Double.parseDouble(s);
+			useGain = true;
+		}
+		catch(NumberFormatException e)
+		{
+			throw new RTMLException(this.getClass().getName()+":setGain:Number Format Exception:"+
+						s+":",e);
+		}
+	}
+
+	/**
+	 * Method to get the gain.
+	 * @return The gain. This is normally only used for EMCCD, where it represents the 
+	 *         multiplying factor.
+	 * @see #gain
+	 */
+	public double getGain()
+	{
+		return gain;
+	}
+
+	/**
+	 * Get whether the gain value has been set.
+	 * @return A boolean, true if the gain value has been set.
+	 * @see #useGain
+	 */
+	public boolean getUseGain()
+	{
+		return useGain;
+	}
+
+	/**
 	 * String representation of this Detector.
 	 * @see #toString(java.lang.String)
 	 */
@@ -157,11 +222,16 @@ public class RTMLDetector extends RTMLAttributes implements Serializable
 		sb.append(super.toString(prefix+"\t"));
 		sb.append(prefix+"\tRow Binning : "+rowBinning+"\n");
 		sb.append(prefix+"\tColumn Binning : "+columnBinning+"\n");
+		if(useGain)
+			sb.append(prefix+"\tGain : "+gain+"\n");
 		return(sb.toString());
 	}
 }
 //
 // $Log: not supported by cvs2svn $
+// Revision 1.5  2008/05/27 14:07:55  cjm
+// Added serialVersionUID.
+//
 // Revision 1.4  2008/05/23 14:15:24  cjm
 // Now extends RTMLAttributes.
 //

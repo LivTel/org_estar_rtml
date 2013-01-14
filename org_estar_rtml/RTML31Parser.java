@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML31Parser.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Parser.java,v 1.7 2012-05-24 14:09:01 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Parser.java,v 1.8 2013-01-14 11:04:37 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -52,14 +52,14 @@ import org.estar.astrometry.*;
  * Extends RTMLParser to make use of methods common to this and RTML22Parser (parseIntegerNode etc), even though
  * this subclass is created as part of the RTMLParser's parsing.
  * @author Chris Mottram
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class RTML31Parser extends RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Parser.java,v 1.7 2012-05-24 14:09:01 cjm Exp $";
+	public final static String RCSID = "$Id: RTML31Parser.java,v 1.8 2013-01-14 11:04:37 cjm Exp $";
 
 	/**
 	 * Default constructor.
@@ -987,6 +987,8 @@ public class RTML31Parser extends RTMLParser
 	 * @param device The device to add the detector to.
 	 * @param detectorNode The XML DOM node for the Detector tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node.
+	 * @see #parseBinningNode
+	 * @see #parseGainNode
 	 */
 	private void parseDetectorNode(RTMLDevice device,Node detectorNode) 
 		throws RTMLException
@@ -1020,6 +1022,8 @@ public class RTML31Parser extends RTMLParser
 			{
 				if(childNode.getNodeName() == "Binning")
 					parseBinningNode(detector,childNode);
+				else if(childNode.getNodeName() == "Gain")
+					parseGainNode(detector,childNode);
 				else
 					System.err.println("parseDetectorNode:ELEMENT:"+childNode);
 			}
@@ -1099,6 +1103,56 @@ public class RTML31Parser extends RTMLParser
 						}
 					}
 					detector.setRowBinning(parseIntegerNode(binningNode));
+				}
+				else
+					System.err.println("parseBinningNode:ELEMENT:"+childNode);
+			}
+		}
+	}
+
+	/**
+	 * Internal method to parse a Gain node.
+	 * @param detector The detector to set the gain value in.
+	 * @param gainNode The XML DOM node for the Gain tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node.
+	 * @see org.estar.rtml.RTMLDetector
+	 * @see org.estar.rtml.RTMLDetector#setGain
+	 */
+	private void parseGainNode(RTMLDetector detector,Node gainNode) throws RTMLException
+	{
+		Node childNode,attributeNode;
+		NamedNodeMap attributeList = null;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(gainNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseGainNode:Illegal Node:"+
+						gainNode);
+		}
+		if(gainNode.getNodeName() != "Gain")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseGainNode:Illegal Node Name:"+
+						gainNode.getNodeName());
+		}
+		// go through child nodes
+		childList = gainNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				if(childNode.getNodeName() == "Description")
+				{
+					// We should really put the gain in the 'Value' element.
+					// But the 'Value' element has a fixed 'units' attribute of 'electrons_per_adu'
+					// We want to specify the EMCCD Gain, which as far as I know, 
+					// does not use these units.
+					// Therefore retrieve the value into the 'Description' element instead,
+					// where the creator put it (RTML31Create.java:createDetector).
+					detector.setGain(parseDoubleNode(childNode));
 				}
 				else
 					System.err.println("parseBinningNode:ELEMENT:"+childNode);
@@ -2666,6 +2720,10 @@ public class RTML31Parser extends RTMLParser
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.7  2012/05/24 14:09:01  cjm
+** Changed parseSkyConstraintNode so Flux and Units sub elements are parsed correctly, as part
+** os RCS sky brightness changes.
+**
 ** Revision 1.6  2011/02/09 18:42:38  cjm
 ** Added airmass and extinction constraint parsing.
 **
