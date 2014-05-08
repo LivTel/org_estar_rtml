@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTML31Create.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.11 2013-08-30 12:44:46 eng Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTML31Create.java,v 1.12 2014-05-08 09:19:47 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -59,14 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class RTML31Create
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Create.java,v 1.11 2013-08-30 12:44:46 eng Exp $";
+	public final static String RCSID = "$Id: RTML31Create.java,v 1.12 2014-05-08 09:19:47 cjm Exp $";
 	/**
 	 * Default Schema location (URL).
 	 */
@@ -147,9 +147,11 @@ public class RTML31Create
 		rtmlElement.setAttribute("xmlns","http://www.rtml.org/v3.1a");
 		rtmlElement.setAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
 		rtmlElement.setAttribute("xsi:schemaLocation", schemaURLString);
-		//	rtmlElement.setAttribute("xsi:schemaLocation","http://www.rtml.org/v3.1a "+schemaURLString);
-		// removed as the rtml.org site has been nabbed by an external entity
-
+		// This is the mapping from the namespace to it's schema
+		// The www.rtml.org domain is now owned by someone else, but here it functions
+		// only as a namespace identifier and it not resolved/contacted during document parsing
+		// so we think it's still OK to use it here
+		rtmlElement.setAttribute("xsi:schemaLocation","http://www.rtml.org/v3.1a "+schemaURLString);
 		// uid - must exist in RTML
 		if(d.getUId() != null)
 			rtmlElement.setAttribute("uid",d.getUId());
@@ -1279,6 +1281,9 @@ public class RTML31Create
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.11  2013/08/30 12:44:46  eng
+** removed rtml.org from schemaLocation attribute
+**
 ** Revision 1.10  2013/01/14 11:04:40  cjm
 ** Added <Detector> <Gain> paramater. Currently the value is stuffed in a <Gain><Description>
 ** tag, as the <Gain><Value> tag has fixed units which are not compatible with Andor EMCCD
