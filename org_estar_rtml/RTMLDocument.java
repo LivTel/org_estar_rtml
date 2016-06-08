@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLDocument.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.20 2009-08-12 17:49:50 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLDocument.java,v 1.21 2016-06-08 13:57:33 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
@@ -28,7 +28,7 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.20 $
+ * @version $Revision: 1.21 $
  * @see org.estar.rtml.RTMLDeviceHolder
  * @see org.estar.rtml.RTMLTargetHolder
  */
@@ -37,7 +37,7 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder, RTMLTargetH
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.20 2009-08-12 17:49:50 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLDocument.java,v 1.21 2016-06-08 13:57:33 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -791,6 +791,11 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder, RTMLTargetH
 		{
 			observation = getObservation(i);
 			target = observation.getTarget();
+			// if the observation target is null, use the document's overall target if it exists
+			if(target == null)
+			{
+				target = this.target;
+			}
 			schedule = observation.getSchedule();
 			if(target == null)
 			{
@@ -901,6 +906,11 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder, RTMLTargetH
 		{
 			observation = getObservation(i);
 			target = observation.getTarget();
+			// if the observation target is null, use the document's overall target if it exists
+			if(target == null)
+			{
+				target = this.target;
+			}
 			schedule = observation.getSchedule();
 			if(target == null)
 			{
@@ -1567,6 +1577,10 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder, RTMLTargetH
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.20  2009/08/12 17:49:50  cjm
+** Now has default document-wide target.
+** Now implements RTMLTargetHolder.
+**
 ** Revision 1.19  2008/07/16 13:32:38  cjm
 ** Attempt to bodge setErrorString for RTML 3.1a, rather than getting a NullPointerException on type.
 **
