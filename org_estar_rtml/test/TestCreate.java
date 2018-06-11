@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TestCreate.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.28 2013-01-14 11:04:27 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/test/TestCreate.java,v 1.29 2018-06-11 09:54:21 cjm Exp $
 package org.estar.rtml.test;
 
 import java.io.*;
@@ -37,14 +37,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.29 $
  */
 public class TestCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestCreate.java,v 1.28 2013-01-14 11:04:27 cjm Exp $";
+	public final static String RCSID = "$Id: TestCreate.java,v 1.29 2018-06-11 09:54:21 cjm Exp $";
 	/**
 	 * Create to use for creating the RTML XML from the document object model tree.
 	 */
@@ -1637,6 +1637,7 @@ public class TestCreate
 		System.err.println("\t\t[-series_constraint_tolerance <P{(y)Y{(m)M}{(d)D}{T{(h)H}{(m}M}{(s.s..)S}>]");
 		System.err.println("\t\t[-start_date <yyyy-MM-ddTHH:mm:ss>]");
 		System.err.println("\t\t[-end_date <yyyy-MM-ddTHH:mm:ss>]");
+		System.err.println("\t\t[-airmass_constraint <min> <max>]");
 		System.err.println("\t\t[-moon_constraint <distance> <units(degs|rads)>]");
 		System.err.println("\t\t[-seeing_constraint <min arcsec> <max arcsec>]");
 		System.err.println("\t\t[-sky_constraint <dark|bright|<number (mags/arcsec^2)>>]");
@@ -1675,6 +1676,9 @@ public class TestCreate
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.28  2013/01/14 11:04:27  cjm
+** Added <Detector> <Gain> paramater.
+**
 ** Revision 1.27  2012/05/24 16:26:42  cjm
 ** Changed -sky_constraint parameters to allow flux in mags/arcsec^2.
 **
