@@ -1,0 +1,34 @@
+#!/bin/csh
+# FTN
+#set project = "agent_test"
+#set contact_user = "TMC/estar"
+# LT
+set rtml_version = "3.1a"
+set project = "TEA01"
+set contact_user = "TEST/estar"
+set hostname = "localhost"
+set port_number = 8081
+# score request monitor group
+set iaid = "rtml://create_example_rtml-"`date +%s`
+java org.estar.rtml.test.TestCreate -rtml_version ${rtml_version} -score -iahost localhost -iaid ${iaid} -iaport 1234 -observation -target -target_name NGC752 -target_ident test-ident -ra 01:57:40 -dec +37:40:18 -exposure 30000 ms 1 -start_date 2005-10-20T00:00:00 -end_date 2005-10-30T00:00:00 -series_constraint_count 2 -series_constraint_interval P1DT -series_constraint_tolerance PT1H -device -device_name ratcam -device_type camera -device_spectral_region optical -device_filter R -binning 2 2 -project ${project} -contact -contact_name "Chris Mottram" -contact_user ${contact_user} > ~/tmp/ngc752-example_score.rtml
+java org.estar.io.test.SendFile ${hostname} ${port_number} ~/tmp/ngc752-example_score.rtml > ~/tmp/ngc752-example_score_reply.rtml
+# request monitor group
+java org.estar.rtml.test.TestCreate -rtml_version ${rtml_version} -request -document_score 0.9 -completion_time 2005-10-29T23:00:00 -iahost localhost -iaid ${iaid} -iaport 1234 -observation -target -target_name NGC752 -target_ident test-ident -ra 01:57:40 -dec +37:40:18 -exposure 30000 ms 1 -start_date 2005-10-20T00:00:00 -end_date 2005-10-30T00:00:00 -series_constraint_count 2 -series_constraint_interval P1DT -series_constraint_tolerance PT1H -device -device_name ratcam -device_type camera -device_spectral_region optical -device_filter R -binning 2 2 -project ${project} -contact -contact_name "Chris Mottram" -contact_user ${contact_user} > ~/tmp/ngc752-example_request.rtml
+java org.estar.io.test.SendFile ${hostname} ${port_number} ~/tmp/ngc752-example_request.rtml > ~/tmp/ngc752-example_request_reply.rtml
+# score request single
+set iaid = create_example_rtml-`date +%s`
+java org.estar.rtml.test.TestCreate -rtml_version ${rtml_version} -score -iahost localhost -iaid ${iaid} -iaport 1234 -observation -target -target_name NGC752 -target_ident test-ident -ra 01:57:40 -dec +37:40:18 -exposure 30000 ms 1 -start_date 2005-10-20T00:00:00 -end_date 2005-10-30T00:00:00 -device -device_name ratcam -device_type camera -device_spectral_region optical -device_filter V -binning 2 2 -project ${project} -contact -contact_name "Chris Mottram" -contact_user ${contact_user} > ~/tmp/ngc752v-example_score.rtml
+java org.estar.io.test.SendFile ${hostname} ${port_number} ~/tmp/ngc752v-example_score.rtml > ~/tmp/ngc752v-example_score_reply.rtml
+# request single
+java org.estar.rtml.test.TestCreate -rtml_version ${rtml_version} -request -document_score 0.9 -completion_time 2005-10-29T23:00:00 -iahost localhost -iaid ${iaid} -iaport 1234 -observation -target -target_name NGC752 -target_ident test-ident -ra 01:57:40 -dec +37:40:18 -exposure 30000 ms 1 -start_date 2005-10-20T00:00:00 -end_date 2005-10-30T00:00:00 -device -device_name ratcam -device_type camera -device_spectral_region optical -device_filter V -binning 2 2 -project ${project} -contact -contact_name "Chris Mottram" -contact_user ${contact_user} > ~/tmp/ngc752v-example_request.rtml
+java org.estar.io.test.SendFile ${hostname} ${port_number} ~/tmp/ngc752v-example_request.rtml > ~/tmp/ngc752v-example_request_reply.rtml
+# score request single2
+set iaid = create_example_rtml-`date +%s`
+java org.estar.rtml.test.TestCreate -rtml_version ${rtml_version} -score -iahost localhost -iaid ${iaid} -iaport 1234 -observation -target -target_name NGC752 -target_ident test-ident -ra 01:57:40 -dec +37:40:18 -exposure 30000 ms 1 -start_date 2005-10-20T00:00:00 -end_date 2005-10-30T00:00:00 -device -device_name ratcam -device_type camera -device_spectral_region optical -device_filter B -binning 2 2 -project ${project} -contact -contact_name "Chris Mottram" -contact_user ${contact_user} > ~/tmp/ngc752b-example_score.rtml
+java org.estar.io.test.SendFile ${hostname} ${port_number} ~/tmp/ngc752b-example_score.rtml > ~/tmp/ngc752b-example_score_reply.rtml
+# request single2
+java org.estar.rtml.test.TestCreate -rtml_version ${rtml_version} -request -document_score 0.9 -completion_time 2005-10-29T23:00:00 -iahost localhost -iaid ${iaid} -iaport 1234 -observation -priority 3 -target -target_name NGC752 -target_ident test-ident -ra 01:57:40 -dec +37:40:18 -exposure 30000 ms 1 -start_date 2005-10-20T00:00:00 -end_date 2005-10-30T00:00:00 -device -device_name ratcam -device_type camera -device_spectral_region optical -device_filter B -binning 2 2 -project ${project} -contact -contact_name "Chris Mottram" -contact_user ${contact_user} > ~/tmp/ngc752b-example_request.rtml
+java org.estar.io.test.SendFile ${hostname} ${port_number} ~/tmp/ngc752b-example_request.rtml > ~/tmp/ngc752b-example_request_reply.rtml
+# constraint example
+java org.estar.rtml.test.TestCreate -rtml_version ${rtml_version} -request -document_score 0.9 -completion_time 2005-10-29T23:00:00 -iahost localhost -iaid ${iaid} -iaport 1234 -observation -priority 3 -target -target_name NGC752 -target_ident test-ident -ra 01:57:40 -dec +37:40:18 -exposure 30000 ms 1 -start_date 2005-10-20T00:00:00 -end_date 2005-10-30T00:00:00 -device -device_name ratcam -device_type camera -device_spectral_region optical -device_filter B -binning 2 2 -moon_constraint 20 degs -seeing_constraint 0.8 1.3 -sky_constraint dark -extinction_constraint heavy -project ${project} -contact -contact_name "Chris Mottram" -contact_user ${contact_user} > ~/tmp/ngc752_constraint_example_request.rtml
+java org.estar.io.test.SendFile ${hostname} ${port_number} ~/tmp/ngc752_constraint_example_request.rtml > ~/tmp/ngc752_constraint_example_request_reply.rtml
