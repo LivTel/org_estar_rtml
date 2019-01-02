@@ -18,17 +18,21 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // RTMLTarget.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLTarget.java,v 1.10 2009-08-12 17:48:46 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLTarget.java,v 1.11 2019-01-02 11:34:48 cjm Exp $
 package org.estar.rtml;
 
 import java.io.*;
 import java.text.*;
+import java.util.*;
+//import java.util.Comparator;
+//import java.util.SortedSet;
+//import java.util.TreeSet;
 import org.estar.astrometry.*;
 
 /**
  * This class is a data container for information contained in the target nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLTarget extends RTMLAttributes implements Serializable
@@ -36,7 +40,7 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLTarget.java,v 1.10 2009-08-12 17:48:46 cjm Exp $";
+	public final static String RCSID = "$Id: RTMLTarget.java,v 1.11 2019-01-02 11:34:48 cjm Exp $";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -55,17 +59,23 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	 */
 	private String name = null;
 	/**
-	 * The right ascension of the target.
+	 * The right ascension of the target. This will be null if the target is an ephemeris target.
 	 */
 	private RA ra = null;
 	/**
-	 * The declination of the target.
+	 * The declination of the target. This will be null if the target is an ephemeris target.
 	 */
 	private Dec dec = null;
 	/**
 	 * The equinox of the coordinates.
 	 */
 	private String equinox = null;
+	/**
+	 * If the target is an ephemeris target rather than an extra solar target, this set will contain a 
+	 * sorted (in time) list of RTMLEphemerisTargetTrackNode s.
+	 * @see org.estar.rtml.RTMLEphemerisTargetTrackNode
+	 */
+	private SortedSet ephemerisTargetTrack = null;
 	/**
 	 * An offset to be applied to the Right Ascension.
 	 */
@@ -274,6 +284,71 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	}
 
 	/**
+	 * Set the ephemeris target track to the specified set of RTMLEphemerisTargetTrackNode s.
+	 * @param track A SortedSet containing elements of RTMLEphemerisTargetTrackNode, sorted in timestamp order.
+	 * @see #ephemerisTargetTrack
+	 * @see org.estar.rtml.RTMLEphemerisTargetTrackNode
+	 */
+	public void setEphemerisTrack(SortedSet track)
+	{
+		ephemerisTargetTrack = track;
+	}
+
+	/**
+	 * Get the ephemeris target track.
+	 * @return The ephemeris target track, A SortedSet containing elements of RTMLEphemerisTargetTrackNode, 
+	 *         sorted in timestamp order.
+	 * @see #ephemerisTargetTrack
+	 * @see org.estar.rtml.RTMLEphemerisTargetTrackNode
+	 */
+	public SortedSet getEphemerisTrack()
+	{
+		return ephemerisTargetTrack;
+	}
+
+	/**
+	 * Add the specified ephemeris target track node to the list of ephemeris target track nodes.
+	 * @param node An instance of RTMLEphemerisTargetTrackNode to add to the list.
+	 * @see #ephemerisTargetTrack
+	 * @see org.estar.rtml.RTMLEphemerisTargetTrackNode
+	 */
+	public void addEphemerisTrackNode(RTMLEphemerisTargetTrackNode node)
+	{
+		if(ephemerisTargetTrack == null)
+			ephemerisTargetTrack = new TreeSet(new NodeComparator());
+		if(ephemerisTargetTrack.contains(node) == false)
+			ephemerisTargetTrack.add(node);
+	}
+
+	/**
+	 * Remove the list of ephemeris target track nodes.
+	 * ephemerisTargetTrack is set to null, which effectively makes this target an extra solar target
+	 * until an ephemeris target track node is added.
+	 * @see #ephemerisTargetTrack
+	 * @see org.estar.rtml.RTMLEphemerisTargetTrackNode
+	 */
+	public void clearEphemerisTrack()
+	{
+		ephemerisTargetTrack.clear();
+		ephemerisTargetTrack = null;
+	}
+
+	/**
+	 * Remove the specified ephemeris target track node from the list of ephemeris target track nodes.
+	 * @param node An instance of RTMLEphemerisTargetTrackNode to remove from the list.
+	 * @see #ephemerisTargetTrack
+	 * @see org.estar.rtml.RTMLEphemerisTargetTrackNode
+	 */
+	public void removeEphemerisTrackNode(RTMLEphemerisTargetTrackNode node)
+	{
+		if(ephemerisTargetTrack != null)
+		{
+			if(ephemerisTargetTrack.contains(node))
+				ephemerisTargetTrack.remove(node);
+		}
+	}
+
+	/**
 	 * Set an offset from right ascension.
 	 * @param d The offset, in decimal arcseconds.
 	 * @see #raOffset
@@ -418,12 +493,14 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	 * @see #ra
 	 * @see #dec
 	 * @see #equinox
+	 * @see #ephemerisTargetTrack
 	 * @see #raOffset
 	 * @see #decOffset
 	 * @see #magnitude
 	 * @see #magnitudeFilterType
 	 * @see #magnitudeError
 	 * @see org.estar.rtml.RTMLAttributes#toString(java.lang.String)
+	 * @see org.estar.rtml.RTMLEphemerisTargetTrackNode
 	 */
 	public String toString(String prefix)
 	{
@@ -440,12 +517,22 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 			sb.append(prefix+"\tIdent:"+ident+"\n");
 		if(ra != null)
 			sb.append(prefix+"\tRA:"+ra+"\n");
+		if(equinox != null)
+			sb.append(prefix+"\tEquinox:"+equinox+"\n");
+		if(ephemerisTargetTrack != null)
+		{
+			sb.append(prefix+"\tEphemeris Target Track:\n");
+			List<RTMLEphemerisTargetTrackNode> list = new ArrayList<RTMLEphemerisTargetTrackNode>(ephemerisTargetTrack);
+			for (RTMLEphemerisTargetTrackNode node : list) 
+			{
+				//RTMLEphemerisTargetTrackNode node  = (RTMLEphemerisTargetTrackNode)o;
+				sb.append(prefix+"\t\t"+node);
+			}		
+		}
 		sb.append(prefix+"\tRA offset:"+df.format(raOffset)+"\n");
 		if(dec != null)
 			sb.append(prefix+"\tDec:"+dec+"\n");
 		sb.append(prefix+"\tDec offset:"+df.format(decOffset)+"\n");
-		if(equinox != null)
-			sb.append(prefix+"\tEquinox:"+equinox+"\n");
 		if(magnitudeFilterType != null)
 		{
 			sb.append(prefix+"\tMagtitude:"+df.format(magnitude)+" in "+magnitudeFilterType+
@@ -453,9 +540,53 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 		}
 		return sb.toString();
 	}
+
+	/** 
+	 * Internal Comparator class for testing order of track anchor points (track nodes).
+	 * @see org.estar.rtml.RTMLEphemerisTargetTrackNode
+	 */
+	public static class NodeComparator implements Comparator, Serializable 
+	{
+		/** 
+		 * Method to compare two objects in the set. These should both be instances of 
+		 * RTMLEphemerisTargetTrackNode. Any list using this comparator are ordered in timestamp order.
+		 * @param o1 An object, should be an instance of RTMLEphemerisTargetTrackNode.
+		 * @param o2 An object, should be an instance of RTMLEphemerisTargetTrackNode.
+		 * @return Returns an integer, -1 if o1's timestamp is before o2, 1 if o1's timestamp is after o2,
+		 *         0 if they have the same timestamp.
+		 * @exception ClassCastException Thrown if o1 and o2 are not both instances of 
+		 *            RTMLEphemerisTargetTrackNode
+		 * @see org.estar.rtml.RTMLEphemerisTargetTrackNode
+		 * @see org.estar.rtml.RTMLEphemerisTargetTrackNode#timestamp
+		 * @see org.estar.rtml.RTMLEphemerisTargetTrackNode#getTimestamp
+		 */
+		public int compare (Object o1, Object o2) 
+		{
+			long time1,time2;
+			if (! (o1 instanceof RTMLEphemerisTargetTrackNode) ||
+			    ! (o2 instanceof RTMLEphemerisTargetTrackNode))
+			{
+				throw new ClassCastException("Compare:: Not both EphemerisTrackNodes: ("+
+						(o1 == null ? "NULL": o1.getClass().getName())+","+
+						(o2 == null ? "NULL": o2.getClass().getName())+")");
+			}
+			RTMLEphemerisTargetTrackNode node1 = (RTMLEphemerisTargetTrackNode)o1;
+			RTMLEphemerisTargetTrackNode node2 = (RTMLEphemerisTargetTrackNode)o2;
+			time1 = node1.getTimestamp().getTime();
+			time2 = node2.getTimestamp().getTime();
+			if (time1 < time2)
+				return -1;
+			else if(time1 > time2)
+				return 1;
+			return 0;	
+		}
+	} // comparator
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.10  2009/08/12 17:48:46  cjm
+** Added target magnitude data.
+**
 ** Revision 1.9  2008/08/11 13:54:54  cjm
 ** Added RA and Dec offsets.
 **
