@@ -1,0 +1,4675 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+	Remote Telescope Markup Language eSTAR 2.2 XML DTD
+
+	The included documentation should be enough to enable a fully
+	functional dynamic web-based information service documenting all
+	the detailed functionality.
+-->
+
+<!-- 
+	RTML v2.2
+
+	========================================================================
+
+        27/03/07
+        Chris Mottram
+
+        Removed ScoreList, DateTime, and InverseQueuePosition. Replaced with HTN 2006 implementation (RTML 3.1a): 
+        Scores tag.
+
+        19/08/05
+        Chris Mottram
+        Added votable-url to the %objectListTypes; ENTITY.
+
+        04/05/2005
+        Chris Mottram
+
+        Added ObjectList to ImageData, to allow multiple ImageData's in an Observation.
+
+        Added "fail|abort|incomplete" to %rtmlDocumentModes; ENTITY.
+
+        Back-ported Expoure sub-tag Count from RTML3.0g, to enable Multrun support.
+
+        25/04/2005
+        Chris Mottram
+
+        Changed timespec documentation.
+
+        Added ELEMENTs SeriesConstraint, Interval, Count as per RTML 3.0g, for specifying a series of
+        repeating observations (MonitorGroups). Added SeriesConstraint to Schedule's sub-element list.
+
+        Added ELEMENTs ScoreList, DateTime, and InverseQueuePosition, and changed Score ELEMENT. This
+        to allow a list of queue positions over time to be returned. Added ScoreList to RTML's list 
+        of sub-elements.
+
+	========================================================================
+
+        25/04/2005
+        Chris Mottram
+
+        Initial change from RTML2.1 to RTML2.2
+
+	RTML v2.1
+
+	========================================================================
+
+        18/01/2005
+        Chris Mottram
+
+        Changed FilterType, rather than having a type=%filterType, the Type is in the PCDATA
+        associated with the tag.
+
+	========================================================================
+
+        22/03/2004
+        Chris Mottram
+
+        Added Score and CompletionTime tags ELEMENTs to RTML ELEMENT. This is to
+        make DTD consistent with RTML docs returned by the ers's.
+
+	========================================================================
+
+        17/02/2003
+        Chris Mottram
+
+        Changes to enable RTML v2.1 to be machine parsed by a Java parser
+        *****************************************************************
+
+        Moved ENTITY declarations to top of DTD file. This means ENTITYs are parsed before
+        the elements that use them. This enables some DTD parsers to work.
+
+        Removed references to booleanTypes[T|F] in favour of booleanType[T|F]
+        e.g. ENTITY declarion itself, ImageData compressed attribute.
+
+	Fixed  ENTITY %exposureType not %exposureTypes.
+
+        Fixed Exposure ATTLIST: replaced %timeTypes with %timeUnits.
+
+        Replaced instances of %lengthTypes; with %lengthUnits;.
+
+        Removed parenthesis "()" for ENTITY  %calendarUnits;, as 
+        this is used as a sub-entity of %timeUnits;
+
+        Removed parenthesis "()" for ENTITY  %timeSystemUnits;, as 
+        this is used as a sub-entity of %timeUnits;
+
+        ENTITY %fluxTypes; : removed asterisk from lambda*F-lambda and nu*F-nu 
+        to fix dtd parsing error.
+
+        Removed &beta;-Stromgren from filterTypes ENTITY - this does not parse.
+
+        Removed "ergs/cm2/s|ergs/cm2/s/A|ergs/cm2/s/Hz|ergs/cm2/s/micron|Watts/m2" from ENTITY fluxUnits,
+        replaced with "ergs-per-cm2-per-s|ergs-per-cm2-per-s-per-A|ergs-per-cm2-per-s-per-Hz|
+        ergs-per-cm2-per-s-per-micron|Watts-per-m2".
+
+        Removed km/s from ENTITY velocityUnits and replaced with km-per-s.
+
+        Added "encoding" string to xml statement (1st line) - Java XML requirement.
+
+        ELEMENTs with #CDATA fail to parse in Java - change #CDATA to #PCDATA.
+
+        Most elements with mixed content are incorrectly declared, changed to standard
+        mixed content declaration. Restrictions in the DTD specification mean that the
+        resultant document set that are valid has changed. I think this is just a relaxation of
+        ordering restrictions, and sub-elements can no longer be forced to exist.
+        See http://www.w3.org/TR/REC-xml
+        e.g.: AirmassConstraint,Contact,Coordinates,Declination,Device,ExtinctionConstraint,Filter
+        ImageData,LatCoordinate,Location,LongCoordinate,Object,ObjectList,OrbitalElements,PhaseConstraint
+        PointingLimits,PositionFilter,Project,Reduction,RightAscension,RTML,Schedule,SeeingConstraint,Telescope
+        TimeConstraint,TrackRate,Windowing
+
+        Removed # in front of CDATA for attributes of Binning.
+
+        PlateScale ATTLIST was specified as ATTLIST Telescope. Fixed.
+        "units" attribute of PlateScale element attlist incorrectly defined, arcsec/mm not legel (/ is illegal).
+        Changed to arcsec-per-mm.
+        Added %plateScaleUnits; ENTITY, as direct declaration in PlateScale ATTLIST would not parse.
+
+        ATTLIST of PositionAngle has units as %angleTypes;, which does not exist. Changed to %angleUnits;.
+
+        Changes to make DTD consistent with the average RTML document
+        *************************************************************
+
+        Note, the next set of changes were derived from parsing errors in the example RTML files, and
+        some documents actually emitted by the ers/ia.
+        Thsese are not RTML DTD parsing errors per se, but incompatibilities between the DTD and 'real'
+        RTML documents.
+
+        Added IntelligentAgent ELEMENT.
+
+        Added %lengthUnits; entity value "metres", English version of "meters".
+
+        Added Name ELEMENT as sub element of Location ELEMENT, as per documentation.
+
+        Changed ImageData ATTLIST, attribute compressed was boolean entity type, but should have type
+        %compressionTypes; according to documentation/examples.
+
+        Added "type" attribute to Target ATTLIST.
+        Added %targetTypes; ENTITY with default target type "normal".
+
+        ELEMENT Schedule, changed attribute "priority" from #REQUIRED to #IMPLIED, as the ers
+        does not emit the attribute. This is probably actually an ers error, but I have changed
+        the DTD to allow legacy RTML documents. Note priority was defined by Hessman to include TOOPS,
+        which we have re-implemented (for no apparent reason) as the Target ELEMENT "type" attribute.
+
+        estar_rtml_create.c:L644 No ELEMENT Dark defined in DTD, should be DarkCurrent. Note value in
+        Data_Pipeline_Flags is also wrong wrt current data pipeline!
+
+        The ers currently emits a Calibration element within a Schedule element. This is not allowed by the DTD.
+        Calibration elements should be within RTML or Observation elements (Observation in this case).
+        This is an error in estar_rtml_create.c:L635.
+
+        The ers currently emits an ObjectList element within an Observation element. This is not allowed by the DTD,
+        which specifies an Observation element should contain a Reduction element which should contain an ObjectList
+        element. This is an ers error, but add ObjectList to Observation element list for now.
+
+        Changed definition of ELEMENT ObjectList. Was (Object)*, is now (#PCDATA|Object)* to allow embedded
+        cluster format files. Added "type" attribute to ObjectList. Added ENTITY %objectListTypes;.
+
+        The ers adds the attribute "reduced" to the element ImageData. This is currently hard-coded to "true".
+        This attribute was not present in the DTD. What is it used for?
+        The "reduced" attribute has been added to the ImageData ATTLIST, for ers compatibility.
+
+        Just spotted a major league blunder. This document was modified from Jason's 31/10/2001 document,
+        but I've now found a version dated 18/01/02. Will try to back-port Jason's last set of changes in (see below).
+        Changes integrated, %targetType entity has become %targetTypes. CompletionTime element is now called
+        CompletionTime, rather than ColumnPixelSize! CompletionTime element now has content #PCDATA (see above).
+        CompletionTime ATTLIST is now for element CompletionTime (was blank!). Score element now has content type
+        #PCDATA (see above).
+
+        The ers adds the Score and CompletionTime elements in the RTML element. The DTD specifies the
+        Score and CompletionTime elements are in the Observation. Which needs to be changed?
+
+        Added "reject" to %rtmlDocumentModes; ENTITY.
+
+	========================================================================
+
+	18/01/2002
+	Jason Etherton
+
+	Added ELEMENT Score for returning DN scores.
+	Added ELEMENT CompletionTime (#CDATA) for returning the completion time
+	              for the current observation.
+
+	Added ELEMENT CompletionTime (#CDATA) for returning DN current 
+	              observation completion time
+
+	Added ENTITY  %targetType = "(normal|toop)"
+
+	========================================================================
+
+	31/10/2001
+	Jason Etherton
+
+        Slight revisions and removal mistakes from rtml2.dtd 
+	( single quoted strings, mismatched parentheses )
+
+	Added ENTITY %rtmlDocumentModes = "score"
+
+	Added ENTITY %statusTypes = "aborted"
+
+        Defined ATTRIBUTE type = "(fixed|calculated)" to Exposure
+
+	Defined ENTITY %exposureType = "(time|snr)"  
+
+	Added ELEMENT Name as daughter of Location and Telescope
+
+	Added ATTRIBUTE %timeUnits to ProperMotion ( RA = sec/yr )
+
+	Defined ELEMENT Parallax
+
+	Added ATTRIBUTE status = %statusTypes to Observation
+
+	Removed Filter ATTLIST and replaced with defined daughter ELEMENTS:
+	    FilterNumber   (#CDATA)
+	    FilterProfile  (wavelength=CDATA width=CDATA units=%lengthUnits)
+	    FilterType     (type=%filterTypes)
+
+	Defined ELEMENT Reduction = (#CDATA, ObjectList?)
+
+	Defined ELEMENT ObjectList = (#CDATA)
+	Added ATTRIBUTE number (#CDATA) to ObjectList
+
+	Defined ELEMENT MagnitudeFilter = (#CDATA)
+	Added ATTRIBUTE minimum CDATA to MagnitudeFilter
+	Added ATTRIBUTE maximum CDATA to MagnitudeFilter
+
+	Define ELEMENT PositionFilter = (#CDATA, RightAscension+, Declination+)
+	Added ATTRIBUTE radius CDATA to PositionFilter
+	Added ATTRIBUTE units  %angleUnits to PositionFilter
+
+	Defined ELEMENT Object = (#CDATA, RightAscension, Declination, Flux)
+-->
+
+<!-- XML Schema-style documentation
+<annotation>
+<documentation>
+	<name>RTML - Remote Telescope Markup Language</name>
+	<revision value="1.0">
+		<author>Shawn Gorden</author>
+		<date>1999.06.23</date>
+		Initial formulation of RTML using DTD.
+	</revision>
+
+	 <revision value="1.0">
+		<author>Jon Aymon</author>
+		<date>2000.07.10</date>
+		Tested for well-formedness on Windows98 Internet Explorer XML
+		Tested for validity on Microsoft XMLINT.
+	</revision>
+
+	<revision value="2.0">
+		<author>Frederic V. Hessman</author>
+		<date>2001.05.30</date>
+		Major revision preparing for XML Schema, lower-case names, 
+		fewer attributes to improve commentability and ease of use.
+	</revision>
+
+	<revision value="2.0b">
+		<author>Frederic V. Hessman</author>
+		<date>2001.07.22</date>
+		Major re-revision after a bit of criticism throwing out the 
+		&lt;request&gt; and &lt;response&gt; tags in favour of a more 
+		static description of an observation.
+	</revision>
+
+	<revision value="2.1">
+	        <author>Jason Etherton</author>
+		<date>2001.10.30</date>
+		As above.
+	</revision>
+
+	<revision value="2.1">
+	        <author>Chris Mottram</author>
+		<date>2003.02.17</date>
+		Tried to make RTML machine-readable, and parsable from Java XML.
+                Validating using com.wutka.dtd.DTDParser (dtdparser-1.20).
+                Then tried validating using Java DTD Validator, then tried
+                to make DTD valid for current RTML documents produced by the eSTAR project.
+	</revision>
+
+	<revision value="2.2">
+	        <author>Chris Mottram</author>
+		<date>2005/04/27</date>
+		Minor revisions for support of MonitorGroup (SeriesConstraint).
+	</revision>
+</documentation>
+</annotation>
+-->
+
+<!--========================= RTML Entities =================================-->
+
+<!--=========================================================================-->
+
+<!-- %angleUnits -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%angleUnits;</entityName>
+	<entityDescription>
+		Units (with abbreviations) for astronomical angles,
+		including the abbreviation "hms" and "dms" for some
+		form of (hours,minutes,seconds) and
+		(degrees,arcminutes,arcseconds).
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % angleUnits
+	"(arcsec|arcsecs|arcseconds|arcmin|arcmins|arcminutes|deg|degs|degrees|rad|rads|radians|hms|dms|HMS|DMS|sec|secs|seconds|min|mins|minutes|hr|hrs|hours)"
+>
+
+<!--=========================================================================-->
+
+<!-- %booleanTypeT -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%booleanTypeT;</entityName>
+	<entityDescription>
+		Boolean value with default "true".
+		<br></br>
+		See <seeEntity>booleanTypeF</seeEntity>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % booleanTypeT
+	"(true|false)"
+>
+
+<!--=========================================================================-->
+
+<!-- %booleanTypeF -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%booleanTypeF;</entityName>
+	<entityDescription>
+		Boolean value with default "false".
+		<br></br>
+		See <seeEntity>booleanTypeT</seeEntity>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % booleanTypeF
+	"(false|true)"
+>
+
+<!--=========================================================================-->
+
+<!-- %calendarUnits -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%calendarUnits;</entityName>
+	<entityDescription>
+		Time units found in calendar dates.
+		<br></br>
+		See <seeEntity>timeUnits</seeEntity>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % calendarUnits
+	"day|days|mon|month|months|yr|yrs|year|years"
+>
+
+<!--=========================================================================-->
+
+<!-- %cloudTypes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%cloudTypes;</entityName>
+	<entityDescription>
+		Descriptions of cloud cover.
+		<br></br>
+		See <seeTag>ExtinctionConstraint</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % cloudTypes
+	"(clear|light|heavy)"
+>
+
+<!--=========================================================================-->
+
+<!-- %compressionTypes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%compressionTypes;</entityName>
+	<entityDescription>
+		Different types of data compression used to compress
+		images.
+		<br></br>
+		See <seeTag>ImageData</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % compressionTypes
+	"(gzip|zip|compress|hzip)"
+>
+
+<!--=========================================================================-->
+
+<!-- %coordinateTypes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%coordinateTypes;</entityName>
+	<entityDescription>
+		Different astronomical coordinate systems.
+		<br></br>
+		See <seeTag>Coordinates</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % coordinateTypes
+	"(equatorial|ecliptic|galactic)"
+>
+
+<!--=========================================================================-->
+
+<!-- %deliveryTypes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%deliveryTypes;</entityName>
+	<entityDescription>
+		Different ways of delivering data to the end-user.
+		<br></br>
+		See <seeTag>ImageData</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % deliveryTypes
+	"(ftp|url|email|mail)"
+>
+
+<!--=========================================================================-->
+
+<!-- %deviceTypes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%deviceTypes;</entityName>
+	<entityDescription>
+		Types of RTML devices.
+		<br></br>
+		See <seeTag>Device</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % deviceTypes
+	"(camera|spectrograph|photometer|polarimeter|spectropolarimeter|weatherStation|autoguider|webCamera|skyMonitor|other)"
+>
+
+<!--=========================================================================-->
+
+<!-- %exposureType -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%exposureType;</entityName>
+	<entityDescription>
+		Types of RTML exposure times.
+		<br></br>
+		See <seeTag>Exposure</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % exposureType
+	"(time|snr)"
+>
+
+<!--=========================================================================-->
+
+<!-- %filterTypes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%filterTypes;</entityName>
+	<entityDescription>
+		Different standardized astronomical filters.
+		<br></br>
+		See <seeTag>Filter</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % filterTypes
+	"(none|clear|open|violet|blue|green|yellow|orange|red|U|B|V|R|I|J|H|K|L|M|N|U-Johnson|B-Johnson|V-Johnson|R-Johnson|I-Johnson|J-Johnson|H-Johnson|K-Johnson|L-Johnson|M-Johnson|N-Johnson|R-Cousins|I-Cousins|u-Sloan|b-Sloan|g-Sloan|r-Sloan|i-Sloan|u-Stromgren|b-Stromgren|r-Stromgren|other)"
+>
+
+<!--=========================================================================-->
+
+<!-- %fluxTypes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%fluxTypes;</entityName>
+	<entityDescription>
+		Different types of astrnomical fluxes.
+		<br></br>
+		See <seeTag>Flux</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % fluxTypes
+	"(continuum|line|F-lambda|F-nu|lambdaF-lambda|nuF-nu)"
+>
+
+<!--=========================================================================-->
+
+<!-- %fluxUnits -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%fluxUnits;</entityName>
+	<entityDescription>
+		Different units for astronomical fluxes.
+		<br></br>
+		See <seeTag>Flux</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+<!-- Removed ergs/cm2/s|ergs/cm2/s/A|ergs/cm2/s/Hz|ergs/cm2/s/micron|Watts/m2 from ENTITY fluxUnits,
+     replaced with ergs-per-cm2-per-s|ergs-per-cm2-per-s-per-A|ergs-per-cm2-per-s-per-Hz|
+     ergs-per-cm2-per-s-per-micron|Watts-per-m2. -->
+<!ENTITY % fluxUnits
+	"(U-mag|B-mag|V-mag|R-mag|I-mag|Jansky|Jaskies|Jy|Jys|milli-Jansky|mJy|mJys|ergs-per-cm2-per-s|ergs-per-cm2-per-s-per-A|ergs-per-cm2-per-s-per-Hz|ergs-per-cm2-per-s-per-micron|Watts-per-m2|other)"
+>
+
+<!--=========================================================================-->
+
+<!-- %headerTypes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%headerTypes;</entityName>
+	<entityDescription>
+		Choice of FITS header completeness.
+		<br></br>
+		See <seeTag>FITSHeader</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % headerTypes
+	"(minimum|standard|all)"
+>
+
+<!--=========================================================================-->
+
+<!-- %imageFormats -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%imageFormats;</entityName>
+	<entityDescription>
+		Different formats for image data.
+		<br></br>
+		See <seeTag>ImageData</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % imageFormats
+	"(FITS|FITS16|gif|jpg|JPEG)"
+>
+
+<!--=========================================================================-->
+
+<!-- %institutionTypes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%institutionTypes;</entityName>
+	<entityDescription>
+		Different types of institutions which provide or
+		order astronomical data.
+		<br></br>
+		See <seeTag>Contact</seeTag> and <seeTag>Institution</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % institutionTypes
+	"(university|college|school|research|commercial|private|network|other)"
+>
+
+<!--=========================================================================-->
+
+<!-- %lengthUnits -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%lengthUnits;</entityName>
+	<entityDescription>
+		Different astronomical length units.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % lengthUnits
+	"(m|meter|meters|metres|cm|centimeter|centimeters|km|kilometer|kilometers|mm|millimeter|millimeters|micron|microns|nm|nanometer|nanometers|Angstrom|Angstroms|ft|foot|feet|inch|inches|AU|A.U.)"
+>
+
+<!--=========================================================================-->
+
+<!-- %objectListTypes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%objectListTypes;</entityName>
+	<entityDescription>
+		What format the ObjectList tag is in. This is by default "xml", containing a list of XML Object tags 
+                (elements). The eSTAR project also uses "cluster" format for ease of parsing.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % objectListTypes
+        "(xml|cluster|votable-url)"
+>
+
+<!--=========================================================================-->
+
+<!-- %plateScaleUnits -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%plateScaleUnits;</entityName>
+	<entityDescription>
+		Units used to describe the plate scale of the telescope.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % plateScaleUnits "(arcsec-per-mm)">
+
+<!--=========================================================================-->
+
+<!-- %rtmlDocumentModes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%rtmlDocumentModes;</entityName>
+	<entityDescription>
+		The modes for RTML 2.0 documents.
+		<br></br>
+		See <seeTag>RTML</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % rtmlDocumentModes
+	"(score|request|confirmation|information|update|observation|reject|fail|abort|incomplete)"
+>
+
+<!--=========================================================================-->
+
+<!-- %simpleSkyTypes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%simpleSkyTypes;</entityName>
+	<entityDescription>
+		Simple descriptions of how bright the sky is.
+		<br></br>
+		See <seeTag>SkyConstraint</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % simpleSkyTypes
+	"(dark|gray|grey|bright)"
+>
+
+<!--=========================================================================-->
+
+<!-- %spectralRegions -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%spectralRegions;</entityName>
+	<entityDescription>
+		Different names for spectral regions.
+		<br></br>
+		See <seeTag>Device</seeTag>,
+		and
+		<seeTag>Databank</seeTag>
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % spectralRegions
+	"(radio|millimeter|infrared|optical|ultraviolet|x-ray|gamma-ray|other)"
+>
+
+<!--=========================================================================-->
+
+<!-- %statusTypes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%statusTypes;</entityName>
+	<entityDescription>
+		Status messages, mostly used in <seeTag>Observation</seeTag>
+		elements.  See the documentation for
+		<seeTag>Observation</seeTag> for a detailed description.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % statusTypes
+	"(ok|error|pending|incomplete|done|finished|aborted)"
+>
+
+<!--=========================================================================-->
+
+<!-- %targetTypes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%targetTypes;</entityName>
+	<entityDescription>
+	        Specifies whether the target is a normal target or a target of
+		opportunity (Nova, GRB etc.)
+		See the documentation for
+		<seeTag>Target</seeTag> for a description.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % targetTypes
+        "(normal|toop)"
+>
+
+<!--=========================================================================-->
+
+<!-- %trackRateTypes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%trackRateTypes;</entityName>
+	<entityDescription>
+		Different types of telescope track rates.
+		<br></br>
+		See <seeTag>Target</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % trackRateTypes
+	"(siderial|off|lunar|Mercury|Venus|Mars|Jupiter|Saturn|Uranus|Neptune|Pluto|custom|manual)"
+>
+
+<!--=========================================================================-->
+
+<!-- %typeSystemUnits -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%timeSystemUnits;</entityName>
+	<entityDescription>
+		Astronomical time systems.
+		<br></br>
+		See <seeEntity>timeUnits</seeEntity>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % timeSystemUnits
+	"HJD|JD|BJD|MJD"
+>
+
+<!--=========================================================================-->
+
+<!-- %timeUnits -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%timeUnits;</entityName>
+	<entityDescription>
+		Units for astronomical times, including their abbreviations.
+		<br></br>
+		See <seeEntity>calendarUnits<seeEntity> and
+		<seeEntity>timeSystemUnits<seeEntity>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % timeUnits
+	"(s|sec|secs|second|seconds|ms|msec|msecs|millisecond|milliseconds|microsec|microsecs|microsecond|microseconds|min|mins|minutes|hr|hrs|hour|hours|%calendarUnits;|%timeSystemUnits;)"
+>
+
+<!--=========================================================================-->
+
+<!-- %velocityTypes -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%velocityTypes;</entityName>
+	<entityDescription>
+		Types of velocities.
+		<br></br>
+		See <seeTag>RadialVelocity</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+
+<!ENTITY % velocityTypes
+	"(heliocentric|barycentric|LSR|other)"
+>
+
+<!--=========================================================================-->
+
+<!-- %velocityUnits -->
+<!--
+<annotation>
+<documentation>
+	<entityName>%velocityUnits;</entityName>
+	<entityDescription>
+		Units for velocities.
+		<br></br>
+		See <seeTag>RadialVelocity</seeTag>.
+	</entityDescription>
+</documentation>
+</annotation>
+-->
+<!ENTITY % velocityUnits
+	"(km-per-s|z)"
+>
+
+
+<!--========================= RTML Tag Descriptions =========================-->
+
+<!-- Abstract -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Abstract</tagName>
+	<tagDescription>
+		The short abstract of a <seeTag>Project</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Abstract>We want lots of observing time for a great project.
+		</Abstract>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+<!ELEMENT Abstract (#PCDATA)>
+
+<!--=========================================================================-->
+
+<!-- Address -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Address</tagName>
+	<tagDescription>
+		Real mailing address within a <seeTag>Contact</seeTag>.
+ 	</tagDescription>
+	<tagExample>
+		<Address>
+			Geismarlandstr. 11, 37083 G&ouml;ttingen, Germany
+		</Address>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Address (#PCDATA)>
+
+<!--=========================================================================-->
+
+<!-- AirmassConstraint -->
+<!--
+<annotation>
+<documentation>
+	<tagName>AirmassConstraint</tagName>
+	<tagDescription>
+		Places contraints on acceptable airmass.  If an
+		<seeTag>ExposureFactor</seeTag> tag is included, then the
+		nominal <seeTag>Exposure</seeTag> should be corrected
+		for the expected decrease in brightness.
+		<br></br>
+		See <seeTag>Schedule</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<AirmassConstraint minimum="2.9" maximum="3.1">
+			Need this standard star at roughly the same airmass!
+		</AirmassConstraint>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!-- The original declaration of AirmassConstraint was: <!ELEMENT AirmassConstraint (#CDATA, ExposureFactor?)>
+     This is not legal, the current declaration is the closest Mixed content element definition allowed.
+-->
+<!ELEMENT AirmassConstraint 
+        (#PCDATA|ExposureFactor)*
+>
+<!ATTLIST AirmassConstraint
+ minimum CDATA   #IMPLIED
+ maximum CDATA   #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Altitude -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Altitude</tagName>
+	<tagDescription>
+		Terrestrial altitude, used within a
+		<seeTag>Location</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Altitude units="feet">5432</Altitude>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Altitude
+	(#PCDATA)
+>
+<!ATTLIST Altitude
+	format	CDATA           #IMPLIED
+	units	%lengthUnits;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- AngleOffset -->
+<!--
+<annotation>
+<documentation>
+        <tagName>AngleOffset</tagName>
+        <tagDescription>
+		An angular offset in some coordinate system determined by the
+		parent element in some "units".  Depending upon the units,
+		it may be necessary to specify the "format" used.
+                <br></br>
+                See <seeTag>Coordinates</seeTag>.
+        </tagDescription>
+        <tagExample>
+                <LatCoordinate units="degs">
+			+55.4321
+			<AngleOffset units="dms" format="sddd mm ss.s">
+				-000 01 02.3
+			</AngleOffset>
+		</LatCoordinate>
+        </tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT AngleOffset
+        (#PCDATA)
+>
+<!ATTLIST AngleOffset
+        format  CDATA           #IMPLIED
+        units   %angleUnits;    #IMPLIED
+>
+
+<!--=========================================================+===============-->
+
+<!-- Aperture -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Aperture</tagName>
+	<tagDescription>
+		Equivalent circular aperture of a <seeTag>Telescope</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Aperture units="meters">2.4</Aperture>
+	</tagExample>
+</documentation>
+<annotation>
+-->
+
+<!ELEMENT Aperture
+	(#PCDATA)
+>
+<!ATTLIST Aperture
+	units	%lengthUnits;	#REQUIRED
+>
+ 
+<!--=========================================================================-->
+
+<!-- BadPixels -->
+<!--
+<annotation>
+<documentation>
+	<tagName>BadPixels</tagName>
+	<tagDescription>
+		This element within a
+		<seeTag>Calibration</seeTag> describes whether the effects
+		of bad pixels should be/have been removed.  The content is used to
+		provide URL's for data uploads (e.g. images showing the pixels which
+		have been corrected.
+	</tagDescription>
+	<tagExample>
+		<BadPixels correct="false" />
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT BadPixels
+	(#PCDATA)
+>
+<!ATTLIST BadPixels
+	correct	%booleanTypeF;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Bias -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Bias</tagName>
+	<tagDescription>
+		In an RTML request, this element within a
+		<seeTag>Calibration</seeTag> describes whether the bias should
+		be corrected for (overscan and/or mean pattern bias).  The
+		"correct" attribute is for non-specific corrections, whereas
+		the "overscan" and "mean" attributes refer to more specific
+		corrections. The content is used to provide URL's for data
+		uploads.  The "number" attribute suggests/informs how many
+		exposures should be/were used to perform the calibration.
+	</tagDescription>
+	<tagExample>
+		Here's a request-mode bias element:
+
+		<Bias overscan="true" mean="false" />
+	</tagExample>
+	<tagExample>
+		Here's a report-mode bias element:
+
+		<Bias correct="true" number="5">
+		ftp://ftp.monet.uni-sw.gwdg.de/pub/data/2002/05/bias22.fits
+		</Bias>
+
+		The same element with correct="false" would indicate that
+		no correction was made, but also where the mean bias frame
+		could be obtained to make the correction.
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Bias
+	(#PCDATA)
+>
+
+<!ATTLIST Bias
+ correct  %booleanTypeT; #IMPLIED
+ overscan %booleanTypeT; #IMPLIED
+ mean     %booleanTypeT; #IMPLIED
+ number	  CDATA	         #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Binning -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Binning</tagName>
+	<tagDescription>
+		The amount of pixel binning which is to be used in a detector.
+		<br></br>
+		See <seeTag>Detector</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Binning rows="1" columns="4" />
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Binning
+	(#PCDATA)
+>
+<!ATTLIST Binning
+	rows	CDATA	#IMPLIED
+	columns	CDATA	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Calibration -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Calibration</tagName>
+	<tagDescription>
+		Describes what calibration measures should be performed on
+		or for the final <seeTag>Observation</seeTag>.
+		The content of the (optional) calibration
+		daughter elements is used to provide URL's for data uploads.
+		<br></br>
+		See <seeTag>Bias</seeTag>,
+		<seeTag>DarkCurrent</seeTag>,
+		<seeTag>BadPixels</seeTag>,
+		<seeTag>FlatField</seeTag>,
+		<seeTag>Fringing</seeTag>,  and
+		<seeTag>CosmicRays</seeTag>.
+	</tagDescription>
+	<tagExample>
+		Here is a request for calibrations (anything which isn't mentioned
+		is assumed to be defaulted to correct="no":
+
+		<Calibration>
+			<Bias correct="yes" />
+			<DarkCurrent correct="yes" />
+			<FlatField correct="yes" sky="yes" />
+		</Calibration>
+	</tagExample>
+	<tagExample>
+		Here is the result of a set of calibrations:
+
+		<Calibration>
+			<Bias correct="yes" number="10">
+				ftp://ftp.observatory.net/pub/calib/bias/b1234567.fits
+			</Bias>
+			<DarkCurrent correct="yes" />
+				ftp://ftp.observatory.net/pub/calib/dark/d1234567.fits
+			</DarkCurrent>
+			<BadPixels correct="no" />
+			<FlatField correct="yes" sky="yes" number="5">
+				ftp://ftp.observatory.net/pub/calib/flats/f1234567.fits
+			</FlatField>
+			<Fringing correct="no" />
+			<CosmicRays correct="no" />
+		</Calibration>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Calibration
+	(Bias?, DarkCurrent?, BadPixels?, FlatField?, Fringing?, CosmicRays?)
+>
+
+<!--=========================================================================-->
+
+<!-- Capacity -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Capacity</tagName>
+	<tagDescription>
+	The maximum amount of signal in a
+	<seeTag>Detector</seeTag>.  This can either be a total
+	number of counts (e.g. for an integrating detector) or a maximum count
+	rate (e.g. for a photon-counting detector).
+	</tagDescription>
+	<tagExample>
+		<Capacity units="cts/sec">100000</Capacity>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Capacity
+	(#PCDATA)
+>
+<!ATTLIST Capacity
+	units CDATA #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- ColumnPixelSize -->
+<!--
+<annotation>
+<documentation>
+	<tagName>ColumnPixelSize</tagName>
+	<tagDescription>
+	Size of the pixels in the horizontal direction (w.r.t. the final
+	image -
+	"how wide are the columns?") in some units (default is microns)
+	for a <seeTag>Detector</seeTag>. The
+	pixels are assumed to be non-square.
+	<br></br>
+	See <seeTag>PixelRadius</seeTag>,
+	<seeTag>RowPixelSize</seeTag>, and
+	<seeTag>PixelSize</seeTag>
+	</tagDescription>
+	<tagExample>
+		<ColumnPixelSize units="microns">
+			15.0
+		</ColumnPixelSize>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT ColumnPixelSize
+	(#PCDATA)
+>
+<!ATTLIST ColumnPixelSize
+	units %lengthUnits; #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- CompletionTime -->
+<!--
+<annotation>
+<documentation>
+	<tagName>CompletionTime</tagName>
+	<tagDescription>
+	</tagDescription>
+	<tagExample>
+	        <CompletionTime format="hh mm ss">
+		        12 34 56
+		</CompletionTime>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT CompletionTime
+	(#PCDATA)
+>
+<!ATTLIST CompletionTime
+	format CDATA        #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Contact -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Contact</tagName>
+	<tagDescription>
+		<p>
+		Normally, an RTML document body begins with the &lt;Contact&gt;
+		tag.  This contains contact information for the transaction,
+		perhaps both about the client(s) and the server.
+		If several clients are involved, then each should have his/her
+		own &lt;Contact&gt;.  The "PI" attribute is either ignored or
+		equal to "true" (for the Principle Investigator of a project)
+		or "false" (for a Co-PI).
+		</p>
+		<p>
+		The attribute "ident" is an ASCII string used as a short-cut:
+		generally these should be given by the server to the client(s).
+		</p>
+		<p>
+		<br></br>
+		See <seeTag>User</seeTag>,
+		<seeTag>Name</seeTag>,
+		<seeTag>Institution</seeTag>,
+		<seeTag>Address</seeTag>,
+		<seeTag>Telephone</seeTag>,
+		<seeTag>Fax</seeTag>,
+		<seeTag>Email</seeTag>,
+		<seeTag>Url</seeTag>, and
+		<seeTag>TimeCharge</seeTag>
+		</p>
+	</tagDescription>
+	<tagExample>
+		<Contact ident="ae12345" />
+	</tagExample>
+	<tagExample>
+		<Contact PI="yes">
+			<User>aeinste</User>
+			<Name>A. Einstein</Name>
+			<Institution type="university">Princeton Univ.</Institution>
+			<Address>Jadwin Hall, PO Box 708, Princeton, NJ, USA 08544-0708</Address>
+			<Telephone>+1-609-258-4400</Telephone>
+			<Fax>+1-609-258-1124</Fax>
+			<Email>aeinste@princeton.edu</Email>
+			<Url>http://www.phys.princeton.edu</Url>
+			<TimeCharge time="2.0" units="hours" />
+		</Contact>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Contact
+	(#PCDATA|User|Name|Institution|Address|Telephone|Fax|Email|Url|TimeCharge)*
+>
+<!ATTLIST Contact
+	ident CDATA		#IMPLIED
+	PI    %booleanTypeT;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Coordinates -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Coordinates</tagName>
+	<tagDescription>
+		An element containing astronomical coordinates - either a
+		<seeTag>RightAscension</seeTag>, <seeTag>Declination</seeTag>
+		and an <seeTag>Equinox</seeTag> or a longitude-like coordinate
+		(<seeTag>LongCoordinate</seeTag>), a latitude-like coordinate
+		(<seeTag>LatCoordinate</seeTag>) and an
+		<seeTag>Equinox</seeTag>.  All coordinates can be expressed in
+		any of the <seeEntity>angleUnits</seeEntity> and with any
+		(given) format.  An <seeTag>Epoch</seeTag> is optional and
+		is otherwise
+		assumed to be equal to the <seeTag>Equinox</seeTag>.
+		<p>
+		In order to make it possible to observe very faint objects, it
+		is possible to input <seeTag>AngleOffset</seeTag>'s within the
+		individual coordinates.  The assumption is that the original
+		coordinates refer to some other object which can be aquired and
+		centered, so that the final position with offsets may refer
+		to an apparently blank patch of sky.
+		</p>
+		<p>
+		The "format" syntax is mostly for giving coordinates in
+		the form hh:mm:ss.ss etc.  The abbreviations are
+		"s"=sign (only if at the very beginning),
+		"h"=hours_digit, "d"=degrees_digit,"m"=(arc)minutes_digit,
+		"s"=(arc)seconds_digits (also used for and to indicate the
+		number
+		of decimal places).  Other text can be used in the format
+		if appropriate:  e.g.  format="Latitude sddd mm ss.ss".
+		The letters "s", "h", "d", and "m" which should be interpreted
+		as normal non-formating letters can be indicated by a backslash:
+		e.g. format="Longitude hh\h mm\m ss\s E" to express the format
+		of the content "Longitude 12h 34m 56s E".
+		</p>
+	</tagDescription>
+	<tagExample>
+		<Coordinates>
+			<RightAscension format="hh:mm:ss.dd">
+				12:34:56.78
+			</RightAscension>
+			<Declination format="sdd mm ss.dd">
+				-76 54 32.10
+			</Declination>
+			<Equinox>2000</Equinox>
+		</Coordinates>
+	</tagExample>
+	<tagExample>
+		<Coordinates type="galactic">
+			Here's an object in galactic coordinates which is
+			offset by -10.5 arcseconds in galatic latitude.
+			<LongCoordinate units="degrees">-145.63</LongCoordinate>
+			<LatCoordinateunits="degs">
+				+12.342
+				<AngleOffset units="arcsecs">-10.5</AngleOffset>
+			</LatCoordinate>
+			<Equinox>2000</Equinox>
+		</Coordinates>
+	</tagExample>
+	<tagExample>
+		<Coordinates type="equatorial">
+			Nearly the same as first example above!
+			<LongCoordinate format="hh:mm:ss.dd">
+				12:34:56.78
+			</LongCoordinate>
+			<LatCoordinate format="sdd:mm:ss">
+				-76:54:32
+			</LatCoordinate>
+			<Equinox>2000</Equinox>
+		</Coordinates>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Coordinates
+	(#PCDATA|RightAscension|Declination|LongCoordinate|LatCoordinate|Equinox|Epoch)*
+>
+<!ATTLIST Coordinates
+	type	%coordinateTypes;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- CosmicRays -->
+<!--
+<annotation>
+<documentation>
+	<tagName>CosmicRays</tagName>
+	<tagDescription>
+		In request mode of a <seeTag>Calibration</seeTag>,
+		this element describes whether the cosmic
+		rays should be removed.  The content is used to provide
+		URL's for data uploads.
+	</tagDescription>
+	<tagExample>
+		<CosmicRays correct="true" />
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT CosmicRays
+	(#PCDATA)
+>
+<!ATTLIST CosmicRays
+	correct	%booleanTypeF;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Count -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Count</tagName>
+	<tagDescription>
+                Subtag of <seeTag>SeriesConstraint</seeTag>, defining the maximum number of times to perform the
+                observation.
+		See also <seeTag>SeriesConstraint</seeTag>,<seeTag>Interval</seeTag> and <seeTag>Schedule</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<SeriesConstraint>
+                   <Interval>PT1H</Interval>
+                   <Count>5</Count>
+                   <Tolerance>PT30M</Tolerance>
+ 		</SeriesConstraint>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Count
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- DarkCurrent -->
+<!--
+<annotation>
+<documentation>
+	<tagName>DarkCurrent</tagName>
+	<tagDescription>
+		In request mode of a <seeTag>Calibration</seeTag>,
+		this element describes whether the dark
+		current should be removed.  The content is used to provide
+		URL's for data uploads.
+		The "number" attribute suggests/informs how many exposures
+		should be/were used to perform the calibration.
+	</tagDescription>
+	<tagExample>
+		<DarkCurrent correct="true" />
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT DarkCurrent
+	(#PCDATA)
+>
+<!ATTLIST DarkCurrent
+	correct	%booleanTypeT;	#IMPLIED
+	number	CDATA		#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- DarkRate -->
+<!--
+<annotation>
+<documentation>
+	<tagName>DarkRate</tagName>
+	<tagDescription>
+	The rate at which background counts are added to the image during an
+	exposure by a <seeTag>Detector</seeTag> (usually thermal).
+	</tagDescription>
+	<tagExample>
+		<DarkRate units="e-/s">0.01</DarkRate>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT DarkRate
+	(#PCDATA)
+>
+<!ATTLIST DarkRate
+	units CDATA #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Databank -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Databank</tagName>
+	<tagDescription>
+		A virtual observation which can be obtained using
+		previously carried out observations,
+		but can be accessed using the normal RTML
+		syntax (using dates in the past, for example).
+		<br></br>
+		See <seeTag>Target</seeTag>,
+		<seeTag>Telescope</seeTag>,
+		<seeTag>Observation</seeTag>,
+		<seeTag>Project</seeTag>, and
+		<seeTag>Contact</seeTag>
+	</tagDescription>
+	<tagExample>
+		<RTML type="request">
+			.....
+			<Databank region="visual">
+				<Target>
+					<TargetName>M31</TargetName>
+				</Target>
+				<Observation>
+					....
+				</Observation>
+			</Databank>
+		</RTMl2>
+	</tagExample>
+</documentation>
+<annotation>
+-->
+
+<!ELEMENT Databank
+	(Target?, Telescope?, Observation?, Project?, Contact?)
+>
+<!ATTLIST Databank
+	name	CDATA			#IMPLIED
+	region	%spectralRegions;	#IMPLIED
+>
+ 
+<!--=========================================================================-->
+
+<!-- Declination -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Declination</tagName>
+	<tagDescription>
+		An equatorial celestial coordinate (same as
+		&lt;LatCoordinate type="equatorial"&gt;).
+		<br></br>
+		See <seeTag>Coordinates</seeTag> and
+		<seeTag>AngleOffset</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Declination format="sddd mm sss.ss" units="dms">
+			-123 45 43.21
+		</Declination>
+	</tagExample>
+	<tagExample>
+		<Declination units="degs">
+			-123.4567
+		</Declination>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Declination
+	(#PCDATA|AngleOffset)*
+>
+<!ATTLIST Declination
+	format	CDATA		#IMPLIED
+	units	%angleUnits;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Detector -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Detector</tagName>
+	<tagDescription>
+		A general detector for an astronomical instrument. The size of
+		the pixels is given either as a <seeTag>PixelSize</seeTag>, a
+		<seeTag>PixelRadius</seeTag>, or both a
+		<seeTag>ColumnPixelSize</seeTag> and a
+		<seeTag>RowPixelSize</seeTag>;. If <seeTag>PixelRadius</seeTag>
+		is given, the detector is assumed to be circular.
+		The non-trivial units of the detector properties (e.g.
+		"e-/count") are not yet prescribed (e.g.
+		<seeTag>Capacity</seeTag> can be in a rate for a photon-counting
+		detector or a total number of counts for an integrating
+		detector).  If allowed, the pixels of the detector can be
+		binned using the <seeTag>Binning</seeTag> element and only 
+		part of the pixel array can be read-out/stored using the
+		information in the <seeTag>Windowing</seeTag> element.
+		<br></br>
+		See also <seeTag>PositionAngle</seeTag>,
+		<seeTag>DarkRate</seeTag>,
+		<seeTag>Capacity</seeTag>,
+		<seeTag>ReadoutNoise</seeTag>,
+		<seeTag>Gain</seeTag>,
+		<seeTag>Binning</seeTag>,
+		<seeTag>Windowing</seeTag>,
+		<seeTag>Device</seeTag>, and
+		<seeTag>Telescope</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Detector numColumns="1" numRows="1">
+			Photoelectric phototube
+			<PixelRadius units="cm">0.1</PixelRadius>
+			<Gain units="e-/count">1</Gain>
+			<posAngle units="degs">45.5</posAngle>
+			<Capacity units="counts/s">80000</Capacity>
+			<ReadoutNoise units="e-">0.0</ReadoutNoise>
+		</Detector>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Detector
+	((PixelSize | PixelRadius | (ColumnPixelSize, RowPixelSize))?, PositionAngle?, DarkRate?, Capacity?, ReadoutNoise?, Gain?, Binning?, Windowing?)
+>
+<!ATTLIST Detector
+	numColumns	CDATA	#IMPLIED
+	numRows		CDATA	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Device -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Device</tagName>
+	<tagDescription>
+		An RTML device is any instrument or device of interest to a
+		client, including astronomical instruments like cameras,
+		spectrographs, photometers, etc., as well as auxilliary
+		instruments such as weather stations, web-cams, sky-monitors,
+		etc.  RTML provides a minimum set of
+		<seeEntity>deviceTypes</seeEntity> which should
+		cover most needs:
+		<table border=1>
+			<tr><td>Device</td><td>type=</td></tr>
+			<tr><td>direct imaging</td><td>"camera"</td></tr>
+			<tr><td>spectroscopy</td><td>"spectrograph"</td></tr>
+			<tr><td>photometry</td><td>"photometer"</td></tr>
+			<tr><td>polarimetry</td><td>"polarimeter"</td></tr>
+			<tr><td>spectropolarimetry</td><td>"spectropolarimeter"</td></tr>
+			<tr><td>weather monitoring</td><td>"weatherStation"</td></tr>
+			<tr><td>telescope guiding</td><td>"autoGuider"</td></tr>
+			<tr><td>Web cameras</td><td>"webCamera"</td></tr>
+			<tr><td>(other)</td><td>"other"</td></tr>
+		</table>
+		<br></br>
+		See also <seeTag>Filter</seeTag>,
+		<seeTag>Grating</seeTag>, 
+		<seeTag>Telescope</seeTag>, and
+		<seeTag>Detector</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Device type="camera" region="optical">CCD Camera #1</Device>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Device
+	(#PCDATA|Device|Filter|Grating|Detector)*
+>
+<!ATTLIST Device
+	name	CDATA			#IMPLIED
+	region	%spectralRegions;	#IMPLIED
+	type	%deviceTypes;		#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- EffectiveAperture -->
+<!--
+<annotation>
+<documentation>
+	<tagName>EffectiveAperture</tagName>
+	<tagDescription>
+		Effective equivalent circular aperture of a
+		<seeTag>Telescope</seeTag>.  This
+		can be used to aid in the simulation of observations by
+		including the effects of secondary mirror obscuration, missing
+		mirror panels, poor coatings, etc.
+	</tagDescription>
+	<tagExample>
+			<EffectiveAperture units="meters">2.2</EffAperture>
+	</tagExample>
+</documentation>
+<annotation>
+-->
+
+<!ELEMENT EffectiveAperture
+	(#PCDATA)
+>
+<!ATTLIST EffectiveAperture
+	units	%lengthUnits;	#REQUIRED
+>
+ 
+<!--=========================================================================-->
+
+<!-- Email -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Email</tagName>
+	<tagDescription>
+		Electronic mailing address of the form {name}@{address}
+		in a <seeTag>Contact</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Email>hessman@uni-sw.gwdg.de</Email>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Email
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- EndDateTime -->
+<!--
+<annotation>
+<documentation>
+	<tagName>EndDateTime</tagName>
+	<tagDescription>
+		The end date plus time for a <seeTag>TimeConstraint</seeTag>.
+		A format doesn't have to be given since we follow standard
+		ISO 8601 formatting rules (e.g. dates are given yyyy.mm.dd,
+		times as hh:mm:ss and "dateTimes" as
+		yyyy.mm.ddThh:mm:ss{.ss}). This will make RTMLn.0 defined
+		by a DTD compatible with later versions defined by XML
+		Schema and give us free format checking.
+		<br></br>
+		See <seeTag>TimeConstraint</seeTag> and
+		<seeTag>StartDateTime</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<EndDateTime>2001-06-01T11:00:00</EndDateTime>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT EndDateTime
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- EndPhase -->
+<!--
+<annotation>
+<documentation>
+	<tagName>EndPhase</tagName>
+	<tagDescription>
+		The end phase of a <seeTag>PhaseConstraint</seeTag>.
+		May or may not be larger in value than the corresponding
+		<seeTag>StartPhase</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<EndPhase>0.2</EndPhase>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT EndPhase
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- Epoch -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Epoch</tagName>
+	<tagDescription>
+		An element containing an astronomical epoch.
+		<br></br>
+		See <seeTag>Coordinates</seeTag>,
+		<seeTag>Equinox</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Epoch>2000.0</Epoch>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Epoch
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- Equinox -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Equinox</tagName>
+	<tagDescription>
+		An element containing an astronomical equinox.
+		<br></br>
+		See <seeTag>Coordinates</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Equinox>2000.0</Equinox>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Equinox
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- Exposure -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Exposure</tagName>
+	<tagDescription>
+		The basic exposure time for an
+		<seeTag>Observation</seeTag> or for a <seeTag>Schedule</seeTag>.
+		The two attributes
+		give the time units of the content ("units") and the number of
+		exposures ("number").  Defaults should be units="seconds" and
+		number="1".  The actual exposure time used can be modified when 
+		the tag is located within a <seeTag>Schedule</seeTag> by
+		various constraints which have <seeTag>ExposureFactor</seeTag>
+		elements, which are multiplied into the basic exposure time
+		given here.
+	</tagDescription>
+	<tagExample>
+		<Exposure units="seconds">
+		        200
+		</Exposure>
+		<Exposure type="snr">
+		        5.0
+		</Exposure>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Exposure
+	(#PCDATA|Count)*
+>
+<!ATTLIST Exposure
+        type    %exposureType;  #IMPLIED
+	units	%timeUnits;	#IMPLIED
+	number	CDATA		#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- ExposureFactor -->
+<!--
+<annotation>
+<documentation>
+	<tagName>ExposureFactor</tagName>
+	<tagDescription>
+		Used by constraints to change the actual exposure time from the
+		basic time given by the <seeTag>Exposure</seeTag> element.
+		<br></br>
+		See also
+		<seeTag>Schedule</seeTag>,
+		<seeTag>Exposure</seeTag>,
+		<seeTag>ExtinctionConstraint</seeTag> and
+		<seeTag>PhaseConstraint</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<ExposureFactor>0.1</ExposureFactor>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT ExposureFactor (#PCDATA)>
+
+<!--=========================================================================-->
+
+<!-- ExtinctionConstraint -->
+<!--
+<annotation>
+<documentation>
+	<tagName>ExtinctionConstraint</tagName>
+	<tagDescription>
+		Places contraints on clouds, either in terms of magnitudes or
+		in general terms of cloud type ("clear", "light", "heavy").  If
+		an <seeTag>ExposureFactor</seeTag> is included, then the
+		nominal <seeTag>Exposure</seeTag> should be corrected for the
+		expected loss of light due to the extinction (e.g. obtained
+		from monitoring the brightness of guide stars or previously
+		observed field/standard stars).
+		<br></br>
+		See also <seeTag>cloudConstraint</seeTag> and
+		<seeTag>Schedule</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<ExtinctionConstraint magnitudes="0.1">
+			Doesn't have too be photometric, but also not too bad!
+		</ExtinctionConstraint>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT ExtinctionConstraint
+	(#PCDATA|ExposureFactor)*
+>
+<!ATTLIST ExtinctionConstraint
+	magnitudes	CDATA		#IMPLIED
+	clouds		%cloudTypes;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Fax -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Fax</tagName>
+	<tagDescription> 
+		Facimile number within a <seeTag>Contact</seeTag>,
+		including the nation code (+XX) and optional
+		numbers for use within the same country (e.g. "(0)").
+	</tagDescription>
+	<tagExample>
+		<Fax>+49-(0)551-39-5043</Fax>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Fax
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- Filter -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Filter</tagName>
+	<tagDescription>
+		An astronomical filter.  The filter must be defined by either
+		a <seeTag>FilterType</seeTag>, a telescope-specific <seeTag>
+		FilterNumber</seeTag> or a <seeTag>FilterProfile</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Filter>
+		    <FilterNumber>
+		        2
+		    </FilterNumber>
+		</Filter>
+	</tagExample>
+	<tagExample>
+		<Filter>
+		    <FilterProfile wavelength="6563" width="20" units="nm">
+		        H&alpha;
+		    </FilterProfile>
+		</Filter>
+	</tagExample>
+	<tagExample>
+		<Filter>
+		    <FilterType>U</FilterType>
+		</Filter>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Filter
+        (#PCDATA|FilterNumber|FilterProfile|FilterType)*
+>
+
+<!--=========================================================================-->
+
+<!-- FilterNumber -->
+<!--
+<annotation>
+<documentation>
+	<tagName>FilterNumber</tagName>
+	<tagDescription>
+		An astronomical filter.  The filter must be defined by the
+		number of that filter at the telescope.
+		<seeTag>Filter</seeTag>
+	</tagDescription>
+	<tagExample>
+	    <FilterNumber>
+	        2
+	    </FilterNumber>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT FilterNumber
+        (#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- FilterProfile -->
+<!--
+<annotation>
+<documentation>
+	<tagName>FilterProfile</tagName>
+	<tagDescription>
+		An astronomical filter.  The filter must be defined by the
+		number of that filter at the telescope.
+		<seeTag>Filter</seeTag>
+	</tagDescription>
+	<tagExample>
+	<tagExample>
+	    <FilterProfile wavelength="6563" width="20" units="nm">
+	        H&alpha;
+	    </FilterProfile>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT FilterProfile
+        (#PCDATA)
+>
+
+<!ATTLIST FilterProfile
+	wavelength	CDATA		#REQUIRED
+	width		CDATA		#REQUIRED
+	units		%lengthUnits;	#REQUIRED
+>
+
+<!--=========================================================================-->
+
+<!-- FilterType -->
+<!--
+<annotation>
+<documentation>
+	<tagName>FilterType</tagName>
+	<tagDescription>
+		An astronomical filter.  The filter is be defined by the
+		standard filter sets.
+		<seeTag>Filter</seeTag>
+	</tagDescription>
+	<tagExample>
+		<Filter>
+		    <FilterType>B-Johnson"</FilterType>
+		</Filter>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT FilterType
+        (#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- FITSHeader -->
+<!--
+<annotation>
+<documentation>
+	<tagName>FITSHeader</tagName>
+	<tagDescription>
+		A simple element containing part or all of the FITS header
+		for an astronomical image.  The "type" attribute determines
+		whether just the most important ("minimum"), the standard
+		("standard") or all the FITS keywords ("all") are shown.
+		<br></br>
+		See also <seeTag>ImageData</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<FITSHeader>
+			SIMPLE = T
+			NAXIS  = 2
+			NAXIS1 = 1024
+			NAXIS2 = 2048
+		</FITSHeader>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT FITSHeader
+	(#PCDATA)
+>
+<!ATTLIST FITSHeader
+	type		%headerTypes;	#REQUIRED
+>
+
+<!--=========================================================================-->
+
+<!-- FlatField -->
+<!--
+<annotation>
+<documentation>
+	<tagName>FlatField</tagName>
+	<tagDescription>
+		In request mode, this element within a
+		<seeTag>Calibration</seeTag> describes whether the flat field
+		effects should be removed.  For camera images, this can either
+		be done using a skyflat (sky="true") and/or a dome flat
+		(dome="true").  The content is used to provide URL's for data
+		uploads.
+		The "number" attribute suggests/informs how many exposures
+		should be/were used to perform the calibration.
+	</tagDescription>
+	<tagExample>
+		<FlatField correct="true" />
+	</tagExample>
+	<tagExample>
+		<FlatField correct="true" sky="true" number="5" />
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT FlatField
+	(#PCDATA)
+>
+<!ATTLIST FlatField
+	correct	%booleanTypeT;	#IMPLIED
+	sky	%booleanTypeF;	#IMPLIED
+	dome	%booleanTypeT;	#IMPLIED
+	number	CDATA		#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Flux -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Flux</tagName>
+	<tagDescription>
+		The flux or brightness of some "type" for a
+		<seeTag>Target</seeTag> at some "wavelength" or "frequency"
+		and in some "units".  The "wavelengths" may also be
+		given as filter names.
+		<bugs>The attributes should be more specified!</bugs>
+	</tagDescription>
+	<tagExample>
+		<Flux	type="continuum"
+			wavelength="R-Johnson"
+			units="mags">19.2</Flux>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Flux
+	(#PCDATA)
+>
+<!ATTLIST Flux
+	type		%fluxTypes;	#IMPLIED
+	wavelength	CDATA		#IMPLIED
+	frequency	CDATA		#IMPLIED
+	units		CDATA		#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- FocalLength -->
+<!--
+<annotation>
+<documentation>
+	<tagName>FocalLength</tagName>
+	<tagDescription>
+		Effective focal length of a <seeTag>Telescope</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<FocalLength units="mm">57600</FocalLength>
+	</tagExample>
+</documentation>
+<annotation>
+-->
+
+<!ELEMENT FocalLength
+	(#PCDATA)
+>
+<!ATTLIST FocalLength
+	units	%lengthUnits;	#REQUIRED
+>
+ 
+<!--=========================================================================-->
+
+<!-- FocalRatio -->
+<!--
+<annotation>
+<documentation>
+	<tagName>FocalRatio</tagName>
+	<tagDescription>
+		Effective focal-ratio ("f-number") of a
+		<seeTag>Telescope</seeTag>, given by
+		the ratio of <seeTag>FocalLength</seeTag> to
+		the <seeTag>Aperture</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<FocalRatio>f/24</FocalRatio>
+	</tagExample>
+</documentation>
+<annotation>
+-->
+
+<!ELEMENT FocalRatio
+	(#PCDATA)
+>
+ 
+<!--=========================================================================-->
+
+<!-- Fringing -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Fringing</tagName>
+	<tagDescription>
+		In request mode, this element within a
+		<seeTag>Calibration</seeTag> describes whether any fringe
+		pattern not removable by flat-fielding should be corrected
+		for.  The content is used to provide URL's for data uploads.
+	</tagDescription>
+	<tagExample>
+		<Fringing correct="true" />
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Fringing
+	(#PCDATA)
+>
+<!ATTLIST Fringing
+	correct	%booleanTypeT;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Gain -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Gain</tagName>
+	<tagDescription>
+	The conversion of counts in the final result/image from a
+	<seeTag>Detector</seeTag> to the number of
+	photons (electrons) actually detected.  The gain of CCD cameras is
+	typically a few whereas it is exactly 1 for a pulse-counting
+	photometer.
+	</tagDescription>
+	<tagExample>
+		<Gain units="e-/count">3.5</Gain>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Gain
+	(#PCDATA)
+>
+<!ATTLIST Gain
+	units CDATA #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Grating -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Grating</tagName>
+	<tagDescription>
+		This element describes a grating, prism, grism or similar
+		device used in a spectrograph, described by its central
+		"wavelength" in some "units", an "angle" (setable random or
+		unknown units, not the blaze angle!), an "order", a
+		"name", and a "resolution" (&lambda;/&Delta;&lambda;).
+		<br></br>
+		See <seeTag>Device</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Grating
+			name="GR#1"
+			wavelength="650" units="nm"
+			resolution="1540"
+			angle="12345"
+		/>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Grating
+	(#PCDATA)
+>
+<!ATTLIST Grating
+	name		CDATA		#IMPLIED
+	wavelength	CDATA		#IMPLIED
+	units		%lengthUnits;	#IMPLIED
+	resolution	CDATA		#IMPLIED
+	order		CDATA		#IMPLIED
+	angle		CDATA		#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- ImageData -->
+<!--
+<annotation>
+<documentation>
+	<tagName>ImageData</tagName>
+	<tagDescription>
+		In a request, this element describes what form the image
+		data resulting from an observation should take (e.g. 16 bit
+		FITS), whether compression should be used (e.g.
+		compress="gzip"), and how the image should be delivered
+		(e.g. delivery="ftp").
+
+		In RTML document of type "information", this element also can
+		be used to provide a URL
+		to the data for data uploads.  A report could include the
+		<seeTag>Contact</seeTag> or
+		<seeTag>Observation</seeTag> element with all of the
+		information concerning how the image was triggered or made.
+		<br></br>
+		See <seeTag>FITSHeader</seeTag>,
+                <seeEntity>compressionTypes</seeEntity>,
+		<seeEntity>imageTypes</seeEntity>, and
+		<seeEntity>deliveryTypes</seeEntity>.
+	</tagDescription>
+	<tagExample>
+		Here is a request for a FITS image in 16-bit format and
+		compressed with the GNU zip algorithm which should
+		be uploadable via ftp when it's available.
+
+		<RTML type="request">
+		....
+		<ImageData
+			type="FITS16"
+			compressed="gzip"
+			delivery="ftp"
+		/>
+		....
+		</RTML>
+	</tagExample>
+	<tagExample>
+		Here is a report on an image which is in some standard
+		(but unspecified) FITS format and has been compressed with
+		the HST h-format:
+
+		<RTML type="observation">
+			....
+			<ImageData type="FITS" compressed="HST" name="1.fits.hz">
+				ftp://ftp.monet.uni-sw.gwdg.de/pub/outgoing/1.fits.hz
+				<FITSHeader type="minimum">
+					....
+				</FITSHeader>
+			</ImageData>
+			....
+		</RTML>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT ImageData
+	(#PCDATA|FITSHeader|Contact|Observation|ObjectList)*
+>
+<!ATTLIST ImageData
+	type            %imageFormats;          #REQUIRED
+	compressed	%compressionTypes;	#IMPLIED
+        reduced         %booleanTypeT;          #IMPLIED
+	filename	CDATA		        #IMPLIED
+	delivery	%deliveryTypes;	        #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Institution -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Institution</tagName>
+	<tagDescription>
+		Name/description of the organizational status of the requesting
+		or responding party contained within a
+		<seeTag>Contact</seeTag>.
+		Can contain, e.g., anchor to a web-site as
+		content.  The required attribute "type" must contain one of the
+		descriptions of the 8 types of institutions:
+		<ul><li>"university"</li><li>"college"</li><li>"school"
+		<li>"research"</li><li>"commercial"</li><li>"private"</li>
+		<li>"network"</li><li>"other"<li></ul>.
+	</tagDescription>
+	<tagExample>
+		<Institution>
+			Universit&auml;ts-Sternwarte G&ouml;ttingen
+		</Institution>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Institution
+	(#PCDATA)
+>
+<!ATTLIST Institution
+	type	%institutionTypes;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- IntelligentAgent -->
+<!--
+<annotation>
+<documentation>
+	<tagName>IntelligentAgent</tagName>
+	<tagDescription>
+		A specification of the location on the internet, of the intelligent agent
+                associated with this document. Note the PCDATA should contain a unique 
+                intelligent agent ID.
+	</tagDescription>
+	<tagExample>	
+            <IntelligentAgent host="150.204.240.111" port="1234">
+                IATEST0001:CT1:0001
+            </IntelligentAgent>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT IntelligentAgent
+	(#PCDATA)
+>
+
+<!ATTLIST IntelligentAgent
+	host		CDATA			#REQUIRED
+        port            CDATA                   #REQUIRED
+>
+
+<!--=========================================================================-->
+
+<!-- Interval -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Interval</tagName>
+	<tagDescription>
+                Subtag of <seeTag>SeriesConstraint</seeTag>, defining the time between performing
+                observations in the series.
+                Interval written in the form P{(yyyy)Y{(mm)M}{(dd)D}{T{(hh)H}{(mm}M}{(ss.s..)S}.
+                (for example "P1Y2M3DT3H6M22.1S" uses all elements, but "P1Y" and "PT6M22.1S" is
+                also OK - note the presence of the "T" separator between the date and time part!).
+		See also <seeTag>SeriesConstraint</seeTag>,<seeTag>Count</seeTag> and <seeTag>Schedule</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<SeriesConstraint>
+                   <Interval>PT1H</Interval>
+                   <Count>5</Count>
+                   <Tolerance>PT30M</Tolerance>
+		</SeriesConstraint>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Interval
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- LatCoordinate -->
+<!--
+<annotation>
+<documentation>
+	<tagName>LatCoordinate</tagName>
+	<tagDescription>
+		A coordinate which behaves like terrestral latitude, i.e. is not
+		cyclic and runs from -90 to 90 degrees (for example).
+		<br></br>
+		See also <seeTag>Coordinates</seeTag>,
+		<seeTag>LongCoordinate</seeTag>, and
+		<seeTag>AngleOffset</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<LatCoordinate units="degs">+55.4321</LatCoordinate>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT LatCoordinate
+	(#PCDATA|AngleOffset)*
+>
+<!ATTLIST LatCoordinate
+	format	CDATA		#IMPLIED
+	units	%angleUnits;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Latitude -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Latitude</tagName>
+	<tagDescription>
+		Terrestrial latitude within a <seeTag>Location</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Latitude units="degs">+55.4321</Latitude>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Latitude
+	(#PCDATA)
+>
+<!ATTLIST Latitude
+	format	CDATA	#IMPLIED
+	units	%angleUnits;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Location -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Location</tagName>
+	<tagDescription>
+		Detailed description of where a
+		<seeTag>Telescope</seeTag> or set of telescopes
+		is located. The (optional) format attribute uses the same
+		symbols as other elements like
+		<seeTag>RightAscension</seeTag> and
+		<seeTag>Declination</seeTag>:
+		see the discussion for <seeTag>Coordinates</seeTag>.
+		<br></br>
+		See also <seeTag>Altitude</seeTag>,
+		<seeTag>Latitude</seeTag>, and
+		<seeTag>Longitude</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Location>
+			<Name>Roque de los Muchachos</Name>
+			<Longitude format="sdd mm E" units="dms">
+				-17 53 E
+			</Longitude>
+			<Latitude format="sdd mm ss">+28 45 36</Latitude>
+			<Altitude units="m">2395</Altitude>
+		</Location>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Location
+	(#PCDATA|Latitude|Longitude|Name|Altitude)*
+>
+
+<!--=========================================================================-->
+
+<!-- LongCoordinate -->
+<!--
+<annotation>
+<documentation>
+	<tagName>LongCoordinate</tagName>
+	<tagDescription>
+		An angular coordinate which behaves like terrestrial longitude,
+		i.e. is strictly cyclic.
+		<br></br>
+		See <seeTag>Coordinates</seeTag>,
+		<seeTag>LatCoordinate</seeTag>, and
+		<seeTag>AngleOffset</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<LongCoordinate format="sddd mm sss.ss" units="dms">
+			-123 45 43.21
+		</LongCoordinate>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT LongCoordinate
+	(#PCDATA|AngleOffset)*
+>
+<!ATTLIST LongCoordinate
+	format	CDATA		#IMPLIED
+	units	%angleUnits;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Longitude -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Longitude</tagName>
+	<tagDescription>
+		Terrestrial longitude within a <seeTag>Location</seeTag>.
+		<br></br>
+		See <seeTag>Coordinates</seeTag>.
+	</tagDescription>
+	<tagExample>
+		This example shows how labels can be used along with the
+		actual number content: if the format is correct, this should
+		be easy to parse.
+
+		<Longitude format="Longitude sddd mm sss.ss E" units="dms">
+			Longitude -123 45 43.21 E
+		</Longitude>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Longitude
+	(#PCDATA)
+>
+<!ATTLIST Longitude
+	format	CDATA	#IMPLIED
+	units	%angleUnits;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- MagnitudeFilter -->
+<!--
+<annotation>
+<documentation>
+	<tagName>MagnitudeFilter</tagName>
+	<tagDescription>
+	        Describe an <seeTag>ObjectList</seeTag> in terms of magnitudes.
+	</tagDescription>
+	<tagExample>
+	        Find the 20 brightest stars.
+	        <ObjectList number="20" />
+		<MagnitudeFilter maximum="maximum" />
+	</tagExample>
+	<tagExample>
+	        Find all objects dimmer than magnitude 15.5 in the J-Band
+	        <ObjectList number="all" />
+		<MagnitudeFilter maximum="15.5" units="J-mag" />
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT MagnitudeFilter
+	(#PCDATA)
+>
+<!ATTLIST MagnitudeFilter
+	minimum         CDATA           #IMPLIED
+	maximum         CDATA           #IMPLIED
+	units           %fluxUnits;     #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- MoonConstraint -->
+<!--
+<annotation>
+<documentation>
+	<tagName>MoonConstraint</tagName>
+	<tagDescription>
+		Says how much moon is acceptable.The "width" attribute is a
+		Lorentzian weight parameter describing how "inacceptable" is
+		inacceptable (i.e. if the weight is 0.01, then this is 10x
+		better than having a weight of 0.1 and 100x better than being
+		at the moon).  Full moon is phase=1.0.   Normally, this tag
+		has no content, but the content can be used to comment the
+		constraint.
+		<br></br>
+		See <seeTag>SkyConstraint</seeTag>,
+		See <seeTag>Schedule</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<MoonConstraint maxPhase="0.5" distance="45.0" units="degs"
+			width="60.0" />
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT MoonConstraint
+	(#PCDATA)
+>
+<!ATTLIST MoonConstraint
+	maxPhase	CDATA		#IMPLIED
+	distance	CDATA		#IMPLIED
+	width		CDATA		#IMPLIED
+	units		%angleUnits;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Name -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Name</tagName>
+	<tagDescription>
+		The name of a person/location/telescope within the
+		<seeTag>Contact</seeTag>
+		<seeTag>Location</seeTag>
+		<seeTag>Telescope</seeTag> elements repectively.
+	</tagDescription>
+	<tagExample>
+		<Name>A. Einstein</Name>
+		<Location>
+		    <Name>
+		        Roque de los Muchachos, La Palma
+		    </name>
+		</location>
+		<Telescope>
+		    <Name>
+		        Liverpool Telescope
+		    </Name>
+		</Telescope>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Name
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- Object -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Object</tagName>
+	<tagDescription>
+	        The position of a detected object.
+		<seeTag>ObjectList</seeTag>
+	</tagDescription>
+	<tagExample>
+	        <ObjectList>
+		    <Object>
+		        Info supplied by reduction routines.
+		        <RightAscension format="hh mm ss.s" units="hms">
+			    12 48 33.2
+			</RighAscension>
+			<Declination format="sdd mm ss.s" units="dms">
+			    +23 44 32.1
+			</Declination>
+			<Flux>
+			    Flux not known.
+			</Flux>
+		    </Object>
+	        </ObjectList>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Object
+	(#PCDATA|RightAscension|Declination|Flux)*
+>
+
+<!--=========================================================================-->
+
+<!-- ObjectList -->
+<!--
+<annotation>
+<documentation>
+	<tagName>ObjectList</tagName>
+	<tagDescription>
+	        Specify the details of an ObjectList.
+		<br>
+		Inclusion of both a <seeTag>MagnitudeFilter</seeTag> and a
+		<seeTag>PositionFilter</seeTag> will apply both criteria to the
+		ObjectList.
+                The ObjectList element can consists of a list of Object elements.
+                It can also contain an embedded cluster format file.
+                It can also contain a URL to a VOTable file.
+		The entity "type" (<seeEntity>objectListTypes</seeEntity>) defines what format is used.
+	</tagDescription>
+	<tagExample>
+		<Reduction>
+	        Create an object list with magnitudes and position of 
+		the 20 brightest objects on frame.
+		    <ObjectList number="20" />
+	 	    <MagnitudeFilter maximum="maximum" />
+		</Reduction>
+	</tagExample>
+	<tagExample>
+		<Reduction>
+	            Create an object list with of the magnitude and position of
+		    the closest star to 12h 48m 33.2s +23d 44m 32.1s
+		    <ObjectList number="1" />
+		    <MagnitudeFilter />
+		    <PositionFilter radius="0">
+		        <RightAscension format="hh mm ss.s" units="hms">
+			    12 48 33.2
+			</RighAscension>
+			<Declination format="sdd mm ss.s" units="dms">
+			    +23 44 32.1
+			</Declination>
+		    </PositionFilter>
+		</Reduction>
+	</tagExample>
+	<tagExample>
+		<Reduction>
+		        Return an object list with magnitudes and position of 
+			the all objects within 5 arcseconds of 
+			12h 48m 33.2s +23d 44m 32.1s
+			<PositionFilter radius="5" units="arcsec">
+		            <RightAscension format="hh mm ss.s" units="hms">
+			        12 48 33.2
+			    </RighAscension>
+			    <Declination format="sdd mm ss.s" units="dms">
+			        +23 44 32.1
+			    </Declination>
+		        </PositionFilter>
+			<ObjectList number="all">
+			    <Object>
+		                <RightAscension format="hh mm ss.s" units="hms">
+			            12 48 37.6
+				</RighAscension>
+			        <Declination format="sdd mm ss.s" units="dms">
+			            +23 44 38.4
+			        </Declination>
+		                <RightAscension format="hh mm ss.s" units="hms">
+			            12 48 40.0
+				</RighAscension>
+			        <Declination format="sdd mm ss.s" units="dms">
+			            +23 44 28.8
+			        </Declination>
+		                <RightAscension format="hh mm ss.s" units="hms">
+			            12 48 20.9
+				</RighAscension>
+			        <Declination format="sdd mm ss.s" units="dms">
+			            +23 44 49.6
+			        </Declination>
+			    </Object>
+			</ObjectList>
+		</Reduction>
+	</tagExample>
+	<tagExample>
+    <ObjectList type="cluster" number="all" format=" fn sn rah ram ras decd decm decs xpos ypos mag magerror magflag"> 1  colours were created.                         
+  V                                               
+                                                  
+   1      1   01 10 12.71   60 04 14.37   254.180   142.627     18.810      0.056   00
+   1      2   01 10 50.78   60 04 15.68    97.969   152.996     18.802      0.057   00
+   1      3   01 11  9.44   60 00 12.74    11.558    44.320     19.228      0.080   00
+   1      4   01 11  8.60   60 03 44.30    23.551   143.005     19.280      0.078   00
+   1      5   01 10 46.14   60 04  2.36   116.464   145.564     19.292      0.081   00
+</ObjectList>
+	</tagExample>
+	<tagExample>
+          <ObjectList type="votable-url">
+          http://ltproxy/~estar/data/c_e_20050819_1_1_1.votable
+          </ObjectList>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+<!ELEMENT ObjectList
+	(#PCDATA|Object)*
+>
+<!ATTLIST ObjectList
+        type            %objectListTypes;   #IMPLIED
+        number          CDATA               #IMPLIED
+        format          CDATA               #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Observation -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Observation</tagName>
+	<tagDescription>
+		The RTML element which contains all of the information
+		necessary for an observation:<br>
+		<ul>
+		<li>	an optional description of the purpose for
+			the observation (<seeTag>Project</seeTag>);</li>
+		<li>
+			a <seeTag>Target</seeTag> (with <seeTag>Coordinates</seeTag>
+			etc.);</li>
+		<li>
+			an optional <seeTag>Telescope</seeTag> tag;</li>
+		<li>
+			an optional <seeTag>Device</seeTag> tag;</li>
+		<li>
+			an <seeTag>Exposure</seeTag> tag (if there's no complex
+			scheduling involved) or a <seeTag>Schedule</seeTag>
+			(for more complex scheduling constraints which may also
+			bear upon the exposure time(s));</li>
+		<li>
+			an optional <seeTag>Calibration</seeTag> tag documenting which
+			forms of calibration are needed; and</li>
+		<li>
+			an optional <seeTag>Telemetry</seeTag> tag.</li>
+		<li>
+			one or more <seeTag>ImageData</seeTag> tags
+			containing the information either about the
+			desired format of the requested data or all the
+			details (including things like the
+			<seeTag>FITSHeader</seeTag>) about finished data.
+			</li>
+		</ul>
+		The "status" attribute is used to check for
+		the completion status of a single observation: <br></br>
+		<table border=1>
+		  <tr><th>Status</th><th>Meaning</th></tr>
+		  <tr><td>error</td><td>observation has not been performed due
+			to some error</td></tr>
+		  <tr><td>pending</td><td>observation has not been performed but
+			is still in the queue</td></tr>
+		  <tr><td>incomplete</td><td>observation has not been started but
+			is not yet complete (e.g. too few images in a series)
+			</td></tr>
+		  <tr><td>done</td><td>observation has been performed but the
+			data may or may not be available to the client</td></tr>
+		  <tr><td>available</td><td>observation has been performed and
+			the data are available</td></tr>
+		  <tr><td>finished</td><td>observation has been performed and
+			the data have been sent to the client - if such has
+			been requested</td></tr>
+		</table>
+		<br></br>
+		See also <seeTag>Device</seeTag>,
+		<seeEntity>statusTypes</seeEntity>,
+		<seeTag>Calibration</seeTag>, and
+		<seeTag>Telemetry</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Observation>
+			<Project>Images of M31 would be especially nice.</Project>
+			<Device name="CCD Camera #1">
+				<Filter type="Johnson-B" />
+			</Device>
+			<Target ident="target1">
+				<TargetName>M31</TargetName>
+				<Coordinates>....</Coordinates>
+			</Target>
+			<Schedule priority="1">
+				<Exposure units="minutes">10</Exposure>
+			</Schedule>
+			<Calibration>
+				<Bias             correct="true" />
+				<DarkCurrent correct="true" />
+				<flat              correct="true" />
+			</Calibration>
+		</Observation>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Observation
+	(Project?, Target, Telescope?, Device?, (Exposure|Schedule), Calibration?, Reduction?, ObjectList*, Telemetry?, ImageData*, Score?, CompletionTime?)
+>
+<!ATTLIST Observation
+        status  %statusTypes;   #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- OrbA -->
+<!--
+<annotation>
+<documentation>
+	<tagName>OrbA</tagName>
+	<tagDescription>
+		Semi-major axis of some solar system object (default: A.U.).
+		<br></br>
+		See <seeTag>OrbitalElements</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<OrbA units="A.U.">2.63969</OrbA>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT OrbA
+	(#PCDATA)
+>
+<!ATTLIST OrbA
+	units	%lengthUnits;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- OrbE -->
+<!--
+<annotation>
+<documentation>
+	<tagName>OrbE</tagName>
+	<tagDescription>
+		Orbital eccentricity of some solar system object.		
+		<br></br>
+		See <seeTag>OrbitalElements</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<OrbE>0.26758</OrbE>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT OrbE
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- OrbI -->
+<!--
+<annotation>
+<documentation>
+	<tagName>OrbI</tagName>
+	<tagDescription>
+		Orbital inclination of some solar system object.		
+		<br></br>
+		See <seeTag>OrbitalElements</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<OrbI units="degs">4.385</OrbI>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT OrbI
+	(#PCDATA)
+>
+<!ATTLIST OrbI
+	units	%angleUnits;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- OrbitalElements -->
+<!--
+<annotation>
+<documentation>
+	<tagName>OrbitalElements</tagName>
+	<tagDescription>
+		Orbital elements of some solar system object: time of
+		perihelion passage <seeTag>OrbT</seeTag>, orbital period
+		<seeTag>OrbP</seeTag>, semi-major axis <seeTag>OrbA</seeTag>,
+		eccentricity <seeTag>OrbE</seeTag>, inclination
+		<seeTag>OrbI</seeTag>, argument of perihelion
+		<seeTag>OrbPerihelion</seeTag>, and longitude of ascending
+		node <seeTag>OrbNode</seeTag>.		
+	</tagDescription>
+	<tagExample>
+		<OrbitalElements>
+			<OrbT>2450230.616</OrbT>
+			<OrbP units="years">13.7</OrbP>
+			<OrbA units="A.U.">2.63969</OrbA>
+			<OrbE>0.26758</OrbE>
+			<OrbI units="degs">4.385</OrbI>
+			<OrbPerihelion units="degs">158.196</OrbPerihelion>
+			<OrbNode units="degs">218.734</OrbNode>
+		</OrbitalElements>			
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT OrbitalElements
+	(OrbT, OrbP, OrbA, OrbE, OrbI, OrbPerihelion, OrbNode)
+>
+
+<!--=========================================================================-->
+
+<!-- OrbNode -->
+<!--
+<annotation>
+<documentation>
+	<tagName>OrbNode</tagName>
+	<tagDescription>
+		Longitude of ascending node for some solar system object.
+		<br></br>
+		See <seeTag>OrbitalElements</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<OrbNode>218.734</OrbNode>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT OrbNode
+	(#PCDATA)
+>
+<!ATTLIST OrbNode
+	units	%angleUnits;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- OrbP -->
+<!--
+<annotation>
+<documentation>
+	<tagName>OrbP</tagName>
+	<tagDescription>
+		Orbital period of some solar system object.  Default is years.
+		<br></br>
+		See <seeTag>OrbitalElements</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<OrbP units="years">13.7</OrbP>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT OrbP
+	(#PCDATA)
+>
+<!ATTLIST OrbP
+	units	%timeUnits;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- OrbPerihelion -->
+<!--
+<annotation>
+<documentation>
+	<tagName>OrbPerihelion</tagName>
+	<tagDescription>
+		Argument of perhelion for some solar system object.	
+		<br></br>
+		See <seeTag>OrbitalElements</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<OrbPerihelion>158.196</OrbPerihelion>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT OrbPerihelion
+	(#PCDATA)
+>
+<!ATTLIST OrbPerihelion
+	units	%angleUnits;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- OrbT -->
+<!--
+<annotation>
+<documentation>
+	<tagName>OrbT</tagName>
+	<tagDescription>
+		Time of perihelion passage for some solar system object
+		(Julian date).
+		<br></br>
+		See <seeTag>OrbitalElements</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<OrbT>2450230.616</OrbT>
+	</OrbitalElements>			
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT OrbT
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- Pair -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Pair</tagName>
+	<tagDescription>
+		A simple, usually comma-separated pair of objects. Used in the
+		<seeTag>PointingLimits</seeTag> object to express 
+		(altitude,azimuth) pairs.
+	</tagDescription>
+	<tagExample>
+		<Pair>1.2,3.4</Pair>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Pair
+	(#PCDATA)
+>
+<!ATTLIST Pair
+	delimeter CDATA #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Parallax -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Parallax</tagName>
+	<tagDescription>
+	        The Parallax of the Target in parallax arcseconds.
+		<seeTag>Target</seeTag>
+	</tagDescription>
+	<tagExample>
+		<Parallax>
+		        1.4
+		</Parallax>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Parallax
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- PhaseConstraint -->
+<!--
+<annotation>
+<documentation>
+	<tagName>PhaseConstraint</tagName>
+	<tagDescription>
+		This constraint insures that the observation will be made
+		during a given phase period defined by a quadratic
+		ephemeris:
+		<br></br>
+		&nbsp;&nbsp;&nbsp;
+		t = <seeTag>PhaseTime</seeTag> + <seeTag>PhasePeriod</seeTag>*E
+		+ 0.5*<seeTag>PhasePeriod</seeTag>*<seeTag>PhasePdot</seeTag>*E*E
+		<br></br>
+		where E is the period count (a total phase
+		usually much larger than 1!).
+		<br></br>
+		If no <seeTag>ExposureFactor</seeTag> is given, then the
+		constraint is to observe ONLY during the given phases.
+
+		The start and end phases can be &lt; or &gt; each other:
+		the client and server software using this data should have
+		a minimal amount of intelligence and be able to handle
+		phases &lt; -1 and &gt; +1.
+		<br></br>
+		See <seeTag>Schedule</seeTag>,
+		<seeTag>StartPhase</seeTag>, and
+		<seeTag>EndPhase</seeTag>, and
+		<seeTag>ExposureFactor</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<PhaseConstraint>
+			Exposure twice as long during as outside the eclipses!
+			<PhaseTime units="HJD">2445890.002152</phaseZeroTime>
+			<PhasePeriod units="hours">6.54281</PhasePeriod>
+			<StartPhase>-0.2</StartPhase>
+			<EndPhase>0.2</EndPhase>
+			<ExposureFactor>2.0</ExposureFactor>
+		</PhaseConstraint>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT PhaseConstraint
+	(#PCDATA|PhaseTime|PhasePeriod|StartPhase|EndPhase|ExposureFactor)*
+>
+
+<!--=========================================================================-->
+
+<!-- PhasePeriod -->
+<!--
+<annotation>
+<documentation>
+	<tagName>PhasePeriod</tagName>
+	<tagDescription>
+		Period to be used for a <seeTag>PhaseConstraint</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<PhasePeriod units="hours">6.54281</PhasePeriod>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+<!ELEMENT PhasePeriod
+	(#PCDATA)
+>
+<!ATTLIST PhasePeriod
+	units	%timeUnits;	#REQUIRED
+>
+
+<!--=========================================================================-->
+
+<!-- PhasePdot -->
+<!--
+<annotation>
+<documentation>
+	<tagName>PhasePdot</tagName>
+	<tagDescription>
+		Rate of change of the period used in a
+		<seeTag>PhaseConstraint</seeTag> (assumed to
+		be in the same
+		units as <seeTag>PhasePeriod</seeTag> so that
+		it is unitless).
+	</tagDescription>
+	<tagExample>
+		<PhasePdot>-1.e-12</PhasePdot>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT PhasePdot
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- PhaseTime -->
+<!--
+<annotation>
+<documentation>
+	<tagName>PhaseTime</tagName>
+	<tagDescription>
+		Zero point of an ephemeris for a
+		<seeTag>PhaseConstraint</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<PhaseTime units="HJD">2445890.002152</phaseZeroTime>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT PhaseTime
+	(#PCDATA)
+>
+<!ATTLIST PhaseTime
+	units	%timeUnits;	#REQUIRED
+>
+
+<!--=========================================================================-->
+
+<!-- PixelRadius -->
+<!--
+<annotation>
+<documentation>
+	<tagName>PixelRadius</tagName>
+	<tagDescription>
+	Size of pixels in a <seeTag>Detector</seeTag>
+	in some units (default is microns).  The pixels are
+	assumed to be circular.
+	<br></br>
+	See <seeTag>PixelSize</seeTag>,
+	<seeTag>RowPixelSize</seeTag>, and
+	<seeTag>ColumnPixelSize</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<PixelRadius units="cm">0.78</PixelRadius>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT PixelRadius
+	(#PCDATA)
+>
+<!ATTLIST PixelRadius
+	units %lengthUnits; #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- PixelSize -->
+<!--
+<annotation>
+<documentation>
+	<tagName>PixelSize</tagName>
+	<tagDescription>
+	Size of pixels in a <seeTag>Detector</seeTag>
+	in some units (default is microns).  The pixels are
+	assumed to be square.
+	<br></br>
+	See <seeTag>PixelRadius</seeTag>,
+	<seeTag>RowPixelSize</seeTag>, and
+	<seeTag>ColumnPixelSize</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<PixelSize units="microns">9</PixelSize>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT PixelSize
+	(#PCDATA)
+>
+<!ATTLIST PixelSize
+	units %lengthUnits; #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- PlateScale -->
+<!--
+<annotation>
+<documentation>
+	<tagName>PlateScale</tagName>
+	<tagDescription>
+		The plate scale at the focus of a
+		<seeTag>Telescope</seeTag>, given by the
+		number of arcseconds in a radian devided by the effective
+		focal length in millimeters.  The required
+		attribute units must thus be equal to "arcsec/mm".
+	</tagDescription>
+	<tagExample>
+		<PlateScale units="arcsec/mm">3.5810</PlateScale>
+	</tagExample>
+</documentation>
+<annotation>
+-->
+
+<!ELEMENT PlateScale
+	(#PCDATA)
+>
+<!ATTLIST PlateScale
+	units %plateScaleUnits; #REQUIRED
+>
+
+<!--=========================================================================-->
+
+<!-- PointingLimits -->
+<!--
+<annotation>
+<documentation>
+	<tagName>PointingLimits</tagName>
+	<tagDescription>
+		Describes the angular limits of the movement of a
+		<seeTag>Telescope</seeTag> in
+		degrees.If given as a series of <seeTag>Pair</seeTag>'s, the
+		assumption is that one can interpolate between.  North is 0
+		degs in azimuth and East is 90 degrees.  The attribute
+		"zenith" is for alt-az telescopes which cannot observe near
+		the zenith. The attributes "sun", "moon", and "earth" are
+		given, e.g., for the avoidance zones of spacecraft.
+	</tagDescription>
+	<tagExample>
+		<PointingLimits zenith="0.5">
+			There's a big tree off to the NNE near our
+			alt-az telescope!
+			<Pair>0,0</Pair>
+			<Pair>10,20</Pair>
+			<Pair>30,25</Pair>
+			<Pair>33,0</Pair>
+		</PointingLimits>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT PointingLimits
+	(#PCDATA|Pair)*
+>
+<!ATTLIST PointingLimits
+	zenith	CDATA		#IMPLIED
+	sun	CDATA		#IMPLIED
+	moon	CDATA		#IMPLIED
+	earth	CDATA		#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- PositionAngle -->
+<!--
+<annotation>
+<documentation>
+	<tagName>PositionAngle</tagName>
+	<tagDescription>
+	Standard astronomical position angle (0 at the north), increasing to the
+	celestial east (usually to the left in images) appropriate
+	for a <seeTag>Detector</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<PositionAngle units="degs">156.7</PositionAngle>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT PositionAngle
+	(#PCDATA)
+>
+<!ATTLIST PositionAngle
+	units %angleUnits; #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- PositionFilter -->
+<!--
+<annotation>
+<documentation>
+	<tagName>PositionFilter</tagName>
+	<tagDescription>
+	        Describe an <seeTag>ObjectList</seeTag> in terms of position.
+	</tagDescription>
+	<tagExample>
+		<Reduction>
+		    Create an object list with positions of all objects within 
+		    30 arcseconds of 12h 48m 33.2s +23d 44m 32.1s
+		    <ObjectList number="all" />
+		    <PositionFilter radius="30" units="arcsec">
+			    <RightAscension format="hh mm ss.s" units="hms">
+			        12 48 33.2
+			    </RighAscension>
+			    <Declination format="sdd mm ss.s" units="dms">
+			        +23 44 32.1
+			    </Declination>
+		    </PositionFilter>
+		</Reduction>
+	</tagExample>
+	<tagExample>
+		<Reduction>
+		    <ObjectList number="20">
+		        Create an object list with magnitudes and position of 
+			the 20 objects closest to 12h 48m 33.2s +23d 44m 32.1s
+		    </ObjectList>
+		    <PositionFilter radius="0" units="arcsec">
+			    <RightAscension format="hh mm ss.s" units="hms">
+			        12 48 33.2
+			    </RighAscension>
+			    <Declination format="sdd mm ss.s" units="dms">
+				+23 44 32.1
+			    </Declination>
+		    </PositionFilter>
+		    <MagnitudeFilter />
+		</Reduction>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT PositionFilter
+	(#PCDATA|RightAscension|Declination)*
+>
+<!ATTLIST PositionFilter 
+        radius          CDATA           #IMPLIED
+	units           %angleUnits;    #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Project -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Project</tagName>
+	<tagDescription>
+		The RTML project elements should contain information describing
+		why the request (within an <seeTag>RTML</seeTag> tag) or
+		<seeTag>Observation</seeTag> is needed, be it a
+		scientific research
+		project (using a shortened form of the standard project
+		descriptions seen by TACs) or a school project ("We would
+		like a nice picture of the moon at phase 0.5 to measure
+		crater heights with.").  The "ident" attribute
+		given either by the client (e.g. from a TAC) or by the
+		server (e.g. in a type="confirmation" document)
+		can be used as a short form for the project.
+		<br></br>
+		See <seeTag>Title</seeTag> and <seeTag>Abstract</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Project ident="TX01_001">
+			<Title>Observations of Mkn123</Title>
+			<Abstract>
+				Monitoring observations of the SyI galaxy
+				in the B and J bands will be used to measure
+				the value of Omega_0.
+			</Abstract>
+			Jones et al. (1999) proposed using the variations in
+			AGN's at optical and infrared wavevlengths....
+		</Project>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Project
+	(#PCDATA|Title|Abstract)*
+>
+
+<!--=========================================================================-->
+
+<!-- ProperMotion -->
+<!--
+<annotation>
+<documentation>
+	<tagName>ProperMotion</tagName>
+	<tagDescription>
+		An angular velocity in some coordinate system determined by
+		the parent element in some units given by the ratio of the
+		<seeEntity>angleUnits</seeEntity> and the
+		<seeEntity>timeUnits</seeEntity>.  If the "useEpoch" attribute
+		is "true", then the amount of offset is calculated relative
+		to the <seeTag>Epoch</seeTag> rather than to the beginning
+		of the <seeTag>Observation</seeTag>.
+		<br></br>
+		See <seeTag>Coordinates</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Declination units="degs">
+			+55.43210234
+			<ProperMotion angleunits="arcsec" timeunits="hour">
+				-0.01
+			</AngleOffset>
+		</LatCoordinate>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT ProperMotion
+	(#PCDATA)
+>
+<!ATTLIST ProperMotion
+	format		CDATA           #IMPLIED
+	angleunits	%angleUnits;	#IMPLIED
+	timeunits	%timeUnits;	#IMPLIED
+	useEpoch        %booleanTypeF;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- RadialVelocity -->
+<!--
+<annotation>
+<documentation>
+	<tagName>RadialVelocity</tagName>
+	<tagDescription>
+		The radial velocity of a <seeTag>Target</seeTag>, expressed
+		in some "units" and some "type".
+	</tagDescription>
+	<tagExample>
+		<RadialVelocity type="LSR" units="km/s">-19.2</RadialVelocity>
+	</tagExample>
+	<tagExample>
+		<RadialVelocity units="z">2.54</RadialVelocity>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT RadialVelocity
+	(#PCDATA)
+>
+<!ATTLIST RadialVelocity
+	type	%velocityTypes;	#IMPLIED
+	units	%velocityUnits;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- ReadoutNoise -->
+<!--
+<annotation>
+<documentation>
+	<tagName>ReadoutNoise</tagName>
+	<tagDescription>
+	The mean amount of noise per pixel in a final measurement
+	obtained from a <seeTag>Detector</seeTag> solely due to
+	the read-out process.
+	</tagDescription>
+	<tagExample>
+		<ReadoutNoise units="counts">1.4</ReadoutNoise>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT ReadoutNoise
+	(#PCDATA)
+>
+<!ATTLIST ReadoutNoise
+	units CDATA #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Reduction -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Reduction</tagName>
+	<tagDescription>
+	Specify that reduction should be carried out on the observation.
+	So far the only reduction format is a World Coordinate System solution
+	and photometric Magnitudes in an <seeTag>ObjectList</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Reduction>
+		    <ObjectList number="all">
+		        Create an object list with Photometry and position of 
+			all objects on frame.
+		    </ObjectList>
+		</Reduction>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Reduction
+	(#PCDATA|ObjectList|Magnitude|Position)*
+>
+
+<!--=========================================================================-->
+
+<!-- RightAscension -->
+<!--
+<annotation>
+<documentation>
+	<tagName>RightAscension</tagName>
+	<tagDescription>
+		Equatorial celestial coordinate (same as
+		&lt;LongCoordinate type="equatorial"&gt;).
+		See the description of the format syntax at
+		<seeTag>Coordinates</seeTag>.
+		<br></br>
+		See <seeTag>AngleOffset</seeTag>
+	</tagDescription>
+	<tagExample>
+		<RightAscension format="hh:mm:ss.s" units="hms">
+			23:45:43.2
+		</RightAscension>
+	</tagExample>
+	<tagExample>
+		<RightAscension format="hh\h mm\m ss.s\s" units="hms">
+			23h 45m 43.2s
+		</RightAscension>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT RightAscension
+	(#PCDATA|AngleOffset)*
+>
+<!ATTLIST RightAscension
+	format	CDATA		#IMPLIED
+	units	%angleUnits;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- RowPixelSize -->
+<!--
+<annotation>
+<documentation>
+	<tagName>RowPixelSize</tagName>
+	<tagDescription>
+	Size of pixels in the vertical direction
+	(w.r.t. the final image - "how
+	high are the rows?") in some units (default is microns)
+	for some <seeTag>detetctor</seeTag>. The pixels
+	are assumed to be non-square (e.g. SBIG ST6).
+	<br></br>
+	See <seeTag>PixelRadius</seeTag>,
+	<seeTag>PixelSize</seeTag>, and
+	<seeTag>ColumnPixelSize</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<RowPixelSize units="microns">26.0</RowPixelSize>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT RowPixelSize
+	(#PCDATA)
+>
+<!ATTLIST RowPixelSize
+	units %lengthUnits; #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- RTML -->
+<!--
+<annotation>
+<documentation>
+	<tagName>RTML</tagName>
+	<tagDescription>
+		<p>
+		Delimits a complete RTML Document consisting of<br></br>
+		<ul>
+		<li>one or more <seeTag>Contact</seeTag>'s;</li>
+		<li>an optional <seeTag>Project</seeTag> element describing the
+			whole project;</li>
+		<li>an optional <seeTag>Location</seeTag> element giving the
+			location of the observatory;</li>
+		<li>an optional <seeTag>Telescope</seeTag> element specifying
+			the telescope to be used;</li>
+		<li>an optional <seeTag>Databank</seeTag> element if the data
+			are being requested from a virtual telescope;</li>
+		<li>an optional <seeTag>Device</seeTag> element if all observations
+			are to be carried out with the same device (e.g. same camera
+			and filter);</li>
+		<li>one or more <seeTag>Observation</seeTag> tags containing all
+			of the details (possibly including <seeTag>Device</seeTag>
+			elements if each <seeTag>Observation</seeTag> uses different
+			devices); and</li>
+		<li>an optional <seeTag>Calibration</seeTag> element if all calibrations
+			are to be carried out the same for all observations.</li>
+                <li>A <seeTag>IntelligentAgent</seeTag> element specifying the location
+                    (on the internet) of the intelligent agent, and it's unique reference id
+                    for the transactiob specified by this document.
+                <li>A <seeTag>Score</seeTag> element specifying how observable this object is.
+                <li>A <seeTag>CompletionTime</seeTag> element specifying when the object can be observed.
+		</ul>
+		</p>
+		<p>
+		The attribute "version" gives the RTML version number (e.g. "2.0"),
+		and the attribute "type" the document mode (one of the
+		<seeEntity>rtmlDocumentModes</seeEntity>).  The
+		attribute "ident" contains an ASCII string which can be used
+		as a short-cut to identify an RTML request/observation; this
+		attribute should be created by a server sending a RTML document
+		with type "confirmation".  The "timeStamp" attribute contains
+		an ISO-conforming date-time which dates an RTML document.
+		Finally, the "status" attribute is mainly used to flag errors (e.g. a
+		request cannot be confirmed due to errors in syntax, due to
+		the inavailability of a certain telescope/instrument configuration,
+		or because the telescope is down).
+	</tagDescription>
+	<tagExample>
+		Here's an example of an RTML 2.0 observation request for a default
+		telescope - note how there is a project description both at the request
+		and observation level and that we could have specified the device outside
+		of the <Observation> tags had we used the same filter:
+
+		<RTML version="2.0" type="request">
+			<Contact ident="fvh0001" />
+                        <IntelligentAgent host="150.204.240.111" port="1234">
+                             IATEST0001:CT1:0001
+                        </IntelligentAgent>
+ 			<Project>
+				We need some images for our class project.
+			</Project>
+			<Observation>
+				<Project>Images of M31 would be especially nice.</Project>
+				<Device name="CCD Camera #1">
+					<Filter type="Johnson-B" />
+				</Device>
+				<Target ident="target1">
+					<TargetName>M31</TargetName>
+					<Coordinates>....</Coordinates>
+				</Target>
+				<Schedule priority="1">
+					<Exposure units="minutes">10</Exposure>
+				</Schedule>
+				<Calibration>
+					<Bias             correct="true" />
+					<DarkCurrent correct="true" />
+					<flat              correct="true" />
+				</Calibration>
+			</Observation>
+			<Observation>
+				<Project>Red images of an elliptical would be nice.</Project>
+				<Device name="CCD Camera #1">
+					<Filter type="Johnson-V" />
+				</Device>
+				<Target ident="target1">
+					<TargetName>M32</TargetName>
+					<Coordinates>....</Coordinates>
+				</Target>
+				<Schedule priority="2">
+					<Exposure units="minutes">10</Exposure>
+				</Schedule>
+				<Calibration>
+					<Bias             correct="true" />
+					<DarkCurrent correct="true" />
+					<flat              correct="true" />
+				</Calibration>
+			</Observation>
+		</RTML>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT RTML
+	(#PCDATA|Contact|IntelligentAgent|Project|Location|Telescope|Databank|Device|Observation|Calibration|Score|Scores|CompletionTime)*
+>
+<!ATTLIST RTML
+	version		CDATA			#REQUIRED
+	type		%rtmlDocumentModes;	#REQUIRED
+	ident		CDATA			#IMPLIED
+	timeStamp	CDATA			#IMPLIED
+	status		%statusTypes;		#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Schedule -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Schedule</tagName>
+	<tagDescription>
+		Defines the constraints on a given
+		<seeTag>Observation</seeTag>, both the manner
+		in which the observation should be / has been carried out and
+		whatever constraints should be / have been taken into
+		consideration when carrying out an observation.  The basic
+		exposure time is given in the <seeTag>Exposure</seeTag>
+		element and the
+		other constraint elements modify this exposure 
+		(using <seeTag>ExposureFactor</seeTag>'s) based upon
+		various conditions.  Multiple constraints of the same type
+		are possible
+		(e.g. changing the exposure times as function of different
+		orbital phases or for different sky brightnesses). The required
+		priority attribute is an integer: 0=Target-of-Opportunity
+		(highest priority), 1=high priority, 2=lower priority, etc.
+		<br></br>
+		See <seeTag>Exposure</seeTag>,
+		<seeTag>ExposureFactor</seeTag>,
+		<seeTag>SeeingConstraint</seeTag>,
+		<seeTag>SkyConstraint</seeTag>,
+		<seeTag>MoonConstraint</seeTag>,
+		<seeTag>ExtinctionConstraint</seeTag>,
+		<seeTag>AirmassConstraint</seeTag>,
+		<seeTag>TimeConstraint</seeTag>, and
+		<seeTag>PhaseConstraint</seeTag>
+	</tagDescription>
+	<tagExample>
+		<Schedule priority="1">
+			<Exposure units="minutes">10</Exposure>
+			<SeeingConstraint......>...</SeeingConstraint>
+			<PhaseConstraint....>...</PhaseConstraint>
+			<PhaseConstraint....>...</PhaseConstraint>
+		</Schedule>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Schedule
+	(#PCDATA|Exposure|SeeingConstraint|SkyConstraint|MoonConstraint|ExtinctionConstraint|AirmassConstraint|TimeConstraint|PhaseConstraint|SeriesConstraint)*
+>
+<!ATTLIST Schedule
+	priority	CDATA	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Score -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Score</tagName>
+	<tagDescription>
+	        A tag to return the score calculated by a scheduler.
+
+		The score is analogous to the probability of that observation
+		being carried out.
+
+                In the simple case, a single number is returned representing the probability of the 
+                observation being done.
+
+                In the more complicated case, the score represents the inverse 
+                queue position for a particular time period.
+	</tagDescription>
+	<tagExample>
+           <Score>
+	      0.833
+	   </Score>
+           <Score delay="P0H" probability="0.1" cumulative="0.1"/>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Score (#PCDATA)>
+
+<!ATTLIST Score
+        delay	        CDATA	#IMPLIED
+	probability	CDATA	#IMPLIED
+	cumulative	CDATA	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- Scores -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Scores</tagName>
+	<tagDescription>
+	        A tag to return a list of probabilities calculated by a scheduler over a period of time.
+
+		This allows an agent to compare the probability of a particular Observation being completed 
+                on a set of telescopes in a meaningful manner.
+	</tagDescription>
+	<tagExample>
+           <Scores>
+              <Score delay="P0H" probability="0.1" cumulative="0.1"/>
+              <Score delay="P1H" probability="0.3" cumulative="0.4"/>
+              <Score delay="P2H" probability="0.0" cumulative="0.4"/>
+              <Score delay="P3H" probability="0.1" cumulative="0.5"/>
+           </Scores>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Scores
+	(#PCDATA|Score)*
+>
+
+<!--=========================================================================-->
+
+<!-- SeeingConstraint -->
+<!--
+<annotation>
+<documentation>
+	<tagName>SeeingContraint</tagName>
+	<tagDescription>
+		A simple means of stipulating which seeing is acceptable
+		in an RTML <seeTag>Schedule</seeTag>.  Both
+		minimum and maximum seeing constraints are available so that
+		bad-seeing projects can be defined (e.g. "Make sure you really
+		get this image done if the seeing gets this bad!").   Seeing is
+		always FWHM in arcseconds!  If an
+		<seeTag>ExposureFactor</seeTag>
+		is included, the nominal <seeTag>Exposure</seeTag> should be
+		modified to correct for the effects of seeing relative to the
+		"nominal" seeing (given as the attribute "nominal").  The exact
+		method to be used to calculate the correction is left to the
+		server.
+	</tagDescription>
+	<tagExample>
+		<SeeingConstraint minimum="4.0" maximum="5.0">
+			I really need strange data for a silly project!
+		</SeeingConstraint>
+	</tagExample>
+	<tagExample>
+		<Exposure units="secs">10.0</Exposure>
+		<SeeingConstraint nominal="1.0" maximum="5.0">
+			<ExposureFactor>0.5</ExposureFactor>
+			Don't want the exposure to get TOO long, so
+			only correct for 1/2 the amount of seeing
+			induced exposure lengthening.
+		</SeeingConstraint>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT SeeingConstraint
+	(#PCDATA|ExposureFactor)*
+>
+<!ATTLIST SeeingConstraint
+	minimum	CDATA	#IMPLIED
+	maximum	CDATA	#IMPLIED
+	nominal	CDATA	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- SeriesConstraint -->
+<!--
+<annotation>
+<documentation>
+	<tagName>SeriesConstraint</tagName>
+	<tagDescription>
+                Defines the scheduling constraints on a series of scheduled observations defined within
+                a single <seeTag>Schedule</seeTag> but separated by a constant interval plus a time tolerance
+                (written as an XML Schema duration of the form P{(yyyy)Y{(mm)M}{(dd)D}{T{(hh)H}{(mm}M}{(ss.s..)S}
+                (for example "P1Y2M3DT3H6M22.1S" uses all elements, but "P1Y" and "PT6M22.1S" is
+                also OK - note the presence of the "T" separator between the date and time part!).
+		See also <seeTag>Schedule</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<SeriesConstraint>
+                   <Interval>PT1H</Interval>
+                   <Count>5</Count>
+                   <Tolerance>PT30M</Tolerance>
+		</SeriesConstraint>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT SeriesConstraint
+	(#PCDATA|Count|Interval|Tolerance)*
+>
+
+<!--=========================================================================-->
+
+<!-- SkyConstraint -->
+<!--
+<annotation>
+<documentation>
+	<tagName>SkyConstraint</tagName>
+	<tagDescription>
+		Like <seeTag>MoonConstraint</seeTag>,
+		<seeTag>SkyConstraint</seeTag> says how much moon is
+		acceptable, however this time expressed in sky brightness,
+		either in terms of a formal intensity (e.g. flux="1.e-20"
+		units="...") or as a general description (e.g. attribute
+		sky="dark").  The former form needs a "units" attribute.
+		Normally, this tag has no content, but the content can be
+		used to comment the constraint.
+		<br></br>
+		See also <seeTag>MoonConstraint</seeTag> and
+		<seeTag>Schedule</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<SkyConstraint flux="20.0" units="B-mag/sqr-arcsec"  />
+	</tagExample>
+	<tagExample>
+		<SkyConstraint sky="gray" />
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT SkyConstraint
+	(#PCDATA)
+>
+<!ATTLIST SkyConstraint
+	sky	%simpleSkyTypes;	#IMPLIED
+	value	CDATA			#IMPLIED
+	units	%fluxUnits;		#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- StartDateTime -->
+<!--
+<annotation>
+<documentation>
+	<tagName>StartDateTime</tagName>
+	<tagDescription>
+		The staring date plus time for a
+		<seeTag>TimeConstraint</seeTag>.
+		A format doesn't have to be given since we follow standard
+		ISO 8601 formatting rules (e.g. dates are given yyyy.mm.dd,
+		times as hh:mm:ss and "dateTimes" as
+		yyyy.mm.ddThh:mm:ss{.ss}). This will make RTMLn.0 defined
+		by a DTD compatible with later versions defined by XML
+		Schema and give us free format checking.
+		<br></br>
+		See <seeTag>TimeConstraint</seeTag> and
+		<seeTag>EndDateTime</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<StartDateTime>2001-05-29T12:00:00</StartDateTime>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT StartDateTime
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- StartPhase -->
+<!--
+<annotation>
+<documentation>
+	<tagName>StartPhase</tagName>
+	<tagDescription>
+		The beginning phase of a <seeTag>PhaseConstraint</seeTag>.
+		May or may not be smaller in value than the corresponding
+		<seeTag>EndPhase</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<StartPhase>-0.2</StartPhase>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT StartPhase
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- Target -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Target</tagName>
+	<tagDescription>
+		All of the information needed to point a
+		<seeTag>Telescope</seeTag> to an object 
+		and track on it.  The "ident" attribute is a client-supplied
+		shortcut for accessing information about the source (e.g. "Have
+		you looked at HST1_001 yet?").  If a <seeTag>Url</seeTag> is
+		given, it is assumed to be for a finder chart.
+                The "type" attribute is used to specify whether the Target is a toop (Target of opportunity)
+                or not, which can used to influence scheduling descisions.
+		<br></br>
+		See <seeTag>Coordinates</seeTag>,
+		<seeTag>Flux</seeTag>,
+		<seeTag>Velocity</seeTag>,
+		<seeTag>TrackRate</seeTag>,
+		<seeTag>OrbitalElements</seeTag>, and
+		<seeTag>Url</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Target ident="HST1_001">
+			Here's a great target!
+			<TargetName>M31</TargetName>
+			<Coordinates>....</Coordinates>
+		</Target>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Target
+	(TargetName*, Coordinates?, Flux?, Velocity?, TrackRate?, OrbitalElements?, Url?)
+>
+<!ATTLIST Target
+	ident	CDATA	#IMPLIED
+        type    %targetTypes; #IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- TargetName -->
+<!--
+<annotation>
+<documentation>
+	<tagName>TargetName</tagName>
+	<tagDescription>
+		Standard name of a target (e.g. "M31" "RXJ01234-5678", etc).
+	</tagDescription>
+	<tagExample>
+		<TargetName>M31</TargetName>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT TargetName
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- Telemetry -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Telemetry</tagName>
+	<tagDescription>
+		The RTML element which contains all of the log information 
+		created for an <seeTag>Observation</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Telemetry>
+			Time            Event                   Status
+			=======================================================
+			00:10:00        Exposure started        60sec
+			00:11:30        CCD readout             OK
+			00:11:35        Exposure started        60sec
+			00:13:05        CCD readout             OK
+			00:14:35        Exposure started        60sec
+			ERROR:  your Win98 computer has lost its connection to
+			the keyboard - please type <ENTER> in order to reboot
+			without substantial data loss!
+		</Telemetry>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Telemetry
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- Telephone -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Telephone</tagName>
+	<tagDescription>
+		Telephone number within a <seeTag>Contact</seeTag>
+		element, including the nation code (+XX) and optional
+		numbers for use within the same country (e.g. "(0)").
+	</tagDescription>
+	<tagExample>
+		<Telephone>+1-123-456-7890</Telephone>
+	</tagExample>
+	<tagExample>
+		<Telephone>+49-(0)551-39-5052</Telephone>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Telephone
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- Telescope -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Telescope</tagName>
+	<tagDescription>
+		Information about a telescope. If no spectral region is given,
+		it is assumed to be an optical telescope.
+		<br></br>
+		See <seeTag>Location</seeTag>,
+		<seeTag>Aperture</seeTag>,
+		<seeTag>EffectiveAperture</seeTag>,
+		<seeTag>FocalLength</seeTag>,
+		<seeTag>FocalRatio</seeTag>,
+		<seeTag>PlateScale</seeTag>,
+		<seeTag>Device</seeTag>, and
+		<seeTag>PointingLimits</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Telescope region="optical" alias="LT">
+			<Name>Liverpool Telescope</Name>
+			<Aperture units="meters">2.0</Aperture>
+			<FocalLength units="mm">20000</FocalLength>
+			<FocalRatio>f/10</FocalRatio>
+		</Telescope>
+	</tagExample>
+</documentation>
+<annotation>
+-->
+
+<!ELEMENT Telescope
+	(#PCDATA|Name|Location|Aperture|EffectiveAperture|FocalLength|FocalRatio|PlateScale|Device|PointingLimits)*
+>
+<!ATTLIST Telescope
+	region	%spectralRegions;	#IMPLIED
+	alias	CDATA			#IMPLIED
+>
+ 
+<!--=========================================================================-->
+
+<!-- TimeCharge -->
+<!--
+<annotation>
+<documentation>
+	<tagName>TimeCharge</tagName>
+	<tagDescription>
+		An element within a <seeTag>Contact</seeTag> which
+		is only relevant for multi-user
+		requests: the contents describe
+		how the successfully used observing time for the requested
+		<seeTag>Observation</seeTag>
+		is to be charged, given either in percent
+		(attribute "percent") or as a real time (attributes "time" and
+		"units").If abscent, the time will be charged equally among all
+		of the parties with <seeTag>Contact</seeTag>'s. 
+	</tagDescription>
+	<tagExample>
+		<TimeCharge percent="50">
+			Time shared equally among G&ouml;ttingen and Texas.
+		</TimeCharge>
+	</tagExample>
+	<tagExample>
+		<TimeCharge time="2" units="hours">
+ 			G&ouml;ttingen only pays for the first 2 hours.
+		</TimeCharge>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT TimeCharge
+	(#PCDATA)
+>
+<!ATTLIST TimeCharge
+	percent	CDATA		#IMPLIED
+	time	CDATA		#IMPLIED
+	units	%timeUnits;	#IMPLIED
+>
+
+<!--=========================================================================-->
+
+<!-- TimeConstraint -->
+<!--
+<annotation>
+<documentation>
+	<tagName>TimeConstraint</tagName>
+	<tagDescription>
+		This constraint forces an observation to be made within a
+		certain time period given by a
+		<seeTag>StartDateTime</seeTag>
+		and <seeTag>EndDateTime</seeTag>.
+		<br></br>
+		See <seeTag>Schedule</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<TimeConstraint>
+			Simultaneous observations with XMM.
+			<StartDateTime>2001-05-29T12:00:00</StartDateTime>
+			<EndDateTime>2001-06-01T11:00:00</EndDateTime>
+		</TimeConstraint>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT TimeConstraint
+	(#PCDATA|StartDateTime|EndDateTime)*
+>
+
+<!--=========================================================================-->
+
+<!-- Title -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Title</tagName>
+	<tagDescription>
+		The title of a <seeTag>Project</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Title>Observations of Mkn123</Title>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Title
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- Tolerance -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Tolerance</tagName>
+	<tagDescription>
+                Subtag of <seeTag>SeriesConstraint</seeTag>, defining the tolarance (how near) we have to be to the 
+                time between performing observations in the series. i.e. How much slack in period.
+                Interval written in the form P{(yyyy)Y{(mm)M}{(dd)D}{T{(hh)H}{(mm}M}{(ss.s..)S}.
+                (for example "P1Y2M3DT3H6M22.1S" uses all elements, but "P1Y" and "PT6M22.1S" is
+                also OK - note the presence of the "T" separator between the date and time part!).
+		See also <seeTag>SeriesConstraint</seeTag>,<seeTag>Count</seeTag>,<seeTag>Interval</seeTag> 
+                and <seeTag>Schedule</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<SeriesConstraint>
+                   <Interval>PT1H</Interval>
+                   <Count>5</Count>
+                   <Tolerance>PT30M</Tolerance>
+		</SeriesConstraint>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Tolerance
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- TrackRate -->
+<!--
+<annotation>
+<documentation>
+	<tagName>TrackRate</tagName>
+	<tagDescription>
+		The rate at which a <seeTag>Telescope</seeTag> must
+		be tracked in order to
+		observe a <seeTag>target</seeTag>.  For solar system
+		objects, this can be defined by a set of
+		<seeTag>OrbitalElements</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<TrackRate type="siderial" />
+	</tagExample>
+	<tagExample>
+		<TrackRate type="Jupiter" />
+	</tagExample>
+	<tagExample>
+		<TrackRate type="orbital">
+			Follow the comet having the following elements.
+			<OrbitalElements>...</OrbitalElements>
+		</TrackRate>
+	</tagExample>
+</documentation>
+<annotation>
+-->
+
+<!ELEMENT TrackRate
+	(#PCDATA|OrbitalElements)*
+>
+<!ATTLIST TrackRate
+	type	%trackRateTypes;	#IMPLIED
+>
+ 
+<!--=========================================================================-->
+
+<!-- Url -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Url</tagName>
+	<tagDescription>
+		URL (usually http) where further information may be found
+		concerning the &lt;User&gt; or the &lt;Project&gt;.
+		<br></br>
+		See <seeTag>Contact</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<Url>http://www.uni-sw.gwdg.de/~hessman/MONET</Url>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Url
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- User -->
+<!--
+<annotation>
+<documentation>
+	<tagName>User</tagName>
+	<tagDescription>
+		Some symbolic name for the party, e.g. a computer userid-like
+		name, within a <seeTag>Contact</seeTag>.
+	</tagDescription>
+	<tagExample>
+		<User>USG0001</User>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT User
+	(#PCDATA)
+>
+
+<!--=========================================================================-->
+
+<!-- Windowing -->
+<!--
+<annotation>
+<documentation>
+	<tagName>Windowing</tagName>
+	<tagDescription>
+		Determines the pixel sub-array(s) to be used in a
+		<seeTag>Detector</seeTag>,
+		given as pairs of <seeTag>Pair</seeTag>'s of coordinates
+		(lower-left and upper-right).  The lowest-leftest pixel is
+		assumed to be at (1,1).
+	</tagDescription>
+	<tagExample>
+		<Windowing><Pair>1,1</Pair><Pair>1024,100</Pair></Windowing>
+	</tagExample>
+</documentation>
+</annotation>
+-->
+
+<!ELEMENT Windowing
+	(#PCDATA|Pair)*
+>
+
+
+
+
+
+
+
+
+
