@@ -1,0 +1,142 @@
+HTN RTML page
+http://www.telescope-networks.org/wiki/index.php/RTML
+
+
+RTML Home page
+http://monet.uni-sw.gwdg.de/twiki/bin/view/RTML/WebHome
+
+HTN-RTML.pdf - downloaded from RTML Home page.
+
+Scheme to use:
+http://monet.uni-sw.gwdg.de/XMLSchema/RTML/schemas/RTML-nightly.xsd
+
+Note this schema has an incorrect specification for Hours/Minutes, see RTML-nightly_chris_mottram.xsd for fix.
+
+Note RTML-3.0g.xsd and RTML-3.0h.xsd do not contain sufficent values for RTML mode attribute to be usable.
+
+according to:
+http://monet.uni-sw.gwdg.de/twiki/bin/view/RTML/ExampleOfHTNTransaction
+
+http://monet.uni-sw.gwdg.de/XMLSchema/RTML/schemas/
+
+DocumentBuilder schema validation:
+
+http://java.sun.com/j2ee/1.4/docs/tutorial/doc/JAXPDOM8.html
+
+/usr/java/jdk1.5.0_10/bin/java org.estar.rtml.test.TestRTML31Parser ~dev/src/estar/org/estar/rtml/docs/htn_transaction_request.rtml
+
+try {
+  factory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+} 
+catch (IllegalArgumentException x) {
+  // Happens if the parser does not support JAXP 1.2
+
+We need a newer JAXP parser?
+/usr/java/jdk1.5.0_10/bin/java org.estar.rtml.test.TestRTML31Parser ~dev/src/estar/org/estar/rtml/docs/htn_transaction_request.rtml
+
+
+RTMLAttributes
+attribute name="id" type="xs:ID"
+attribute name="ref" type="xs:IDREF
+attribute name="uref" type="UniqueNameType"
+
+Example Create call:
+
+/usr/java/jdk1.5.0_10/bin/java org.estar.rtml.test.TestCreate -rtml_version 2.2 -score -uid 12345 -iauri "http://ltproxy:8080/IAPath/" -iahost ltproxy  -iaport 1234 -observation -target_name 2008-BLG-001 -target_ident ExoPlanetMonitor -ra 17:57:13.80 -dec -29:40:47.1 -exposure 30 s 1 -start_date 2008-02-28T12:00:00 -end_date 2008-02-29T12:00:00 -moon_constraint 40 degs -seeing_constraint 0.8 1.3 -sky_constraint dark -device RATCam camera optical -device_filter R -binning 2 2 -project exoplanet -contact -contact_name "Chris Mottram" -contact_user "kdh1"
+
+Create call with image data:
+
+/usr/java/jdk1.5.0_10/bin/java org.estar.rtml.test.TestCreate -rtml_version 2.2 -score -uid rtml://12345 -iaid  rtml://12345 -iauri "http://ltproxy:8080/IAPath/" -iahost ltproxy -iaport 1234 -observation -target_name 2008-BLG-001 -target_ident ExoPlanetMonitor -ra 17:57:13.80 -dec -29:40:47.1 -exposure 30 s 1 -start_date 2008-02-28T12:00:00 -end_date 2008-02-29T12:00:00 -moon_constraint 40 degs -seeing_constraint 0.8 1.3 -sky_constraint dark -device ratcam camera optical -device_filter R -binning 2 2 -project exoplanet -contact -contact_name "Chris Mottram" -contact_user "cjm1" -contact_address "ARI, Twelve Quays House, Egerton Wharf, Birkenhead, CH41 1LD" -contact_email "cjm@astro.livjm.ac.uk" -contact_fax "+44 151 231 2921" -contact_institution "Astrophysics Research Institute" -contact_telephone "+44 151 231 2903" -contact_url "http://ltobs9.livjm.ac.uk/" -telescope "Liverpool Telescope" -telescope_aperture 2 meters -telescope_focal_ratio "f/10" -telescope_focal_length 20 meters -telescope_location "Roque de los Muchachos, La Palma" 342.1208 28.7624 2363 0 -image_data_url http://ltproxy:8080/1.fits -image_data_fits_header "SIMPLE HEADER" -image_data_object_list votable-url http://ltproxy:8080/1.votable -image_data_url http://ltproxy:8080/2.fits -image_data_fits_header "SIMPLE HEADER2" -image_data_object_list votable-url http://ltproxy:8080/2.votable -document_score_list PT0M 0.0 0.0 -document_score_list PT60M 0.1 0.1 -document_score_list PT120M NaN 0.1 -document_score_list PT240M 0.2 0.2
+
+Meaburn Spectrograph:
+java org.estar.rtml.test.TestCreate -rtml_version 2.2 -request -uid rtml://12345 -iaid rtml://12345 -iauri "http://ltproxy:8080/IAPath/" -iahost ltproxy -iaport 1234 -observation -target_name 2008-BLG-001 -target_ident ExoPlanetMonitor -ra 17:57:13.80 -dec -29:40:47.1 -exposure 30 s 1 -start_date 2008-02-28T12:00:00 -end_date 2008-02-29T12:00:00 -device Meaburn spectrograph optical -grating_wavelength 6563 Angstroms -project exoplanet -contact -contact_name "Chris Mottram" -contact_user "kdh1" 
+
+SupIRCam:
+java org.estar.rtml.test.TestCreate -rtml_version 2.2 -request -uid rtml://12345 -iaid rtml://12345 -iauri "http://ltproxy:8080/IAPath/" -iahost ltproxy -iaport 1234 -observation -target_name 2008-BLG-001 -target_ident ExoPlanetMonitor -ra 17:57:13.80 -dec -29:40:47.1 -exposure 30 s 9 -start_date 2008-02-28T12:00:00 -end_date 2008-02-29T12:00:00 -device -device_name SupIRCam -device_type camera -device_spectral_region infrared -device_filter J -project exoplanet -contact -contact_name "Chris Mottram" -contact_user "kdh1"
+
+Ringo-Star:
+java org.estar.rtml.test.TestCreate -rtml_version 3.1a -request -uid rtml://12345 -iaid rtml://12345 -iauri "http://ltproxy:8080/IAPath/" -iahost ltproxy -iaport 1234 -observation -target_name 2008-BLG-001 -target_ident ExoPlanetMonitor -ra 17:57:13.80 -dec -29:40:47.1 -exposure 30 s 1 -start_date 2008-02-28T12:00:00 -end_date 2008-02-29T12:00:00 -device Ringo-Star polarimeter optical -project exoplanet -contact -contact_name "Chris Mottram" -contact_user "kdh1"
+
+Rise:
+/usr/java/jdk1.5.0_10/bin/java org.estar.rtml.test.TestCreate -rtml_version 2.2 -score -uid 12345 -iauri "http://ltproxy:8080/IAPath/" -iahost ltproxy  -iaport 1234 -observation -target_name 2008-BLG-001 -target_ident ExoPlanetMonitor -ra 17:57:13.80 -dec -29:40:47.1 -exposure 30 s 1 -start_date 2008-02-28T12:00:00 -end_date 2008-02-29T12:00:00 -moon_constraint 40 degs -seeing_constraint 0.8 1.3 -sky_constraint dark -device RISE camera optical -project exoplanet -contact -contact_name "Chris Mottram" -contact_user "kdh1"
+
+Indenting problems on JDK1.5? http://forum.java.sun.com/thread.jspa?threadID=562510&start=15
+
+
+
+toop:
+java org.estar.rtml.test.TestCreate -rtml_version 3.1a -request -uid 12345 -iauri "http://ltproxy:8080/IAPath/" -iahost ltproxy  -iaport 1234 -observation -target_name 2008-BLG-001 -target_ident ExoPlanetMonitor -toop -ra 17:57:13.80 -dec -29:40:47.1 -exposure 30 s 1 -start_date 2008-02-28T12:00:00 -end_date 2008-02-29T12:00:00 -device ratcam camera optical -device_filter R -binning 2 2 -project exoplanet -contact -contact_name "Chris Mottram" -contact_user "kdh1"
+
+lower priority:
+java org.estar.rtml.test.TestCreate -rtml_version 3.1a -request -uid  rtml://12345 -iauri "http://ltproxy:8080/IAPath/" -iahost ltproxy  -iaport 1234 -iaid 12345 -observation -target_name 2008-BLG-001 -target_ident ExoPlanetMonitor -priority 2 -ra 17:57:13.80 -dec -29:40:47.1 -exposure 30 s 1 -start_date 2008-02-28T12:00:00 -end_date 2008-02-29T12:00:00 -device ratcam camera optical -device_filter R -binning 2 2 -project exoplanet -contact -contact_name "Chris Mottram" -contact_user "kdh1"
+
+FTS score request: 
+java org.estar.rtml.test.TestCreate -rtml_version 2.2 -score -uid rtml://12345 -iauri "http://ltproxy:8080/IAPath/" -iahost ltproxy -iaport 1234 -iaid 12345 -observation -target_name 2008-BLG-001 -target_ident ExoPlanetMonitor -priority 2 -ra 17:57:13.80 -dec -29:40:47.1 -exposure 30 s 1 -start_date 2008-08-28T12:00:00 -end_date 2008-08-29T12:00:00 -device -device_type camera -device_spectral_region optical -device_filter R -binning 2 2 -project exoplanet -contact -contact_name "Chris Mottram" -contact_user "kdh1" > test_score22_fts_exoplanet_20080828.rtml
+
+Frodospec:
+java org.estar.rtml.test.TestCreate -rtml_version 3.1a -request -uid rtml://12345 -iaid rtml://12345 -iauri "http://ltproxy:8080/IAPath/" -iahost ltproxy -iaport 1234 -observation -target_name 2008-BLG-001 -target_ident ExoPlanetMonitor -ra 17:57:13.80 -dec -29:40:47.1 -exposure 30 s 1 -start_date 2009-08-12T12:00:00 -end_date 2009-09-12T12:00:00 -device -device_name FrodoSpec-Red -device_type spectrograph -device_spectral_region optical -grating_name low -project exoplanet -contact -contact_name "Chris Mottram" -contact_user "kdh1"
+
+Frodospec simple 1 arm:
+java org.estar.rtml.test.TestCreate -rtml_version 3.1a -request -uid rtml://12345 -iaid rtml://12345 -iauri "http://ltproxy:8080/IAPath/" -iahost ltproxy -iaport 1234 -target -target_ident ExoPlanetMonitor -ra 17:57:13.80 -dec -29:40:47.1 -observation -target_name 2008-BLG-001 -exposure 30 s 1 -start_date 2008-02-28T12:00:00 -end_date 2008-02-29T12:00:00 -device -device_name FrodoSpec-Red -device_type spectrograph -device_spectral_region optical -grating_name low -project exoplanet -contact -contact_name "Chris Mottram" -contact_user "kdh1"
+
+Frodospec 2 arm:
+java org.estar.rtml.test.TestCreate -rtml_version 3.1a -request -uid rtml://12345 -iaid rtml://12345 -iauri "http://ltproxy:8080/IAPath/" -iahost ltproxy -iaport 1234 -project exoplanet -contact -contact_name "Chris Mottram" -contact_user "kdh1" -target -target_ident ExoPlanetMonitor -ra 17:57:13.80 -dec -29:40:47.1 -target_magnitude 13.5 R 0.2 -observation -target_name 2008-BLG-001 -exposure 100 s 3 -start_date 2008-02-28T12:00:00 -end_date 2008-02-29T12:00:00 -device -device_name FrodoSpec-Red -device_type spectrograph -device_spectral_region optical -grating_name low -observation -target_name 2008-BLG-001 -exposure 300 s 1 -start_date 2008-02-28T12:00:00 -end_date 2008-02-29T12:00:00 -device -device_name FrodoSpec-Blue -device_type spectrograph -device_spectral_region optical -grating_name high
+
+IO:I RTML3.1a:
+java org.estar.rtml.test.TestCreate -rtml_version 3.1a -request -uid rtml://12345 -iaid rtml://12345 -iauri "http://ltproxy:8080/IAPath/" -iahost ltproxy -iaport 1234 -observation -target -target_name 2008-BLG-001 -target_ident ExoPlanetMonitor -ra 17:57:13.80 -dec -29:40:47.1 -exposure 30 s 9 -start_date 2008-02-28T12:00:00 -end_date 2008-02-29T12:00:00 -device -device_name IO:I -device_type camera -device_spectral_region infrared -device_filter H -project exoplanet -contact -contact_name "Chris Mottram" -contact_user "kdh1"
+
+Sprat:
+/home/dev/src/estar/scripts/create_rtml -rtml_version 3.1a -request -uid rtml://rtml-sprat-${now_date_s} -iauri "file:/dev/null" -project ${project} -contact -contact_name "Joe.Bloggs" -contact_user ${username}  -observation -target -target_name GD50 -ra 03:48:50.257 -dec -00:58:34.90 -ra_offset 0.0 -dec_offset 0.0 -start_date 2016-01-01T00:00:00 -end_date 2017-12-31T00:00:00   -device -device_name Sprat -device_type spectrograph -device_spectral_region optical -grating_name red -binning 1 1 -exposure 300 s 1 > test_sprat_rtml_document_${now_date_s}.rtml
+
+
+TODO (RTML31Create)
+----
+RTMLAttributes support (library of urefs(?) for ref lookup?)
+Checkin
+
+Done (RTML31Create)
+----
+TOOP support? No. according to RTML-nightly.xsd, should Priority 0? 
+Polarimeter support?
+IR Camera?
+Grating?
+ImageData
+Telescope ?
+What goes in the Observation tag and do we need it at all?
+Scoring data
+RTML uid   
+RespondTo ReplyTo for IA information? History Entry? RespondTo
+IntelligentAgent UID used for logging. Al's enpoint currently just a hostname and port number, will need to be
+	a URL if we want a proper web services container at the end.
+Device/Filter
+Project / User
+IntelligentAgent UID used for logging. Al's enpoint currently just a hostname and port number, will need to be
+	a URL if we want a proper web services container at the end.
+
+IA <-> NodeAgent
+----------------
+
+In current system, Al's IA agent is located on a socket. Info passed in IntelligentAgent tag.
+For update/observation/fail return docs, NodeAgent opens a socket (host/port) and sends a SOAP
+mesage over that socket.
+
+If we had a web-services/tomcat IA, we would need a URI endpoint, i.e. transport://host:port/pathto/endpoint
+
+
+TEA changes
+-----------
+Check parsing with schema/DTD set for other type of document?
+Checkin
+
+DONE TEA changes
+----------------
+document.setType() -> setFail, setComplete, setUpdate etc.
+
+userAgent.getId (for document unique id) -> document.getUId()
+  -grep 'userAgent.getId' *.java
+  -grep getId *.java | grep -v 'tea.getId' | grep -v targetIdent
+check TOOP descisions (target.isTypeTOOP() -> scheule priority 0 or target type toop)
+
+New version after RTML 3.1a integration.
+
+Now extends RTMLAttributes.

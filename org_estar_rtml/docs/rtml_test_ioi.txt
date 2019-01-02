@@ -1,0 +1,43 @@
+cd ~/tmp/20160406/node_agent_client/scripts
+setenv LT_BIN_HOME ~/tmp/20160406/
+set project = "expired_test"
+set username = "fraser_steve"
+set password = "ochaye"
+
+set now_date_s = `date +"%s"`
+
+LT @ midnight 4/6/2016: LST = 11:47:20
+Find target near this RA
+FS134 RA 14:28:43.37 Dec +33:10:41.5
+
+./create_rtml -rtml_version 3.1a -request -uid rtml://rtml-document-${now_date_s} -iauri file:/dev/null 
+-project ${project} -contact -contact_name "Chris.Mottram" -contact_user ${username}
+-observation 
+-target -target_name FS134 -ra 14:28:43.37 -dec +33:10:41.5  -ra_offset 0.0 -dec_offset 0.0
+-device -device_name "IO:I" -device_type camera -device_spectral_region infrared -device_filter H -binning 1 1 -exposure 10 s 9 
+-start_date 2016-01-01T00:00:00 -end_date 2016-12-31T00:00:00
+-moon_constraint 15 degs
+> test_rtml_document_${now_date_s}.rtml
+
+/home/dev/src/estar/scripts/create_rtml
+./create_rtml -rtml_version 3.1a -request -uid rtml://rtml-document-${now_date_s} -iauri file:/dev/null -project ${project} -contact -contact_name "Chris.Mottram" -contact_user ${username} -observation -target -target_name FS134 -ra 14:28:43.37 -dec +33:10:41.5  -ra_offset 0.0 -dec_offset 0.0 -device -device_name "IO:I" -device_type camera -device_spectral_region infrared -device_filter H -binning 1 1 -exposure 10 s 9 -start_date 2016-01-01T00:00:00 -end_date 2016-12-31T00:00:00 -moon_constraint 15 degs > test_rtml_document_${now_date_s}.rtml
+
+
+cat /etc/nodeagent/projectalias.map
+test1=Test1
+expired_test=ExpiredTest1
+
+ cat /etc/nodeagent/useralias.map
+fraser_steve=LTOps/Fraser.Steve
+
+/home/dev/src/estar/scripts/nodetester
+./nodetester -url http://161.72.57.3:8080/org_estar_nodeagent/services/NodeAgent -username ${username} -password ${password} -cookie -axis -urn  urn:/node_agent -method handle_rtml -rtml "test_rtml_document_${now_date_s}.rtml" 
+
+
+Example toop document (-priority 0):
+
+set now_date_s = `date +"%s"`
+./create_rtml -rtml_version 3.1a -request -uid rtml://rtml-document-${now_date_s} -iauri file:/dev/null -project ${project} -contact -contact_name "Chris.Mottram" -contact_user ${username} -observation -priority 0 -target -target_name FS134 -ra 14:28:43.37 -dec +33:10:41.5  -ra_offset 0.0 -dec_offset 0.0 -device -device_name "IO:I" -device_type camera -device_spectral_region infrared -device_filter H -binning 1 1 -exposure 10 s 9  > test_rtml_document_${now_date_s}.rtml
+
+./nodetester -url http://161.72.57.3:8080/org_estar_nodeagent/services/NodeAgent -username ${username} -password ${password} -cookie -axis -urn  urn:/node_agent -method handle_rtml -rtml "test_rtml_document_${now_date_s}.rtml" 
+

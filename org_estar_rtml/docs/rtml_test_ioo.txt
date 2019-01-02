@@ -1,0 +1,21 @@
+Expired:
+set project = "expired_test"
+set username = "fraser_steve"
+set password = "ochaye"
+Active / TOOP:
+set project = "test1"
+set username = "fraser_steve"
+set password = "ochaye"
+
+set now_date_s = `date +"%s"`
+
+/home/dev/src/estar/scripts//create_rtml -rtml_version 3.1a -request -uid rtml://rtml-document-${now_date_s} -iauri file:/dev/null -project ${project} -contact -contact_name "Joe.Bloggs" -contact_user ${username} -observation -target -target_name M100 -ra 12:22:54.9 -dec +15:49:22.0  -ra_offset 0.0 -dec_offset 0.0  -moon_constraint 15 degs -sky_constraint bright -extinction_constraint heavy -seeing_constraint 0.8 5.0 -airmass_constraint 1.0 2.0 -start_date 2013-01-01T00:00:00 -end_date 2013-02-01T00:00:00 -device -device_name IO:O -device_type camera -device_spectral_region optical -device_filter other -binning 2 2 -exposure 60 s 1 > test_rtml_document_${now_date_s}.rtml
+
+
+/home/dev/src/estar/scripts/nodetester -url http://161.72.57.3:8080/org_estar_nodeagent/services/NodeAgent -username ${username} -password ${password} -cookie -axis -urn  urn:/node_agent -method handle_rtml -rtml "test_rtml_document_${now_date_s}.rtml" 
+
+TOOP Test:
+set now_date_s = `date +"%s"`
+/home/dev/src/estar/scripts/create_rtml -rtml_version 3.1a -request -uid rtml://rtml-document-m76-${now_date_s} -iauri file:/dev/null -project ${project} -contact -contact_name "Joe.Bloggs" -contact_user ${username} -observation -priority 0 -target -target_name M76 -ra 01:42:18.1 -dec +51:34:17.0 -ra_offset 0.0 -dec_offset 0.0 -device -device_name IO:O -device_type camera -device_spectral_region optical -device_filter R -binning 2 2 -exposure 30 s 3  > test_toop_rtml_document_${now_date_s}.rtml
+
+/home/dev/src/estar/scripts/nodetester -url http://161.72.57.3:8080/org_estar_nodeagent/services/NodeAgent -username ${username} -password ${password} -cookie -axis -urn  urn:/node_agent -method handle_rtml -rtml "test_toop_rtml_document_${now_date_s}.rtml" 

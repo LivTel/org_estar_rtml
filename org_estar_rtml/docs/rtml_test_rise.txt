@@ -1,0 +1,44 @@
+cd /home/dev/src/estar/org/estar/rtml/docs
+
+Find the LST at midnight (I use exephem)
+LST 19:36:30 at midnight last night
+
+Found a installation of the node_agent_client software here:
+~/tmp/20160406/node_agent_client/scripts
+
+cd ~/tmp/20160803
+
+setenv LT_BIN_HOME ~/tmp/20160406/
+set project = "expired_test"
+set username = "fraser_steve"
+set password = "ochaye"
+
+set now_date_s = `date +"%s"`
+
+M57 18:33:35.1 +33:01;47
+
+~/tmp/20160406/node_agent_client/scripts/create_rtml -rtml_version 3.1a -request -uid rtml://rtml-document-${now_date_s} -iauri file:/dev/null 
+-project ${project} -contact -contact_name "Chris.Mottram" -contact_user ${username}
+-observation 
+-target -target_name M57 -ra  18:53:35.1 -dec +33:01:47 -ra_offset 0.0 -dec_offset 0.0
+-device -device_name RISE -device_type camera -device_spectral_region optical  -binning 1 1 
+-exposure 30 s 1 
+-start_date 2016-01-01T00:00:00 -end_date 2016-12-31T00:00:00
+-moon_constraint 15 degs
+> test_rtml_document_${now_date_s}.rtml
+
+
+~/tmp/20160406/node_agent_client/scripts/create_rtml -rtml_version 3.1a -request -uid rtml://rtml-document-${now_date_s} -iauri file:/dev/null -project ${project} -contact -contact_name "Chris.Mottram" -contact_user ${username} -observation -target -target_name M57 -ra  18:53:35.1 -dec +33:01:47 -ra_offset 0.0 -dec_offset 0.0 -device -device_name RISE -device_type camera -device_spectral_region optical  -binning 1 1 -exposure 30 s 1 -start_date 2016-01-01T00:00:00 -end_date 2016-12-31T00:00:00 -moon_constraint 15 degs > test_rtml_document_${now_date_s}.rtml
+
+~/tmp/20160406/node_agent_client/scripts/nodetester -url http://161.72.57.3:8080/org_estar_nodeagent/services/NodeAgent -username ${username} -password ${password} -cookie -axis -urn  urn:/node_agent -method handle_rtml -rtml "test_rtml_document_${now_date_s}.rtml" 
+
+set now_date_s = `date +"%s"`
+set project = "test1"
+set username = "fraser_steve"
+set password = "ochaye"
+
+~/tmp/20160406/node_agent_client/scripts/create_rtml -rtml_version 3.1a -request -uid rtml://rtml-document-${now_date_s} -iauri file:/dev/null -project ${project} -contact -contact_name "Chris.Mottram" -contact_user ${username} -observation -target -target_name M57 -ra  18:53:35.1 -dec +33:01:47 -ra_offset 0.0 -dec_offset 0.0 -device -device_name RISE -device_type camera -device_spectral_region optical  -binning 1 1 -exposure 10 s 1 -start_date 2016-01-01T00:00:00 -end_date 2016-12-31T00:00:00 -moon_constraint 15 degs > test_rtml_document_${now_date_s}.rtml
+
+~/tmp/20160406/node_agent_client/scripts/nodetester -url http://161.72.57.3:8080/org_estar_nodeagent/services/NodeAgent -username ${username} -password ${password} -cookie -axis -urn  urn:/node_agent -method handle_rtml -rtml "test_rtml_document_${now_date_s}.rtml" 
+
+

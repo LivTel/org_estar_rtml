@@ -1,0 +1,31 @@
+set now_date_s = `date +"%s"`
+
+Multi instrument
+----------------
+
+set now_date_s = `date +"%s"`
+
+/home/dev/src/estar/scripts/create_rtml -rtml_version 3.1a -request -uid rtml://MultipleInstrumentTest-${now_date_s} -iauri file:/dev/null -project expired_test -contact -contact_name "Fraser.Steve" -contact_user "fraser_steve" -observation -target -target_name NGC7331 -target_ident MultipleInstrumentTest -priority 3 -ra 22:37:04.102  -dec +34:24:57.31 -exposure 180 s 1 -device -device_name RATCam -device_type camera -device_spectral_region optical -device_filter R -binning 2 2 -observation -target -target_name NGC7331 -target_ident MultipleInstrumentTest -priority 3 -ra 22:37:04.102  -dec +34:24:57.31 -exposure 180 s 1 -device -device_name RISE -device_type camera -device_spectral_region optical -binning 2 2 > test_multi_inst_ngc7331.rtml
+
+/home/dev/src/estar/scripts/nodetester -url http://161.72.57.3:8080/org_estar_nodeagent/services/NodeAgent -username fraser_steve -password ochaye -cookie -axis -urn  urn:/node_agent -method handle_rtml -rtml test_multi_inst_ngc7331.rtml
+
+Multi target
+------------
+set now_date_s = `date +"%s"`
+
+/home/dev/src/estar/scripts/create_rtml -rtml_version 3.1a -request -uid rtml://MultipleTargetTest-${now_date_s} -iauri file:/dev/null -project expired_test -contact -contact_name "Fraser.Steve" -contact_user "fraser_steve" -observation -target -target_name NGC7331 -target_ident MultipleTargetTest -priority 3 -ra 22:37:04.102  -dec +34:24:57.31 -exposure 180 s 1 -device -device_name RATCam -device_type camera -device_spectral_region optical -device_filter R -binning 2 2  -observation -target -target_name NGC7217 -target_ident MultipleTargetTest -priority 3 -ra 22:07:52.368  -dec +31:21:33.32 -exposure 180 s 1 -device -device_name RATCam -device_type camera -device_spectral_region optical -device_filter R -binning 2 2  > test_multi_target_ngc7331_ngc7217.rtml
+
+/home/dev/src/estar/scripts/nodetester -url http://161.72.57.3:8080/org_estar_nodeagent/services/NodeAgent -username fraser_steve -password ochaye -cookie -axis -urn  urn:/node_agent -method handle_rtml -rtml test_multi_target_ngc7331_ngc7217.rtml
+
+NGC7217
+22:07:52.368 +31:21:33.32
+
+
+Multi Offset
+------------
+
+set now_date_s = `date +"%s"`
+
+/home/dev/src/estar/scripts/create_rtml -rtml_version 3.1a -request -uid rtml://MultipleOffsetTest-${now_date_s} -iauri file:/dev/null -project expired_test -contact -contact_name "Fraser.Steve" -contact_user "fraser_steve" -observation -target -target_name NGC7331 -target_ident MultipleOffsetTest -priority 3 -ra 22:37:04.102  -ra_offset 0.0 -dec +34:24:57.31 -dec_offset 0.0 -exposure 180 s 1 -device -device_name RATCam -device_type camera -device_spectral_region optical -device_filter R -binning 2 2 -observation -target -target_name NGC7331 -target_ident MultipleOffsetTest -priority 3 -ra 22:37:04.102  -ra_offset 30.0 -dec +34:24:57.31 -dec_offset 30.0 -exposure 180 s 1 -device -device_name RATCam -device_type camera -device_spectral_region optical -device_filter R -binning 2 2   > test_multi_offset_ngc7331.rtml
+
+/home/dev/src/estar/scripts/nodetester -url http://161.72.57.3:8080/org_estar_nodeagent/services/NodeAgent -username fraser_steve -password ochaye -cookie -axis -urn  urn:/node_agent -method handle_rtml -rtml test_multi_offset_ngc7331.rtml

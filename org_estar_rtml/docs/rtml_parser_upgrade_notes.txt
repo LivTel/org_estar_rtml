@@ -1,0 +1,24 @@
+Must call:
+parser = new RTMLParser();
+parser.init(false);   <- new method.
+parser.parse(stuff).
+
+RTMLCreate: Must have called RTMLDocument.setVersion(version) before calling create.
+version: RTMLDocument.RTML_VERSION_22. RTMLDocument.RTML_VERSION_31.
+
+To parse RTML 3.1a documents you have to be running Java v1.5 (JAXP v 1.2) for Schema parsing to work.
+
+Should no longer use:
+RTMLDocument document.getType() == "score" etc,etc , RTML v3.1a uses mode not type and "score" becomes "inquiry" etc.
+See RTMLDocument, methods: isScoreRequest, isReject, isScoreReply, isRequest, isRequestConfirm, isUpdate, isFail, isIncomplete, isComplete.
+
+Also, for setting return document types you can now use: setScoreRequest, setScoreReject, setScoreReply, setRequest, setRequestReply, setUpdate, setFail, setIncomplete, setComplete.
+
+When modifying RTMLDocuments (i.e. on score/request) should add an RTMLHistoryEntry each time. Makes no difference for RTML v2.2, but will create History tree in v3.1a.
+
+Unique IDs are more complicated. No longer extract from Intelligent Agent (RTML v2.2 only). Call
+RTMLDocument.getUId(). This extract from intelligentAgent Data if available, but overwrites with RTMLDocument uid attribute if it has been filled in (by RTML v3.1a uid attribute).
+
+IA return address: NodeAgent will have to look at RTMLIntelligentAgent.getUri which contains RTML v3.1a RespondTo data.
+RTML v 2.2 parser still used RTMLIntelligentAgent.getHostname()/getPort() I think.
+

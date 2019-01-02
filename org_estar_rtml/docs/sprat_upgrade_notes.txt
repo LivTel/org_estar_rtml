@@ -1,0 +1,169 @@
+I think v 1.0 of the SPRAT/RTML specification can easily be represented in RTML.
+
+Example document:
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<RTML xmlns="http://www.rtml.org/v3.1a" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" mode="request" uid="rtml://12345" version="3.1a" xsi:schemaLocation="http://www.rtml.org/v3.1a http://telescope.livjm.ac.uk/rtml/RTML-nightly.xsd">
+  <History>
+    <Entry timeStamp="2016-05-11T16:20:22+01:00">
+      <Agent name="org.estar.rtml.test.TestCreate"/>
+      <Description>Created.</Description>
+    </Entry>
+  </History>
+  <Target id="ExoPlanetMonitor" name="2008-BLG-001">
+    <Coordinates>
+      <RightAscension>
+        <Hours>17</Hours>
+        <Minutes>57</Minutes>
+        <Seconds>13.8</Seconds>
+        <Offset units="arcseconds">0.0</Offset>
+      </RightAscension>
+      <Declination>
+        <Degrees>-29</Degrees>
+        <Arcminutes>40</Arcminutes>
+        <Arcseconds>47.1</Arcseconds>
+        <Offset units="arcseconds">0.0</Offset>
+      </Declination>
+      <Equinox>2000</Equinox>
+    </Coordinates>
+  </Target>
+  <Project ProjectID="exoplanet">
+    <Contact>
+      <Username>kdh1</Username>
+      <Name>Chris Mottram</Name>
+      <Communication/>
+    </Contact>
+  </Project>
+  <RespondTo>http://ltproxy:8080/IAPath/</RespondTo>
+  <Schedule>
+    <Device name="Sprat" type="spectrograph">
+      <SpectralRegion>optical</SpectralRegion>
+      <Setup>
+        <Detector>
+          <Binning>
+            <X units="pixels">1</X>
+            <Y units="pixels">1</Y>
+          </Binning>
+        </Detector>
+        <Grating name="red"/>
+      </Setup>
+    </Device>
+    <Priority>3</Priority>
+    <Exposure count="3">
+      <Value units="seconds">100.0</Value>
+    </Exposure>
+    <DateTimeConstraint type="include">
+      <DateTimeStart system="UT" value="2008-02-28T12:00:00+00:00"/>
+      <DateTimeEnd system="UT" value="2008-02-29T12:00:00+00:00"/>
+    </DateTimeConstraint>
+  </Schedule>
+</RTML>
+
+
+Example TestCreate document invocation:
+java org.estar.rtml.test.TestCreate -rtml_version 3.1a -request -uid rtml://12345 -iaid rtml://12345 -iauri "http://ltproxy:8080/IAPath/" -iahost ltproxy -iaport 1234 -target -target_ident ExoPlanetMonitor -ra 17:57:13.80 -dec -29:40:47.1 -observation -target_name 2008-BLG-001 -exposure 100 s 3 -start_date 2008-02-28T12:00:00 -end_date 2008-02-29T12:00:00 -device -device_name Sprat -device_type spectrograph -device_spectral_region optical -grating_name red -binning 1 1 -project exoplanet -contact -contact_name "Chris Mottram" -contact_user "kdh1"
+
+Parsing this test document and printing out the resulting parsed objects gives:
+
+java org.estar.rtml.test.TestParser -parse_schema -filename test_create_sprat31.rtml
+org.estar.rtml.test.TestParser:parseArguments: setting filename to:test_create_sprat31.rtml
+RTML : version = 3.1a uid = rtml://12345 mode = request
+        History:
+                Entry
+                TimeStamp: Wed May 11 16:20:22 BST 2016
+                Agent: Intelligent Agent: host = null: port = 0
+        ID:org.estar.rtml.test.TestCreate       URI:null
+                Description: Created.
+
+
+        Contact :
+                Attributes:
+                        Id:null
+                        Ref:null
+                        URef:null
+                Name : Chris Mottram
+                User : kdh1
+                Institution : null
+                Address : null
+                Telephone : null
+                Fax : null
+                eMail : null
+                URL : null
+
+        Project :
+                Attributes:
+                        Id:null
+                        Ref:null
+                        URef:null
+                Project : exoplanet
+
+        Intelligent Agent: host = null: port = 0
+                ID:null         URI:http://ltproxy:8080/IAPath/
+        Target: type = normal
+                Attributes:
+                        Id:null
+                        Ref:null
+                        URef:null
+                Name:2008-BLG-001
+                Ident:ExoPlanetMonitor
+                RA:17:57:13.80
+                RA offset:0.0
+                Dec:-29:40:47.10
+                Dec offset:0.0
+                Equinox:2000
+
+        Observation
+                Device
+                Attributes:
+                        Id:null
+                        Ref:null
+                        URef:null
+                Type: spectrograph
+                SpectralRegion: optical
+                Name: Sprat
+                Detector :
+                Attributes:
+                        Id:null
+                        Ref:null
+                        URef:null
+                Row Binning : 1
+                Column Binning : 1
+
+                Grating
+                Name: red
+
+                Schedule: (Monitor Group:false)
+                Attributes:
+                        Id:null
+                        Ref:null
+                        URef:null
+                Priority: 3
+                Exposure: type = time: units = seconds
+                        Length:100.0
+                        Count:3
+                Between:Thu Feb 28 12:00:00 GMT 2008 and Fri Feb 29 12:00:00 GMT 2008
+
+Therefore the red/blue grating option is retrieved from the parsed RTMLDevice object "device" as follows:
+
+device.getGrating().getName()
+
+You perhaps need to check device.getGrating() is not null (i.e. no grating has been set), and either throw an error document or choose a default.
+
+The binning can be retrieved the same as other instrument implementations.
+
+I've added some code to DeviceInstrumentUtilites.java (in ltdevsrv:dev/src/estar/tea/java/org/estar/tea),
+method getInstrumentConfig, which can be used by Phase2ExtractorTNG.java to get a SpratConfig.
+
+
+2015/05/23
+
+v1.1
+
+Brightest acquisition?
+
+Target -> TargetBrightness -> Magnitude / Type (FilterTypes)
+
+
+Latest test document:
+
+/home/dev/src/estar/scripts/create_rtml -rtml_version 3.1a -request -uid rtml://rtml-sprat-${now_date_s} -iauri "file:/dev/null" -project ${project} -contact -contact_name "Joe.Bloggs" -contact_user ${username}  -observation -target -target_name GD50 -ra 03:48:50.257 -dec -00:58:34.90 -ra_offset 0.0 -dec_offset 0.0 -start_date 2016-01-01T00:00:00 -end_date 2017-12-31T00:00:00   -device -device_name Sprat -device_type spectrograph -device_spectral_region optical -grating_name red -binning 1 1 -exposure 300 s 1 > test_sprat_rtml_document_${now_date_s}.rtml
+
