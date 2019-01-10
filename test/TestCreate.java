@@ -173,7 +173,12 @@ public class TestCreate
 		}
 		for(int i = 0; i < args.length; i++)
 		{
-			if(args[i].equals("-airmass_constraint"))
+			if(args[i].equals("-abort"))
+			{
+				document.setType("abort");// RTML 2.2
+				document.setMode("abort");// RTML 3.1a
+			}
+			else if(args[i].equals("-airmass_constraint"))
 			{
 				if((i+2) < args.length)
 				{
@@ -1612,7 +1617,7 @@ public class TestCreate
 		System.err.println("java -Dhttp.proxyHost=wwwcache.livjm.ac.uk -Dhttp.proxyPort=8080 org.estar.rtml.test.TestCreate");
 		System.err.println("\t[-doctype_system_id <url string>][-schema_url <url string>]");
 		System.err.println("\t[-rtml_version <string>]");
-		System.err.println("\t<-request|-score|-score_reply|-confirmation|-update|-complete|-incomplete|-reject <error string>>");
+		System.err.println("\t<-request|-score|-score_reply|-confirmation|-update|-complete|-incomplete|-reject <error string>|-abort>");
 		System.err.println("\t[-uid <string>][-iahost <hostname>][-iaid <id>][-iaport <number>][-iauri <uri>][-help]");
 		System.err.println("\t[-history <agent name> <agent uri> <description>]");
 		System.err.println("\t[-project <proposal id>]");
