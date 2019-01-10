@@ -37,14 +37,14 @@ import org.estar.rtml.*;
  * </code>
  * to obtain information on the command line arguments.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision$
  */
 public class TestRTML31Create
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestRTML31Create.java,v 1.1 2008-05-13 16:56:06 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Create to use for parsing.
 	 */

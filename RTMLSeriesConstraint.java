@@ -36,14 +36,14 @@ import java.text.*;
  * <i>Do the observation <b>count</b> times with a time period of <b>interval</b> 
  * +/- <b>tolerance</b> between them.</i>
  * @author Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision$
  */
 public class RTMLSeriesConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSeriesConstraint.java,v 1.6 2008-08-11 13:54:54 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * The number of times the observation associated wit this SeriesConstraint should be executed.
 	 */

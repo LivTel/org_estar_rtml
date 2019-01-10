@@ -35,14 +35,14 @@ import java.text.*;
  * </ul>
  * Only the <i>sky</i> value is used by the TEA at the moment. 
  * @author Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision$
  */
 public class RTMLSkyConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSkyConstraint.java,v 1.5 2012-05-24 16:27:34 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Constant for describing the units of sky constraint. This one as defined in the RTML3.1 schema.
 	 */

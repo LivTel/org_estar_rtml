@@ -30,14 +30,14 @@ import org.estar.rtml.*;
 /**
  * This class tests the parse and format methods in SimpleDateFormat.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision$
  */
 public class TestSimpleDateFormat
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestSimpleDateFormat.java,v 1.3 2007-01-30 18:31:42 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Default SimpleDateFormat pattern.
 	 */

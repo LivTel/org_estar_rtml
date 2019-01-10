@@ -30,14 +30,14 @@ import org.estar.rtml.*;
 /**
  * This class tests RTMLParser.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision$
  */
 public class ExtractScore
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: ExtractScore.java,v 1.1 2019-01-02 11:36:37 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Name of file to parse.
 	 */

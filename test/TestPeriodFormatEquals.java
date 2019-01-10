@@ -29,14 +29,14 @@ import org.estar.rtml.*;
 /**
  * This class tests the parse method in TestPeriodFormatEquals.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision$
  */
 public class TestPeriodFormatEquals
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestPeriodFormatEquals.java,v 1.1 2008-08-11 14:55:49 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * The input period to parse.
 	 */

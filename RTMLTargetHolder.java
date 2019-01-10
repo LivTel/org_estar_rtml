@@ -28,14 +28,14 @@ import java.util.*;
 /**
  * This interface is implemented by classes holding target data.
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision$
  */
 public interface RTMLTargetHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLTargetHolder.java,v 1.1 2009-08-12 14:42:31 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Set the target.
 	 * @param target The target to set.
