@@ -28,7 +28,7 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the base nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.21 $
+ * @version $Revision$
  * @see org.estar.rtml.RTMLDeviceHolder
  * @see org.estar.rtml.RTMLTargetHolder
  */
@@ -37,7 +37,7 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder, RTMLTargetH
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDocument.java,v 1.21 2016-06-08 13:57:33 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -700,6 +700,36 @@ public class RTMLDocument implements Serializable, RTMLDeviceHolder, RTMLTargetH
 		{
 			throw new IllegalArgumentException(this.getClass().getName()+
 							   ":setAbort:Unsupported version:"+version);
+		}
+	}
+
+	/**
+	 * Set this document to be a succesful reply to an abort document. The underlying type or mode is set based on
+	 * the document's version (which must have been set before this method is invoked using setVersion).
+	 * RTML 3.1a says an "abort reply" has the mode "confirm". We have made RTML 2.2 do the same
+	 * (i.e. "confirmation").
+	 * @exception NullPointerException Thrown if the version has not been set.
+	 * @exception IllegalArgumentException Thrown if the version is not supported.
+	 * @see #version
+	 * @see #type
+	 * @see #mode
+	 * @see #setType
+	 * @see #setMode
+	 * @see #RTML_VERSION_22
+	 * @see #RTML_VERSION_31
+	 */
+	public void setAbortReply() throws NullPointerException, IllegalArgumentException
+	{
+		if(version == null)
+			throw new NullPointerException(this.getClass().getName()+":setAbortReply:version was null.");
+		if(version.equals(RTML_VERSION_22))
+			setType("confirmation");
+		else if(version.equals(RTML_VERSION_31))
+			setMode("confirm");
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setAbortReply:Unsupported version:"+version);
 		}
 	}
 
