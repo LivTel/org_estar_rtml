@@ -1,0 +1,19 @@
+DeviceTypes
+			<xs:enumeration value="half-wave_plate"/>
+			<xs:enumeration value="quarter-wave_plate"/>
+			<xs:enumeration value="polarimeter"/>
+Device can contain Setup containing Device
+Device can contain Device
+<Device type="half-wave_plate" rotorSpeed="slow|fast">
+
+
+
+<xs:simpleType name="FilterTypes">
+			<xs:enumeration value="B"/>
+			<xs:enumeration value="V"/>
+			<xs:enumeration value="R"/>
+			<xs:enumeration value="I"/>
+			<xs:enumeration value="L"/>
+			
+Example TestCreate document invocation:
+java org.estar.rtml.test.TestCreate -rtml_version 3.1a -request -uid rtml://12345 -iaid rtml://12345 -iauri "http://ltproxy:8080/IAPath/" -iahost ltproxy -iaport 1234 -target -target_ident ExoPlanetMonitor -ra 17:57:13.80 -dec -29:40:47.1 -observation -target_name 2008-BLG-001 -exposure 100 s 3 -start_date 2020-10-07T12:00:00 -end_date 2020-10-08T12:00:00 -device -device_name Moptop -device_type polarimeter -device_spectral_region optical -device_filter R -rotor_speed fast -project exoplanet -contact -contact_name "Chris Mottram" -contact_user "kdh1"

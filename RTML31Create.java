@@ -59,14 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram
- * @version $Revision: 1.12 $
+ * @version $Revision$
  */
 public class RTML31Create
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Create.java,v 1.12 2014-05-08 09:19:47 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Default Schema location (URL).
 	 */
@@ -506,12 +506,13 @@ public class RTML31Create
 
 	/**
 	 * Method to create the Device tags.
-	 * Create a contact node and associated sub-elements.
+	 * Create a Device node and associated sub-elements.
 	 * @param rtmlElement The RTML DOM element to add the Contact tag to.
 	 * @param device The Java object containing the device (instrument) data to add.
 	 * @see org.estar.rtml.RTMLDevice
 	 * @see #createDetector
 	 * @see #createGrating
+	 * @see #createHalfWavePlateSubDevice
 	 */
 	private void createDevice(Element rtmlElement,RTMLDevice device)
 	{
@@ -569,6 +570,11 @@ public class RTML31Create
 				filterElement.appendChild(centerElement);
 				setupElement.appendChild(filterElement);
 			}
+		}
+		// half-wave plate (Moptop rotor speed)
+		if(device.getHalfWavePlate() != null)
+		{
+			createHalfWavePlateSubDevice(setupElement,device.getHalfWavePlate());
 		}
 		// add Setup to Device
 		deviceElement.appendChild(setupElement);
@@ -658,6 +664,25 @@ public class RTML31Create
 		rtmlElement.appendChild(gratingElement);
 	}
 
+	/**
+	 * Method to create a half-wave plate Device (as a sub-device of the Device tag)
+	 * and set a rotorSpeed attribute to encode the Moptop rotator speed.
+	 * @param rtmlElement The RTML DOM Device element to add the half-wave plate sub-Device to.
+	 * @param halfWavePlate The Java object containing the half-wave plate data to add.
+	 * @see #createDevice
+	 * @see org.estar.rtml.RTMLHalfWavePlate
+	 * @see org.estar.rtml.RTMLHalfWavePlate#rotorSpeedToString
+	 */
+	private void createHalfWavePlateSubDevice(Element rtmlElement,RTMLHalfWavePlate halfWavePlate)
+	{
+		Element subDeviceElement = null;
+
+		subDeviceElement = (Element)document.createElement("Device");
+		subDeviceElement.setAttribute("type","half-wave_plate");
+		subDeviceElement.setAttribute("rotorSpeed",halfWavePlate.rotorSpeedToString());
+		rtmlElement.appendChild(subDeviceElement);
+	}
+	
 	/**
 	 * Method to create XML in the Observation tag.
 	 * Our document model has Observation's, each Containing one Schedule.

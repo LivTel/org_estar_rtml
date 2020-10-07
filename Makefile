@@ -15,7 +15,8 @@ SRCS = RTMLException.java RTMLErrorHandler.java RTMLDateFormat.java RTMLPeriodFo
 	RTMLTarget.java RTMLEphemerisTargetTrackNode.java \
 	RTMLSeeingConstraint.java RTMLSeriesConstraint.java RTMLMoonConstraint.java RTMLSkyConstraint.java \
 	RTMLExtinctionConstraint.java RTMLAirmassConstraint.java \
-	RTMLSchedule.java RTMLGrating.java RTMLDevice.java RTMLDetector.java RTMLObservation.java \
+	RTMLSchedule.java RTMLGrating.java RTMLHalfWavePlate.java RTMLDevice.java \
+	RTMLDetector.java RTMLObservation.java \
 	RTMLTelescope.java RTMLTelescopeLocation.java \
 	RTMLDocument.java RTMLParser.java RTMLCreate.java RTMLContact.java RTMLProject.java RTMLScore.java \
 	RTML22Parser.java RTML31Parser.java RTMLHistory.java RTMLHistoryEntry.java RTML22Create.java RTML31Create.java 

@@ -52,14 +52,14 @@ import org.estar.astrometry.*;
  * Extends RTMLParser to make use of methods common to this and RTML22Parser (parseIntegerNode etc), even though
  * this subclass is created as part of the RTMLParser's parsing.
  * @author Chris Mottram
- * @version $Revision: 1.8 $
+ * @version $Revision$
  */
 public class RTML31Parser extends RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTML31Parser.java,v 1.8 2013-01-14 11:04:37 cjm Exp $";
+	public final static String RCSID = "$Id$";
 
 	/**
 	 * Default constructor.
@@ -876,6 +876,7 @@ public class RTML31Parser extends RTMLParser
 	 * @see #parseFilterNode
 	 * @see #parseDetectorNode
 	 * @see #parseGratingNode
+	 * @see #parseHalfWavePlateSubDeviceNode
 	 */
 	private void parseSetupNode(RTMLDevice device,Node setupNode) 
 		throws RTMLException
@@ -910,6 +911,8 @@ public class RTML31Parser extends RTMLParser
 					parseFilterNode(device,childNode);
 				else if(childNode.getNodeName() == "Grating")
 					parseGratingNode(device,childNode);
+				else if(childNode.getNodeName() == "Device")
+					parseHalfWavePlateSubDeviceNode(device,childNode);
 				else
 					System.err.println("parseSetupNode:ELEMENT:"+childNode);
 			}
@@ -1210,6 +1213,75 @@ public class RTML31Parser extends RTMLParser
 		}
 		// set grating in device.
 		device.setGrating(grating);
+	}
+
+	/**
+	 * Internal method to parse a Device node, that should be of type "half-wave_plate".
+	 * @param device The device to add the half-wave plate data to.
+	 * @param deviceNode The XML DOM node for the Device tag node (which should be of type "half-wave_plate".
+	 * @exception RTMLException Thrown if a strange child is in the node.
+	 */
+	private void parseHalfWavePlateSubDeviceNode(RTMLDevice device,Node deviceNode) 
+		throws RTMLException
+	{
+		RTMLHalfWavePlate halfWavePlate = null;
+		NamedNodeMap attributeList = null;
+		Node childNode,attributeNode;
+		NodeList childList;
+
+		// check current XML node is correct
+		if(deviceNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseHalfWavePlateSubDeviceNode:Illegal Node:"+deviceNode);
+		}
+		if(deviceNode.getNodeName() != "Device")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseHalfWavePlateSubDeviceNode:Illegal Node Name:"+
+						deviceNode.getNodeName());
+		}
+		// go through attribute list
+		attributeList = deviceNode.getAttributes();
+		// type
+		attributeNode = attributeList.getNamedItem("type");
+		if(attributeNode != null)
+		{
+			if(attributeNode.getNodeValue().equals("half-wave_plate"))
+			{
+				if(device.getHalfWavePlate() != null)
+					halfWavePlate = device.getHalfWavePlate();
+				else
+					halfWavePlate = new RTMLHalfWavePlate();
+				attributeNode = attributeList.getNamedItem("rotorSpeed");
+				if(attributeNode != null)
+				{
+					halfWavePlate.setRotorSpeed(attributeNode.getNodeValue());
+				}
+			}
+			else
+			{
+				System.err.println("parseHalfWavePlateSubDeviceNode:"+
+						   "type attribute was not half-wave_plate:"+
+						   attributeNode.getNodeValue());
+			}
+		}
+		else
+		{
+		}
+		// go through child nodes
+		childList = deviceNode.getChildNodes();
+		for(int i = 0; i < childList.getLength(); i++)
+		{
+			childNode = childList.item(i);
+
+			if(childNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+				System.err.println("parseGratingNode:ELEMENT:"+childNode);
+			}
+		}
+		// set half-wave plate in device.
+		device.setHalfWavePlate(halfWavePlate);
 	}
 
 	/**
