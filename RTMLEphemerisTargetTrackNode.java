@@ -20,7 +20,7 @@ import org.estar.astrometry.*;
  * <li>10 = DEC rate (arcsec/hour)
  * </ul>
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision$
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLEphemerisTargetTrackNode extends RTMLAttributes implements Serializable
@@ -28,7 +28,7 @@ public class RTMLEphemerisTargetTrackNode extends RTMLAttributes implements Seri
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLEphemerisTargetTrackNode.java,v 1.1 2018-09-27 14:34:31 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * The date format used to parse and print the timestamp in an ephemeris target line.
 	 * This is currently "yyyy-MMM-dd HH:mm".

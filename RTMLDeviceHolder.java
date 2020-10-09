@@ -28,14 +28,14 @@ import java.util.*;
 /**
  * This interface is implemented by classes holding device (instrument) data.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision$
  */
 public interface RTMLDeviceHolder
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDeviceHolder.java,v 1.2 2007-01-30 18:31:12 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Set the device.
 	 * @param device The device to set.

@@ -28,7 +28,7 @@ import java.util.*;
 /**
  * This class is a data container for information contained in the observation nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.10 $
+ * @version $Revision$
  * @see org.estar.rtml.RTMLDeviceHolder
  * @see org.estar.rtml.RTMLTargetHolder
  */
@@ -37,7 +37,7 @@ public class RTMLObservation implements Serializable, RTMLDeviceHolder, RTMLTarg
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLObservation.java,v 1.10 2009-08-12 17:49:19 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */

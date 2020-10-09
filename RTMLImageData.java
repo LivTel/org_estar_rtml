@@ -27,14 +27,14 @@ import java.net.*;
 /**
  * This class is a data container for information contained in the ImageData nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision$
  */
 public class RTMLImageData implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLImageData.java,v 1.5 2008-05-27 14:15:55 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */

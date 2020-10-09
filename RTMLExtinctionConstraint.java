@@ -33,14 +33,14 @@ import java.text.*;
  * </ul>
  * Only the <i>Clouds</i> value is used by the TEA at the moment. 
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision$
  */
 public class RTMLExtinctionConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLExtinctionConstraint.java,v 1.1 2011-02-09 18:40:42 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */

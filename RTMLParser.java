@@ -53,14 +53,14 @@ import org.estar.astrometry.*;
  * @see #init
  * @see #parse
  * @author Chris Mottram
- * @version $Revision: 1.29 $
+ * @version $Revision$
  */
 public class RTMLParser
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLParser.java,v 1.29 2008-06-02 11:21:48 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Constant used to configure schema parsing.
 	 */

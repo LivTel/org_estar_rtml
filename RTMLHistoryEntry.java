@@ -30,14 +30,14 @@ import org.estar.rtml.RTMLDateFormat;
 /**
  * This class is a data container for information contained in the Entry nodes/tags of an RTML History list.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision$
  */
 public class RTMLHistoryEntry implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLHistoryEntry.java,v 1.2 2008-05-27 14:13:44 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */

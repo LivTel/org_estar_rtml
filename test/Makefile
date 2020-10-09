@@ -8,7 +8,7 @@ RTML_NAME	=rtml
 PACKAGEDIR 	=org/$(ESTAR_NAME)/$(RTML_NAME)/$(TEST_NAME)
 PACKAGENAME	=org.$(ESTAR_NAME).$(RTML_NAME).$(TEST_NAME)
 JAR_FILE	=org_$(ESTAR_NAME)_$(RTML_NAME)_$(TEST_NAME).jar
-JAVACFLAGS 	= -d $(LIBDIR) -sourcepath ../../../../ -classpath $(LIBDIR):$(CLASSPATH)
+JAVACFLAGS 	=$(JAVAC_VERSION_FLAGS) -d $(LIBDIR) -sourcepath ../../../../ -classpath $(LIBDIR):$(CLASSPATH)
 DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 
 SRCS = TestParser.java TestCreate.java TestPeriodFormatParser.java TestSimpleDateFormat.java RTMLConverter.java \

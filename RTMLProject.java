@@ -26,7 +26,7 @@ import java.io.*;
 /**
  * This class is a data container for information contained in the Project nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision$
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLProject extends RTMLAttributes implements Serializable
@@ -34,7 +34,7 @@ public class RTMLProject extends RTMLAttributes implements Serializable
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLProject.java,v 1.5 2008-05-27 14:20:32 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */

@@ -27,14 +27,14 @@ import java.io.*;
  * This class is a data container for information contained in the intelligent agent nodes/tags of an RTML document.
  * These are IntelligentAgent nodes in RTML2.2, and Agent nodes in RTML3.1.
  * @author Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision$
  */
 public class RTMLIntelligentAgent implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLIntelligentAgent.java,v 1.5 2008-05-27 14:16:49 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
