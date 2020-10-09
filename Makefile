@@ -22,12 +22,12 @@ SRCS = RTMLException.java RTMLErrorHandler.java RTMLDateFormat.java RTMLPeriodFo
 	RTML22Parser.java RTML31Parser.java RTMLHistory.java RTMLHistoryEntry.java RTML22Create.java RTML31Create.java 
 OBJS = $(SRCS:%.java=$(LIBDIR)/$(PACKAGEDIR)/%.class)
 DOCS = $(SRCS:%.java=$(DOCSDIR)/$(PACKAGEDIR)/%.html)
-CONFIGS = xml_environment.csh
-CONFIGSBIN = $(CONFIGS:%=$(LIBDIR)/%)
+#CONFIGS = xml_environment.csh
+#CONFIGSBIN = $(CONFIGS:%=$(LIBDIR)/%)
 
 DIRS = test
-
-top: jar configs
+# configs
+top: jar
 	@for i in $(DIRS); \
 	do \
 		(echo making in $$i...; cd $$i; $(MAKE) ); \
@@ -49,10 +49,10 @@ docs: $(DOCS)
 $(DOCSDIR)/$(PACKAGEDIR)/%.html: %.java
 	$(JAVADOC) -sourcepath ../../..:$(CLASSPATH) -d $(DOCSDIR) $(DOCFLAGS) $(PACKAGENAME)
 
-configs: $(CONFIGSBIN)
+#configs: $(CONFIGSBIN)
 
-$(LIBDIR)/%: %
-	$(CP) $< $@
+#$(LIBDIR)/%: %
+#	$(CP) $< $@
 
 checkout:
 	$(CO) $(CO_OPTIONS) $(SRCS)
