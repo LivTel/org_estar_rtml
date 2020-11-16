@@ -38,14 +38,14 @@ import java.text.*;
  * by the (nominal-actual seeing) * ExposureFactor in some manner. This is not implemented, as it does not exist
  * in RTML 3. RTML 3 has the minimum and maximum attributes as sub-elements, and a fixed Units element.
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision$
  */
 public class RTMLSeeingConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSeeingConstraint.java,v 1.4 2008-08-11 13:54:54 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
