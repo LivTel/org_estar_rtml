@@ -59,14 +59,14 @@ import org.estar.astrometry.*;
  * from an instance of RTMLDocument into a DOM tree, using JAXP.
  * The resultant DOM tree is traversed,and created into a valid XML document to send to the server.
  * @author Chris Mottram, Jason Etherton
- * @version $Revision: 1.41 $
+ * @version $Revision$
  */
 public class RTMLCreate
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLCreate.java,v 1.41 2008-05-23 14:14:33 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * System ID put into DOCTYPE statement. This is the URL of the RTML DTD.
 	 */

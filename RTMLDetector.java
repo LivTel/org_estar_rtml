@@ -26,7 +26,7 @@ import java.io.*;
 /**
  * This class is a data container for information contained in the Detector nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision$
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLDetector extends RTMLAttributes implements Serializable
@@ -34,7 +34,7 @@ public class RTMLDetector extends RTMLAttributes implements Serializable
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDetector.java,v 1.6 2013-01-14 11:04:42 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */

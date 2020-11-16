@@ -29,14 +29,14 @@ import java.util.*;
  * This class is a data container for information contained RTMLAttrubutes attribute group.
  * Most RTML 3.1a element tags have these attributes.
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision$
  */
 public class RTMLAttributes implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLAttributes.java,v 1.2 2008-05-27 14:01:18 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */

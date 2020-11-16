@@ -1,0 +1,43 @@
+Expired:
+set project = "expired_test"
+set username = "fraser_steve"
+set password = "ochaye"
+Active / TOOP:
+set project = "test1"
+set username = "fraser_steve"
+set password = "ochaye"
+
+Single filter Phase2
+====================
+set now_date_s = `date +"%s"`
+/home/dev/src/estar/scripts//create_rtml.ltdevsrv -rtml_version 3.1a -request -uid rtml://rtml-document-${now_date_s} -iauri file:/dev/null -project ${project} -contact -contact_name "Joe.Bloggs" -contact_user ${username} -observation -target -target_name BDp28_4211_zpol -ra 21:51:11.067 -dec +28:51:51.82 -ra_offset 0.0 -dec_offset 0.0  -moon_constraint 15 degs -start_date 2020-11-01T00:00:00 -end_date 2020-12-01T00:00:00 -device -device_name Moptop -device_type polarimeter -device_spectral_region optical -device_filter L -rotor_speed fast -exposure 20 s 1 > test_rtml_document_${now_date_s}.rtml
+
+Note, for Moptop exposures, the exposure count is ignored, and the exposure length used to construct a Duration exposure.
+
+NodeAgent:
+/home/dev/src/estar/scripts/nodetester.ltdevsrv -url http://161.72.57.3:8080/org_estar_nodeagent/services/NodeAgent -username ${username} -password ${password} -cookie -axis -urn  urn:/node_agent -method handle_rtml -rtml "test_rtml_document_${now_date_s}.rtml" 
+
+NodeAgent2:
+java org.estar.node_agent2.client.NodeAgentClient -host 161.72.57.3 -port 8080 -username ${username} -password ${password} -handle_rtml "test_rtml_document_${now_date_s}.rtml" -output_filename "test_rtml_document_${now_date_s}_output.rtml"
+
+
+Multiple filter single target Phase2
+====================================
+set now_date_s = `date +"%s"`
+
+/home/dev/src/estar/scripts//create_rtml.ltdevsrv -rtml_version 3.1a -request -uid rtml://rtml-document-${now_date_s} -iauri file:/dev/null -project ${project} -contact -contact_name "Joe.Bloggs" -contact_user ${username} -target -target_name BDp64_106_pol -ra 0:57:36.71 -dec +64:51:26.49 -ra_offset 0.0 -dec_offset 0.0 -observation -moon_constraint 15 degs -start_date 2020-11-01T00:00:00 -end_date 2020-12-01T00:00:00 -device -device_name Moptop -device_type polarimeter -device_spectral_region optical -device_filter B -rotor_speed slow -exposure 160 s 1 -observation -moon_constraint 15 degs -start_date 2020-11-01T00:00:00 -end_date 2020-12-01T00:00:00 -device -device_name Moptop -device_type polarimeter -device_spectral_region optical -device_filter V -rotor_speed slow -exposure 160 s 1 -observation -moon_constraint 15 degs -start_date 2020-11-01T00:00:00 -end_date 2020-12-01T00:00:00 -device -device_name Moptop -device_type polarimeter -device_spectral_region optical -device_filter R -rotor_speed slow -exposure 160 s 1 -observation -moon_constraint 15 degs -start_date 2020-11-01T00:00:00 -end_date 2020-12-01T00:00:00 -device -device_name Moptop -device_type polarimeter -device_spectral_region optical -device_filter I -rotor_speed slow -exposure 160 s 1 > test_rtml_document_${now_date_s}.rtml
+
+java org.estar.node_agent2.client.NodeAgentClient -host 161.72.57.3 -port 8080 -username ${username} -password ${password} -handle_rtml "test_rtml_document_${now_date_s}.rtml" -output_filename "test_rtml_document_${now_date_s}_output.rtml"
+
+
+TOOP Test:
+==========
+set now_date_s = `date +"%s"`
+/home/dev/src/estar/scripts/create_rtml.ltdevsrv -rtml_version 3.1a -request -uid rtml://rtml-document-${now_date_s} -iauri file:/dev/null -project ${project} -contact -contact_name "Joe.Bloggs" -contact_user ${username} -observation -priority 0 -target -target_name BDp28_4211_zpol -ra 21:51:11.067 -dec +28:51:51.82 -ra_offset 0.0 -dec_offset 0.0 -device -device_name Moptop -device_type polarimeter -device_spectral_region optical -device_filter L -rotor_speed fast -exposure 20 s 1  > test_toop_rtml_document_${now_date_s}.rtml
+
+NodeAgent:
+/home/dev/src/estar/scripts/nodetester -url http://161.72.57.3:8080/org_estar_nodeagent/services/NodeAgent -username ${username} -password ${password} -cookie -axis -urn  urn:/node_agent -method handle_rtml -rtml "test_toop_rtml_document_${now_date_s}.rtml" 
+
+NodeAgent2:
+java org.estar.node_agent2.client.NodeAgentClient -host 161.72.57.3 -port 8080 -username ${username} -password ${password} -handle_rtml "test_toop_rtml_document_${now_date_s}.rtml" -output_filename "test_toop_rtml_document_${now_date_s}_output.rtml"
+

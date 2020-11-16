@@ -7,7 +7,7 @@ RTML_NAME	=rtml
 PACKAGEDIR 	=org/$(ESTAR_NAME)/$(RTML_NAME)
 PACKAGENAME	=org.$(ESTAR_NAME).$(RTML_NAME)
 JAR_FILE	=org_$(ESTAR_NAME)_$(RTML_NAME).jar
-JAVACFLAGS 	= -d $(LIBDIR) -sourcepath ../../../ -classpath $(LIBDIR):$(CLASSPATH)
+JAVACFLAGS 	=$(JAVAC_VERSION_FLAGS) -d $(LIBDIR) -sourcepath ../../../ -classpath $(LIBDIR):$(CLASSPATH)
 DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 
 SRCS = RTMLException.java RTMLErrorHandler.java RTMLDateFormat.java RTMLPeriodFormat.java RTMLAttributes.java \
@@ -15,18 +15,19 @@ SRCS = RTMLException.java RTMLErrorHandler.java RTMLDateFormat.java RTMLPeriodFo
 	RTMLTarget.java RTMLEphemerisTargetTrackNode.java \
 	RTMLSeeingConstraint.java RTMLSeriesConstraint.java RTMLMoonConstraint.java RTMLSkyConstraint.java \
 	RTMLExtinctionConstraint.java RTMLAirmassConstraint.java \
-	RTMLSchedule.java RTMLGrating.java RTMLDevice.java RTMLDetector.java RTMLObservation.java \
+	RTMLSchedule.java RTMLGrating.java RTMLHalfWavePlate.java RTMLDevice.java \
+	RTMLDetector.java RTMLImageData.java RTMLObservation.java \
 	RTMLTelescope.java RTMLTelescopeLocation.java \
 	RTMLDocument.java RTMLParser.java RTMLCreate.java RTMLContact.java RTMLProject.java RTMLScore.java \
 	RTML22Parser.java RTML31Parser.java RTMLHistory.java RTMLHistoryEntry.java RTML22Create.java RTML31Create.java 
 OBJS = $(SRCS:%.java=$(LIBDIR)/$(PACKAGEDIR)/%.class)
 DOCS = $(SRCS:%.java=$(DOCSDIR)/$(PACKAGEDIR)/%.html)
-CONFIGS = xml_environment.csh
-CONFIGSBIN = $(CONFIGS:%=$(LIBDIR)/%)
+#CONFIGS = xml_environment.csh
+#CONFIGSBIN = $(CONFIGS:%=$(LIBDIR)/%)
 
 DIRS = test
-
-top: jar configs
+# configs
+top: jar
 	@for i in $(DIRS); \
 	do \
 		(echo making in $$i...; cd $$i; $(MAKE) ); \
@@ -48,10 +49,10 @@ docs: $(DOCS)
 $(DOCSDIR)/$(PACKAGEDIR)/%.html: %.java
 	$(JAVADOC) -sourcepath ../../..:$(CLASSPATH) -d $(DOCSDIR) $(DOCFLAGS) $(PACKAGENAME)
 
-configs: $(CONFIGSBIN)
+#configs: $(CONFIGSBIN)
 
-$(LIBDIR)/%: %
-	$(CP) $< $@
+#$(LIBDIR)/%: %
+#	$(CP) $< $@
 
 checkout:
 	$(CO) $(CO_OPTIONS) $(SRCS)

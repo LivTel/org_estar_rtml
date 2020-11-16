@@ -26,14 +26,14 @@ import java.io.*;
 /**
  * This class extends Exception. 
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision$
  */
 public class RTMLException extends Exception
 {
 	/**
 	 * Revision Control System id string, showing the version of the Class
 	 */
-	public final static String RCSID = new String("$Id: RTMLException.java,v 1.4 2008-05-27 14:11:45 cjm Exp $");
+	public final static String RCSID = new String("$Id$");
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */

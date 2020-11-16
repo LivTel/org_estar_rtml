@@ -30,7 +30,7 @@ import org.estar.astrometry.*;
 /**
  * This class is a data container for information contained in the Schedule nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.19 $
+ * @version $Revision$
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLSchedule extends RTMLAttributes implements Serializable
@@ -38,7 +38,7 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLSchedule.java,v 1.19 2011-02-09 18:41:22 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */

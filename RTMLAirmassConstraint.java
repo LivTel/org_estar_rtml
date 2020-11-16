@@ -33,14 +33,14 @@ import java.text.*;
  * </ul>
  * Only the <i>maximum</i> value is used by the TEA at the moment. 
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision$
  */
 public class RTMLAirmassConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLAirmassConstraint.java,v 1.3 2011-02-10 14:49:45 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */

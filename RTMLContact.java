@@ -28,7 +28,7 @@ import java.net.URL;
  * This class is a data container for information contained in the Contact
  * nodes/tags of an RTML document.
  * @author Jason Etherton, CHris Mottram
- * @version $Revision: 1.7 $
+ * @version $Revision$
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLContact extends RTMLAttributes implements Serializable
@@ -36,7 +36,7 @@ public class RTMLContact extends RTMLAttributes implements Serializable
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLContact.java,v 1.7 2008-05-27 14:02:05 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -278,10 +278,10 @@ public class RTMLContact extends RTMLAttributes implements Serializable
 	}
 }
 /*
- *    $Date: 2008-05-27 14:02:05 $
+ *    $Date$
  * $RCSfile: RTMLContact.java,v $
- *  $Source: /space/home/eng/cjm/cvs/org_estar_rtml/RTMLContact.java,v $
- *      $Id: RTMLContact.java,v 1.7 2008-05-27 14:02:05 cjm Exp $
+ *  $Source$
+ *      $Id$
  *     $Log: not supported by cvs2svn $
  *     Revision 1.6  2008/05/23 14:12:11  cjm
  *     Now extends RTMLAttributes.

@@ -28,14 +28,14 @@ import org.xml.sax.SAXParseException;
 /**
  * This class is a JAXP compliant ErrorHandler, i.e. it implements org.xml.sax.ErrorHandler.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision$
  */
 public class RTMLErrorHandler implements org.xml.sax.ErrorHandler
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLErrorHandler.java,v 1.3 2008-05-23 14:24:03 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * The parser that is using this error handler.
 	 */

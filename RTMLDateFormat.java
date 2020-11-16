@@ -34,14 +34,14 @@ import java.util.*;
  * ISO8601 dates without a timezone should be parsed as being UTC dates, but we currently parse them in the parser's
  * locale timezone , which makes specifying local-relative dates easy.
  * @author Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision$
  */
 public class RTMLDateFormat implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDateFormat.java,v 1.5 2008-05-27 14:06:37 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */

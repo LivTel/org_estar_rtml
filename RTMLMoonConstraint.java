@@ -38,14 +38,14 @@ import java.text.*;
  * </ul>
  * Only the <i>distance</i> and <i>units</i> attributes are currently used by the TEA.
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision$
  */
 public class RTMLMoonConstraint implements Serializable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLMoonConstraint.java,v 1.3 2008-08-11 13:54:54 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */

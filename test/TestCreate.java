@@ -82,6 +82,10 @@ public class TestCreate
 	 */
 	protected RTMLGrating grating = null;
 	/**
+	 * RTML half wave plate device data, used to store Moptop rotor speed.
+	 */
+	protected RTMLHalfWavePlate halfWavePlate = null;
+	/**
 	 * RTML observation data.
 	 */
 	protected RTMLObservation observation = null;
@@ -777,7 +781,7 @@ public class TestCreate
 				else
 				{
 					System.err.println(this.getClass().getName()+
-							   ":parseArguments:Binning:Device was null.");
+							   ":parseArguments:Grating name:Device was null.");
 					System.exit(4);
 				}
 			}
@@ -803,7 +807,7 @@ public class TestCreate
 				else
 				{
 					System.err.println(this.getClass().getName()+
-							   ":parseArguments:Binning:Device was null.");
+							   ":parseArguments:Grating wavelength:Device was null.");
 					System.exit(4);
 				}
 			}
@@ -1000,6 +1004,31 @@ public class TestCreate
 					System.err.println(this.getClass().getName()+
 						 ":parseArguments:moon_constraint needs a <distance> and <units>.");
 					System.exit(2);
+				}
+			}
+			else if(args[i].equals("-rotor_speed"))
+			{
+				if (device != null)
+				{
+					if((i+1) < args.length)
+					{
+						halfWavePlate = new RTMLHalfWavePlate();
+						device.setHalfWavePlate(halfWavePlate);
+						halfWavePlate.setRotorSpeed(args[i+1]);
+						i+= 1;
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:Rotor speed needs a speed (slow|fast).");
+						System.exit(3);
+					}
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Rotor Speed:Device was null.");
+					System.exit(4);
 				}
 			}
 			else if(args[i].equals("-target_name"))

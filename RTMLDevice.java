@@ -26,7 +26,7 @@ import java.io.*;
 /**
  * This class is a data container for information contained in the device nodes/tags of an RTML document.
  * @author Chris Mottram
- * @version $Revision: 1.7 $
+ * @version $Revision$
  * @see org.estar.rtml.RTMLAttributes
  */
 public class RTMLDevice extends RTMLAttributes implements Serializable
@@ -34,7 +34,7 @@ public class RTMLDevice extends RTMLAttributes implements Serializable
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: RTMLDevice.java,v 1.7 2008-05-27 14:09:46 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Serial version ID. Fixed as these documents can be used as parameters in RMI calls across JVMs.
 	 */
@@ -66,7 +66,12 @@ public class RTMLDevice extends RTMLAttributes implements Serializable
 	 * Only normally used for spectrographs.
 	 */
 	private RTMLGrating grating = null;
-
+	/**
+	 * Object holding information on a half-wave plate, used by the Moptop polarimeter.
+	 * The data is actually encoded into a separate sub &lt;Device&gt; node in the XML.
+	 */
+	private RTMLHalfWavePlate halfWavePlate = null;
+	
 	/**
 	 * Default constructor.
 	 */
@@ -178,6 +183,29 @@ public class RTMLDevice extends RTMLAttributes implements Serializable
 	}
 
 	/**
+	 * Set a half-wave plate for this device. This is used to encode the rotator (containing a half-wave plate)
+	 * on Moptop. The data is actually stored in RTML in a Device sub-node of this device with type "half-wave_plate".
+	 * @param hwp The half-wave plate object to store.
+	 * @see #halfWavePlate
+	 * @see RTMLHalfWavePlate
+	 */
+	public void setHalfWavePlate(RTMLHalfWavePlate hwp)
+	{
+		halfWavePlate = hwp;
+	}
+
+	/**
+	 * Get the half-wave plate for this device. 
+	 * @return The half-wave plate object, or null if none is set for this device.
+	 * @see #halfWavePlate
+	 * @see RTMLHalfWavePlate
+	 */
+	public RTMLHalfWavePlate getHalfWavePlate()
+	{
+		return halfWavePlate;
+	}
+
+	/**
 	 * Method to print out a string representation of this node.
 	 * @see #toString(java.lang.String)
 	 */
@@ -195,6 +223,7 @@ public class RTMLDevice extends RTMLAttributes implements Serializable
 	 * @see #filterType
 	 * @see #detector
 	 * @see #grating
+	 * @see #halfWavePlate
 	 * @see org.estar.rtml.RTMLAttributes#toString(java.lang.String)
 	 */
 	public String toString(String prefix)
@@ -216,6 +245,8 @@ public class RTMLDevice extends RTMLAttributes implements Serializable
 			sb.append(prefix+detector.toString("\t")+"\n");
 		if(grating != null)
 			sb.append(prefix+grating.toString("\t")+"\n");
+		if(halfWavePlate != null)
+			sb.append(prefix+halfWavePlate.toString("\t")+"\n");
 		return sb.toString();
 	}
 
