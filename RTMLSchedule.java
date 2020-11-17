@@ -417,7 +417,7 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 	/**
 	 * Set the exposure count. 
 	 * @param s A string representing an integer, which is the number of exposures.
-	 *         The string should represent a number of at least 1.
+	 *         The string should represent a number of at least 1 (or 0 for Moptop).
 	 * @see #exposureCount
 	 * @see #setExposureCount
 	 * @exception RTMLException Thrown if the string is not a valid number.
@@ -441,16 +441,16 @@ public class RTMLSchedule extends RTMLAttributes implements Serializable
 
 	/**
 	 * Set the number of exposures to do at that length.
-	 * @param i The number of exposures. This must be at least 1.
+	 * @param i The number of exposures. This is usually at least 1, except for the case of Moptop where it can be 0.
 	 * @see #exposureCount
-	 * @exception IllegalArgumentException Thrown if the integer is not at least 1.
+	 * @exception IllegalArgumentException Thrown if the integer is not at least 0.
 	 */
 	public void setExposureCount(int i) throws IllegalArgumentException
 	{
-		if(i < 1)
+		if(i < 0)
 		{
 			throw new IllegalArgumentException(this.getClass().getName()+":setExposureCount:count "+
-							   i+" less than 1.");
+							   i+" less than 0.");
 		}
 		exposureCount = i;
 	}
