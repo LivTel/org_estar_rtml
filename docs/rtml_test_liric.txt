@@ -1,0 +1,43 @@
+set project = ""
+set username = ""
+set password = ""
+
+Example single filter Phase2 request
+FS138 LIRIC H 9x10s Phase2
+--------------------------
+set now_date_s = `date +"%s"`
+/home/dev/src/estar/scripts//create_rtml.ltdevsrv -rtml_version 3.1a -request -uid rtml://liric-fs138-h-9x10-${now_date_s} -iauri file:/dev/null -project ${project} -contact -contact_name "Joe.Bloggs" -contact_user ${username} -observation -target -target_name FS138 -ra 16:28:06.72 -dec +34:58:47.90  -ra_offset 0.0 -dec_offset 0.0 -moon_constraint 20 degs -sky_constraint bright -seeing_constraint 0.6 3.0 -start_date 2024-06-18T00:00:00 -end_date 2024-06-30T00:00:00 -device -device_name LIRIC -device_type camera -device_spectral_region infrared -device_filter H -binning 1 1 -exposure 10 s 9 > liric_fs138_h_9x10_${now_date_s}.rtml
+
+/home/cjm/eclipse-workspace/node_agent2/scripts/nodeagentclient -host ltproxy -port 8080 -username ${username} -password ${password} -handle_rtml liric_fs138_h_9x10_${now_date_s}.rtml -output_filename liric_fs138_h_9x10_${now_date_s}_output.rtml
+
+Currently the nudgematic offset size and coadd exposure length are configured in the TEA, and are not controllable by the user/RTML.
+ltproxy:/proxy/tea/config/tea.properties:
+# Default liric nudgematic offset size / coadd exposure length
+instrument.liric.nudgematic_offset_size.default =small
+instrument.liric.coadd_exposure_length.default  =1000
+
+The TEA LIRIC config is currently setup for faint, point-source objects.
+We can add RTML to make these settings controllable by the user/RTML, this would take about a week.
+
+The filters currently available for LIRIC are:
+FELH1500, H, J, R.
+H is currently mapped to FELH1500, as the installed H filter appears to be K' currently and doesn't allow usable flux onto the detector.
+
+You really want to specify a multrun with at least 9 exposures, to get an image at each nudgematic position.
+
+Real time override (toop / Target of Opportunity) request:
+
+FS138 LIRIC H 9x10s toop
+------------------------
+
+set now_date_s = `date +"%s"`
+/home/dev/src/estar/scripts//create_rtml.ltdevsrv -rtml_version 3.1a -request -uid rtml://liric-fs138-h-9x10-toop-${now_date_s} -iauri file:/dev/null -project ${project} -contact -contact_name "Joe.Bloggs" -contact_user ${username} -observation -target -target_name FS138 -ra 16:28:06.72 -dec +34:58:47.90 -toop -ra_offset 0.0 -dec_offset 0.0 -device -device_name LIRIC -device_type camera -device_spectral_region infrared -device_filter H -binning 1 1 -exposure 10 s 9 > liric_fs138_h_9x10_toop_${now_date_s}.rtml
+
+/home/cjm/eclipse-workspace/node_agent2/scripts/nodeagentclient -host ltproxy -port 8080 -username ${username} -password ${password} -handle_rtml liric_fs138_h_9x10_toop_${now_date_s}.rtml -output_filename liric_fs138_h_9x10_toop_${now_date_s}_output.rtml
+
+You can't specify any constraints in a toop document. The TEA checks whether the target is above the horizon, adds it to the TOCSessionManager's document queue, and returns a "confirm" document.
+
+The TOCSessionManager will then start actioning the document, starting by trying to take control of the telescope (which may fail if you don't have permision, or theres bad weather etc)...
+
+You can submit a second RTML TOOP document whilst the first is processing (or up to 2 minutes after the first one has finished) and this will be added to the TOCSessionManager's document queue, to be processed as soon as the current document has been finished.
+
