@@ -16,6 +16,8 @@ NodeAgent:
 
 NodeAgent2:
 java org.estar.node_agent2.client.NodeAgentClient -host 161.72.57.3 -port 8080 -username ${username} -password ${password} -handle_rtml "test_rtml_document_${now_date_s}.rtml" -output_filename "test_rtml_document_${now_date_s}_output.rtml"
+or
+/home/cjm/eclipse-workspace/node_agent2/scripts/nodeagentclient -host ltproxy -port 8080 -username ${username} -password ${password} -handle_rtml "test_rtml_document_${now_date_s}.rtml" -output_filename "test_rtml_document_${now_date_s}_output.rtml"
 
 TOOP Test:
 set now_date_s = `date +"%s"`
