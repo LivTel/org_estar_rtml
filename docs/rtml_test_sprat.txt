@@ -1,0 +1,31 @@
+
+Active / TOOP:
+set project = "test1"
+set username = "fraser_steve"
+set password = "ochaye"
+
+set now_date_s = `date +"%s"`
+
+Not up til end of night
+set target_name = "GD50"
+set target_ra = "03:48:50.257"
+set target_dec = "-00:58:34.90"
+
+High pm?
+set target_name = "BDp26_2606"
+set target_ra = "14:49:02.724"
+set target_dec = "+25:42:0.3"
+
+10th mag, target coords from simbad
+set target_name = "BDp33_2642"
+set target_ra = "15:51:59.885"
+set target_dec = "+32:56:54.32"
+
+
+TOOP 60s red 
+/home/dev/src/estar/scripts/create_rtml.ltdevsrv -rtml_version 3.1a -request -uid rtml://rtml-sprat-${target_name}-${now_date_s} -iauri "file:/dev/null" -project ${project} -contact -contact_name "Joe.Bloggs" -contact_user ${username}  -observation -target -target_name "${target_name}" -ra "${target_ra}" -dec "${target_dec}" -ra_offset 0.0 -dec_offset 0.0 -toop -device -device_name Sprat -device_type spectrograph -device_spectral_region optical -grating_name red -binning 1 1 -exposure 60 s 1 > test_sprat_toop_${target_name}_rtml_document_${now_date_s}.rtml
+
+Node Agent2:
+/home/cjm/eclipse-workspace/node_agent2/scripts/nodeagentclient -host ltproxy -port 8080 -username ${username} -password ${password} -handle_rtml "test_sprat_toop_${target_name}_rtml_document_${now_date_s}.rtml" -output_filename "test_sprat_toop_${target_name}_rtml_document_${now_date_s}_output.rtml"
+
+
