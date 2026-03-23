@@ -12,7 +12,7 @@ DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 
 SRCS = RTMLException.java RTMLErrorHandler.java RTMLDateFormat.java RTMLPeriodFormat.java RTMLAttributes.java \
 	RTMLDeviceHolder.java RTMLTargetHolder.java RTMLIntelligentAgent.java \
-	RTMLTarget.java RTMLEphemerisTargetTrackNode.java \
+	RTMLAcquisition.java RTMLTarget.java RTMLEphemerisTargetTrackNode.java \
 	RTMLSeeingConstraint.java RTMLSeriesConstraint.java RTMLMoonConstraint.java RTMLSkyConstraint.java \
 	RTMLExtinctionConstraint.java RTMLAirmassConstraint.java \
 	RTMLSchedule.java RTMLGrating.java RTMLHalfWavePlate.java RTMLDevice.java \
