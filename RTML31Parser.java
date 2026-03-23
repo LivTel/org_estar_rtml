@@ -1389,6 +1389,7 @@ public class RTML31Parser extends RTMLParser
 	 * @see org.estar.rtml.RTMLTargetHolder
 	 * @see #parseCoordinatesNode
 	 * @see #parseTargetBrightnessNode
+	 * @see #parseAcquisitionNode
 	 */
 	private void parseTargetNode(RTMLTargetHolder parent,Node targetNode) throws RTMLException
 	{
@@ -1439,6 +1440,8 @@ public class RTML31Parser extends RTMLParser
 					parseCoordinatesNode(target,childNode);
 				else if(childNode.getNodeName() == "TargetBrightness")
 					parseTargetBrightnessNode(target,childNode);
+				else if(childNode.getNodeName() == "Acquisition")
+					parseAcquisitionNode(target,childNode);
 				else
 					System.err.println("parseTargetNode:ELEMENT:"+childNode);
 			}
@@ -1767,7 +1770,45 @@ public class RTML31Parser extends RTMLParser
 			}
 		}
 	}
-
+	/**
+	 * Internal method to parse an Acquisition node.
+	 * @param target The instance of RTMLTarget to set the acquisition for.
+	 * @param targetBrightnessNode The XML DOM node for the Acquisition tag node.
+	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
+	 * @see #parseDoubleNode
+	 */
+	private void parseAcquisitionNode(RTMLTarget target,Node acquisitionNode) throws RTMLException
+	{
+		RTMLAcquisition acquisition = null;
+		String acquisitionModeString = null;
+		
+		// check current XML node is correct
+		if(acquisitionNode.getNodeType() != Node.ELEMENT_NODE)
+		{
+			throw new RTMLException(this.getClass().getName()+":parseAcquisitionNode:Illegal Node:"+
+						acquisitionNode);
+		}
+		if(acquisitionNode.getNodeName() != "Acquisition")
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseAcquisitionNode:Illegal Node Name:"+
+						acquisitionNode.getNodeName());
+		}
+		acquisitionModeString = parseStringNode("Acquisition",acquisitionNode);
+		acquisition = new RTMLAcquisition();
+		try
+		{
+			acquisition.setAcquisitionMode(acquisitionModeString);
+		}
+		catch(IllegalArgumentException e)
+		{
+			throw new RTMLException(this.getClass().getName()+
+						":parseAcquisitionNode:Illegal acquisition mode:"+
+						acquisitionModeString,e);
+		}
+		target.setAcquisition(acquisition);
+	}
+	
 	/**
 	 * Internal method to parse a Schedule node.
 	 * @param document The instance of RTMLDocument to set the schedule for.
