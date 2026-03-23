@@ -167,3 +167,37 @@ Latest test document:
 
 /home/dev/src/estar/scripts/create_rtml -rtml_version 3.1a -request -uid rtml://rtml-sprat-${now_date_s} -iauri "file:/dev/null" -project ${project} -contact -contact_name "Joe.Bloggs" -contact_user ${username}  -observation -target -target_name GD50 -ra 03:48:50.257 -dec -00:58:34.90 -ra_offset 0.0 -dec_offset 0.0 -start_date 2016-01-01T00:00:00 -end_date 2017-12-31T00:00:00   -device -device_name Sprat -device_type spectrograph -device_spectral_region optical -grating_name red -binning 1 1 -exposure 300 s 1 > test_sprat_rtml_document_${now_date_s}.rtml
 
+2026/03/18
+
+AMN wants to specify Brightest acquisition as opposed to default WCS.
+
+Target -> Acquisition
+One off
+* none
+* wcs
+* brightest
+e.g.:
+<Target>
+	<Acquisition>wcs</Acquisition>
+	
+
+
+<xs:element name="Acquisition">
+	<xs:annotation>
+		<xs:documentation>
+What acquisition mode to use when moving the target onto the instrument detector plane. This is normally used for spectrograph instruments with a slit or fibre bundle. The current options (used by the LT) are "none", "wcs", "brightest". "wcs" is the normal mode for spectrographs, and "brighest" is normally used for targets that are too bright (in the catalogue), or for extended objects.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:simpleType>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="none"/>
+			<xs:enumeration value="wcs"/>
+			<xs:enumeration value="brightest"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:element>
+
+
+
+<xs:element name="Target">
+				<xs:element ref="Acquisition"/>
