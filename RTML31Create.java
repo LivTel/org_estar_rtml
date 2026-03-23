@@ -855,6 +855,14 @@ public class RTML31Create
 			// append TargetBrightness to Target
 			targetElement.appendChild(brightnessElement);
 		}
+		// acquisition
+		if(target.getAcquisition() != null)
+		{
+			// Acquisition
+			subElement = (Element)document.createElement("Acquisition");
+			subElement.appendChild(document.createTextNode(target.getAcquisition().getAcquisitionMode()));
+			targetElement.appendChild(subElement);
+		}
 		// add target to the parent
 		parentElement.appendChild(targetElement);
 		
