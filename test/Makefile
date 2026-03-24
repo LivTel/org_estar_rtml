@@ -11,8 +11,9 @@ JAR_FILE	=org_$(ESTAR_NAME)_$(RTML_NAME)_$(TEST_NAME).jar
 JAVACFLAGS 	=$(JAVAC_VERSION_FLAGS) -d $(LIBDIR) -sourcepath ../../../../ -classpath $(LIBDIR):$(CLASSPATH)
 DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 
-SRCS = TestParser.java TestCreate.java TestPeriodFormatParser.java TestSimpleDateFormat.java RTMLConverter.java \
-	TestPeriodFormatEquals.java ExtractScore.java
+SRCS = TestParser.java TestCreate.java TestPeriodFormatParser.java \
+	TestSimpleDateFormat.java RTMLConverter.java TestPeriodFormatEquals.java ExtractScore.java
+# TestRTML31Parser.java TestRTML31Create.java 
 OBJS = $(SRCS:%.java=$(LIBDIR)/$(PACKAGEDIR)/%.class)
 DOCS = $(SRCS:%.java=$(DOCSDIR)/$(PACKAGEDIR)/%.html)
 CONFIGS = test_create.csh create_example_rtml.csh
