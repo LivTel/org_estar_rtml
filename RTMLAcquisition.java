@@ -82,7 +82,7 @@ public class RTMLAcquisition implements Serializable
 		}
 		else
 		{
-			throw new IllegalArgumentException(this.getClass().getName()+":setAcquisitionMode: mpde '"+s+
+			throw new IllegalArgumentException(this.getClass().getName()+":setAcquisitionMode: mode '"+s+
 				  "' is not a legal value ("+ACQUISITION_STRING_NONE+"/"+ACQUISITION_STRING_WCS+"/"+
 							   ACQUISITION_STRING_BRIGHTEST+").");
 		}
