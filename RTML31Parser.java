@@ -1770,12 +1770,13 @@ public class RTML31Parser extends RTMLParser
 			}
 		}
 	}
+	
 	/**
 	 * Internal method to parse an Acquisition node.
 	 * @param target The instance of RTMLTarget to set the acquisition for.
 	 * @param targetBrightnessNode The XML DOM node for the Acquisition tag node.
 	 * @exception RTMLException Thrown if a strange child is in the node, or a parse error occurs.
-	 * @see #parseDoubleNode
+	 * @see #parseStringNode
 	 */
 	private void parseAcquisitionNode(RTMLTarget target,Node acquisitionNode) throws RTMLException
 	{
