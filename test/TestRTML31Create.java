@@ -86,6 +86,10 @@ public class TestRTML31Create
 	 */
 	protected RTMLTarget target = null;
 	/**
+	 * RTML acquisition data.
+	 */
+	protected RTMLAcquisition acquisition = null;
+	/**
 	 * RTML schedule data.
 	 */
 	protected RTMLSchedule schedule = null;
@@ -146,7 +150,32 @@ public class TestRTML31Create
 		}
 		for(int i = 0; i < args.length; i++)
 		{
-			if(args[i].equals("-binning"))
+			if(args[i].equals("-acquisition"))
+			{
+				if (target != null)
+				{
+					if((i+1) < args.length)
+					{
+						acquisition = new RTMLAcquisition();
+						target.setAcquisition(acquisition);
+						acquisition.setAcquisitionMode(args[i+1]);
+						i++;
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:Acquisition needs a mode string.");
+						System.exit(3);
+					}
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Acquisition:Target was null.");
+					System.exit(4);
+				}
+			}
+			else if(args[i].equals("-binning"))
 			{
 				if (device != null)
 				{
@@ -1107,8 +1136,8 @@ public class TestRTML31Create
 	{
 		create = new RTML31Create();
 		//System.out.println(document);
-		if(rtmlVersionString != null)
-			create.setRTMLVersionString(rtmlVersionString);
+		//if(rtmlVersionString != null)
+		//	create.setRTMLVersionString(rtmlVersionString);
 		create.create(document);
 		create.toStream(System.out);
 	}
@@ -1132,7 +1161,7 @@ public class TestRTML31Create
 		System.err.println("\t\t[-binning <x> <y>]");
 		System.err.println("\t\t[-grating_wavelength <wavelength> <m|cm|mm|micron|nm|nanometer|nanometers|Angstrom|Angstroms>]");
 		System.err.println("\t<-observation <-name <string>> [-target_ident <string>] ");
-		System.err.println("\t\t<-ra <HH:MM:SS>> <-dec <[+|-]DD:MM:SS>> [-toop]");
+		System.err.println("\t\t<-ra <HH:MM:SS>> <-dec <[+|-]DD:MM:SS>> [-toop] [-acquisition <none|wcs|brightest>]");
 		System.err.println("\t\t<-exposure <length> <units> <count>>");
 		System.err.println("\t\t[-series_constraint_count <number>]");
 		System.err.println("\t\t[-series_constraint_interval <P{(y)Y{(m)M}{(d)D}{T{(h)H}{(m}M}{(s.s..)S}>]");
