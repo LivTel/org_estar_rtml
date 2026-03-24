@@ -564,7 +564,7 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 				  " (+/- "+df.format(magnitudeError)+")\n");
 		}
 		if(acquisition != null)
-			sb.append(prefix+"\t"+acquisition+"\n");
+			sb.append(acquisition.toString(prefix+"\t")+"\n");
 		return sb.toString();
 	}
 
