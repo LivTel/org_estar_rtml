@@ -78,7 +78,7 @@ public class RTMLHalfWavePlate implements Serializable
 	/**
 	 * Set the rotator speed of the half-wave plate from a string..
 	 * @param s The rotator speed, one of "slow" or "fast".
-	 * @exception IllegalArgumentException Thrown if the input string is lot a legal value.
+	 * @exception IllegalArgumentException Thrown if the input string is not a legal value.
 	 * @see #rotorSpeed
 	 * @see #ROTOR_SPEED_SLOW
 	 * @see #ROTOR_SPEED_FAST

@@ -94,6 +94,10 @@ public class TestCreate
 	 */
 	protected RTMLTarget target = null;
 	/**
+	 * RTML acquisition data.
+	 */
+	protected RTMLAcquisition acquisition = null;
+	/**
 	 * RTML schedule data.
 	 */
 	protected RTMLSchedule schedule = null;
@@ -166,6 +170,7 @@ public class TestCreate
 	 * @see #telescope
 	 * @see #device
 	 * @see #target
+	 * @see #acquisition
 	 * @see #observation
 	 */
 	public void parseArguments(String args[]) throws RTMLException,Exception
@@ -181,6 +186,31 @@ public class TestCreate
 			{
 				document.setType("abort");// RTML 2.2
 				document.setMode("abort");// RTML 3.1a
+			}
+			else if(args[i].equals("-acquisition"))
+			{
+				if (target != null)
+				{
+					if((i+1) < args.length)
+					{
+						acquisition = new RTMLAcquisition();
+						target.setAcquisition(acquisition);
+						acquisition.setAcquisitionMode(args[i+1]);
+						i++;
+					}
+					else
+					{
+						System.err.println(this.getClass().getName()+
+								   ":parseArguments:Acquisition needs a mode string.");
+						System.exit(3);
+					}
+				}
+				else
+				{
+					System.err.println(this.getClass().getName()+
+							   ":parseArguments:Acquisition:Target was null.");
+					System.exit(4);
+				}
 			}
 			else if(args[i].equals("-airmass_constraint"))
 			{
@@ -1664,7 +1694,7 @@ public class TestCreate
 		System.err.println("\t\t[-target][-target_ident <string>] ");
 		System.err.println("\t\t-ra <HH:MM:SS> -ra_offset <arcsec> -dec <[+|-]DD:MM:SS> -dec_offset <arcsec>"); 
 		System.err.println("\t\t[-target_magnitude <magnitude> <filter> <error>]");
-		System.err.println("\t\t[-toop][-priority <0-3>]");
+		System.err.println("\t\t[-toop][-priority <0-3>][-acquisition <none|wcs|brightest>]");
 		System.err.println("\t\t-exposure <length> <units> <count>");
 		System.err.println("\t\t[-series_constraint_count <number>]");
 		System.err.println("\t\t[-series_constraint_interval <P{(y)Y{(m)M}{(d)D}{T{(h)H}{(m}M}{(s.s..)S}>]");

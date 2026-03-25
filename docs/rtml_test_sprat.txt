@@ -1,4 +1,8 @@
 
+Expired:
+set project = "expired_test"
+set username = "fraser_steve"
+set password = "ochaye"
 Active / TOOP:
 set project = "test1"
 set username = "fraser_steve"
@@ -28,4 +32,5 @@ TOOP 60s red
 Node Agent2:
 /home/cjm/eclipse-workspace/node_agent2/scripts/nodeagentclient -host ltproxy -port 8080 -username ${username} -password ${password} -handle_rtml "test_sprat_toop_${target_name}_rtml_document_${now_date_s}.rtml" -output_filename "test_sprat_toop_${target_name}_rtml_document_${now_date_s}_output.rtml"
 
-
+60s Phase2 with acquisition
+/home/dev/src/estar/scripts/create_rtml.ltdevsrv -rtml_version 3.1a -request -uid rtml://rtml-sprat-${target_name}-${now_date_s} -iauri "file:/dev/null" -project ${project} -contact -contact_name "Joe.Bloggs" -contact_user ${username}  -observation -target -target_name "${target_name}" -ra "${target_ra}" -dec "${target_dec}" -ra_offset 0.0 -dec_offset 0.0 -acquisition wcs -device -device_name Sprat -device_type spectrograph -device_spectral_region optical -grating_name red -binning 1 1 -exposure 60 s 1 > test_sprat_${target_name}_rtml_document_${now_date_s}.rtml

@@ -2069,6 +2069,7 @@ Description of everything needed to point a telescope on a source.  Only a singl
 				<xs:element ref="TargetShape"/>
 				<xs:element ref="TrackRate"/>
 				<xs:element ref="Velocity"/>
+				<xs:element ref="Acquisition"/>
 				<xs:any namespace="##other" processContents="strict"/>
 			</xs:choice>
 			<xs:attribute name="name" type="xs:string"/>
@@ -2181,6 +2182,20 @@ Non-RTML content can be included via an external schema.
 		</xs:complexType>
 	</xs:element>
 
+<xs:element name="Acquisition">
+	<xs:annotation>
+		<xs:documentation>
+What acquisition mode to use when moving the target onto the instrument detector plane. This is normally used for spectrograph instruments with a slit or fibre bundle. The current options (used by the LT) are "none", "wcs", "brightest". "wcs" is the normal mode for spectrographs, and "brighest" is normally used for targets that are too bright (in the catalogue), or for extended objects.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:simpleType>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="none"/>
+			<xs:enumeration value="wcs"/>
+			<xs:enumeration value="brightest"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:element>
 
 <xs:element name="Telemetry">
 		<xs:annotation>

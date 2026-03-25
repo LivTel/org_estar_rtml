@@ -96,7 +96,11 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	 * The error of the magnitude.
 	 */
 	private double magnitudeError = 0.0;
-
+	/**
+	 * How to acquire this target onto the instrument focal plane. Usually only specifried for spectrographs.
+	 */
+	private RTMLAcquisition acquisition = null;
+	
 	/**
 	 * Default constructor.
 	 */
@@ -477,6 +481,26 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	}
 
 	/**
+	 * Set the RTML Acquisition data.
+	 * @param a An RTMLAcquisition instance containing the acquisition mode for this target.
+	 * @see #acquisition
+	 */
+	public void setAcquisition(RTMLAcquisition a)
+	{
+		acquisition = a;
+	}
+	
+	/**
+	 * Get the RTMLAcquisition instance containing the acquisition mode for this targ.
+	 * @return An RTMLAcquisition instance containing the acquisition mode for this target.
+	 * @see #acquisition
+	 */
+	public RTMLAcquisition getAcquisition()
+	{
+		return acquisition;
+	}
+
+	/**
 	 * Method to print out a string representation of this node.
 	 */
 	public String toString()
@@ -499,6 +523,7 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 	 * @see #magnitude
 	 * @see #magnitudeFilterType
 	 * @see #magnitudeError
+	 * @see #acquisition
 	 * @see org.estar.rtml.RTMLAttributes#toString(java.lang.String)
 	 * @see org.estar.rtml.RTMLEphemerisTargetTrackNode
 	 */
@@ -538,6 +563,8 @@ public class RTMLTarget extends RTMLAttributes implements Serializable
 			sb.append(prefix+"\tMagtitude:"+df.format(magnitude)+" in "+magnitudeFilterType+
 				  " (+/- "+df.format(magnitudeError)+")\n");
 		}
+		if(acquisition != null)
+			sb.append(acquisition.toString(prefix+"\t")+"\n");
 		return sb.toString();
 	}
 
